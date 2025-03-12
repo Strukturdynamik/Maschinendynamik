@@ -9,29 +9,67 @@ For more information see: http://www.ucs.louisiana.edu/~jev9637/MCHE485.html
 
 ### Core Topic Jupyter Notebooks
 
-* [Introduction][1]  
-* [Free Vibration][2]  
-* [Interactive Free Vibration][3]  
-* [Step Inputs][4]  
-* [Undamped Seismic Harmonic Inputs][5]  
-* [Undamped Direct-Force Harmonic Inputs][6]  
-* [Transfer Function Introduction][7]  
-* [Force Inputs with Damping][8]  
-* [Seismic Inputs with Damping][9]  
-* [Rotating Imbalance][10]  
-* [Dry Friction][11]  
+* [Introduction][1]
+* [Free Vibration][2]
+* [Interactive Free Vibration][3]
+* [Step Inputs][4]
+* [Undamped Seismic Harmonic Inputs][5]
+* [Undamped Direct-Force Harmonic Inputs][6]
+* [Transfer Function Introduction][7]
+* [Force Inputs with Damping][8]
+* [Seismic Inputs with Damping][9]
+* [Rotating Imbalance][10]
+* [Dry Friction][11]
 * [Direct-Force Pulse Input to Mass-spring-damper System][13]
-* [Mass-Spring-Damper with Multiple Inputs][12]  
-* [Fourier Analysis][14]  
-* [Interactive Fourier Analysis][15]  
-* [Symbolic Fourier Analysis][16]  
+* [Mass-Spring-Damper with Multiple Inputs][12]
+* [Fourier Analysis][14]
+* [Interactive Fourier Analysis][15]
+* [Symbolic Fourier Analysis][16]
 * [Introduction to the FFT][21]
 * [Interactive FFT][22]
-* [Eigenvalues/Eigenvectors][17]  
-* [Vibration Absorbers][18]  
-* [Multi-DOF Example][19]  
+* [Eigenvalues/Eigenvectors][17]
+* [Vibration Absorbers][18]
+* [Multi-DOF Example][19]
 * ["Zeros" in a Forced Response][20]
 * [Modal Damping Approximation][23]
+
+
+### Development Set Up
+
+**Note: python, npm and Node.js installation required**
+
+To set up and acitvate the virtual environment for this project, run following commands on your cmd inside the project folder:
+
+### Windows
+_make virtual environment:_
+```
+python -m venv venv
+```
+
+_activate environment:_
+```
+.\venv\Scripts\activate
+```
+
+_install requirements inside venv:_
+```
+pip install -r requirements.txt
+```
+
+_install ipympl for matplotlib widgets:_
+```
+pip install notebook ipympl matplotlib
+```
+
+_activate pre commit hooks:_
+```
+pre-commit install
+```
+
+### Licenses
+Code is licensed under a 3-clause BSD-style license. See the licenses/LICENSE.md file.
+
+Other content is provided under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/), CC-BY-NC 4.0.
 
 
    [1]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/MCHE485%20-%20Introduction.ipynb (Introduction Notebook)
@@ -57,8 +95,3 @@ For more information see: http://www.ucs.louisiana.edu/~jev9637/MCHE485.html
    [21]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/FFT%20-%20Introduction.ipynb (Introduction to the FFT)
    [22]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/FFT%20-%20Interactive.ipynb (Interactive FFT)
    [23]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Two-Mass-Spring-Damper%20-%20Modal%20Damping%20Approx.ipynb (Modal Damping Approximation)
-
-### Licenses
-Code is licensed under a 3-clause BSD-style license. See the licenses/LICENSE.md file.
-
-Other content is provided under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/), CC-BY-NC 4.0.

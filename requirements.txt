@@ -1,4 +1,12 @@
+jupyterlab
+
 numpy
-matplotlib
 scipy
+
+matplotlib
+nbformat
 sympy
+
+ipycanvas
+
+pre-commit
