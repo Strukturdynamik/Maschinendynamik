@@ -263,6 +263,8 @@ class GUI:
         slider_v.observe(self.on_value_change, names="value")
         slider_defl.observe(self.on_value_change, names="value")
 
+        self.slider = [slider_d, slider_c, slider_v, slider_defl]
+
         return slider_d, slider_c, c_input_max, slider_defl, slider_v
 
     def play_control_element(self) -> widgets:
@@ -367,13 +369,6 @@ class GUI:
         y = [self.animation_instance.solution[self.animation_instance.frame]]
         self.blob.set_data(x, y)
 
-        # update axes
-        self.ax1.relim()
-        self.ax1.autoscale_view()
-
-        # Redraw Bode figure
-        self.fig.canvas.draw_idle()
-
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes."""
         widget = change.owner
@@ -401,21 +396,16 @@ class GUI:
 
             case self.play:
                 if new_value == True:
-                    self.slider_c.disabled = True
+                    for s in self.slider:
+                        s.disabled = True
                     self.c_input_max.disabled = True
-                    self.slider_d.disabled = True
-                    self.slider_v.disabled = True
-                    self.slider_defl.disabled = True
 
             case self.play_slider:
                 # if reset button pressed, enable controls
                 if new_value == self.play.min:
-                    self.slider_c.disabled = False
+                    for s in self.slider:
+                        s.disabled = False
                     self.c_input_max.disabled = False
-                    self.slider_d.disabled = False
-                    self.slider_v.disabled = False
-                    self.slider_defl.disabled = False
-
                     # disable repeat
                     self.play.repeat = False
 
