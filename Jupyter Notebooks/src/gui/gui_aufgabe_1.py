@@ -23,8 +23,8 @@ from ..utils.constants import (
     CANVAS_HEIGHT,
     X_LIM_START,
     X_LIM_END_AUFGABE_1,
-    Y_LIM_START,
-    Y_LIM_END,
+    Y_LIM_START_AUFGABE_1,
+    Y_LIM_END_AUFGABE_1,
 )
 
 
@@ -64,7 +64,7 @@ class GUI:
 
             # set limits for axes
             plt.xlim([X_LIM_START, X_LIM_END_AUFGABE_1])
-            plt.ylim([Y_LIM_START, Y_LIM_END])
+            plt.ylim([Y_LIM_START_AUFGABE_1, Y_LIM_END_AUFGABE_1])
 
             # Optional: Add grid or styling
             self.ax1.grid(True)
@@ -118,7 +118,7 @@ class GUI:
 
             # set limits for axes
             plt.xlim([X_LIM_START, X_LIM_END_AUFGABE_1])
-            plt.ylim([Y_LIM_START, Y_LIM_END])
+            plt.ylim([Y_LIM_START_AUFGABE_1, Y_LIM_END_AUFGABE_1])
 
             # add grid
             self.ax1_bode.grid(True)
@@ -290,7 +290,7 @@ class GUI:
         slider_d = widgets.FloatSlider(
             value=round(self.default_d, 2),
             min=0.0,
-            max=5.0,
+            max=20.0,
             step=0.01,
             description="d",
             # continuous_update=True,
@@ -409,6 +409,7 @@ class GUI:
         slider_d.observe(self.on_value_change, names="value")
         slider_c.observe(self.on_value_change, names="value")
         slider_v.observe(self.on_value_change, names="value")
+        slider_m.observe(self.on_value_change, names="value")
         slider_defl.observe(self.on_value_change, names="value")
         slider_omega.observe(self.on_value_change, names="value")
         radio_buttons.observe(self.on_value_change, names="value")
@@ -536,6 +537,12 @@ class GUI:
         self.ax1.relim()  # Recompute the limits
         self.ax1.autoscale_view()
 
+        # update axes
+        self.ax1.set_xlim([self.t[0], self.t[-1]])  # Dynamically adjust x limits
+        self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
+        self.ax1.relim()  # Recompute limits
+        self.ax1.autoscale_view()  # Autoscale view
+
         # calculate bode diagramm
         omega_vec, omega_0, mag, mag_undamped, phase = (
             self.animation_instance.calc_bode_diagram()
@@ -546,9 +553,20 @@ class GUI:
         self.line_bode_1_2.set_ydata(mag_undamped)
         self.line_bode_1_2.set_xdata(omega_vec / omega_0)
 
+        # update axes
+        self.ax1_bode.relim()
+        self.ax1_bode.autoscale_view()
+
         # second plot
         self.line_bod_2.set_ydata(phase)
         self.line_bod_2.set_xdata(omega_vec / omega_0)
+
+        # update axes
+        self.ax2_bode.relim()
+        self.ax2_bode.autoscale_view()
+
+        # Redraw Bode figure
+        self.fig_bode.canvas.draw_idle()
 
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes."""
@@ -635,33 +653,3 @@ class GUI:
 
                 if new_value == NUM_DATAPOINTS - 1:
                     FIRST_FRAME_CHANGE = False
-
-    # def calc_button_click(self, b: widgets.Button):
-
-    #     """_summary_
-
-    #     Args:
-    #         b (widgets.Button): _description_
-    #     """
-    #     solution = self.animation_instance._calculate()
-
-    #     # set new y data
-    #     self.line.set_ydata(solution)
-    #     self.fig_deflection.canvas.draw()  # Redraw the canvas
-
-    #     # set blob
-    #     x = [self.t[self.animation_instance.frame]]
-    #     y = [self.animation_instance.solution[self.animation_instance.frame]]
-    #     self.blob.set_data(x, y)
-    #     # self.fig_deflection.canvas.draw_idle()
-
-    #     # draw first frame
-    #     self.animation_instance._draw_first_frame()
-
-    #     # enable play slider
-    #     if self.play_slider.disabled == True:
-    #         self.play_slider.disabled = False
-    #     if self.play.disabled == True:
-    #         self.play.disabled = False
-
-    #     self.calc_button.description = "✔️Done"

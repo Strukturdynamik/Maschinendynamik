@@ -229,26 +229,26 @@ class Aufgabe1(AnimationInstance):
             self.anim_canvas[5].fill_circle(dot_x, dot_y, dot_radius)
 
             # draw arrow indicating force
-            self.anim_canvas[6].stroke_style = "red"
-            self.anim_canvas[6].line_width = 2.0
-            # get vector with frequencies
-            omega_0 = np.sqrt(2 * self.c / (3 * self.m))
-            omega_vec = np.linspace(
-                0, omega_0, self.t.size
-            )  # np.linspace(0, 2 * omega_0, self.t.size)
-            fps = 60
-            # get current frequency
-            freq = omega_vec[self.frame]
-            # smooth animation of arrow
-            direction = np.sin(2 * np.pi * freq * (self.frame / fps))
+            # self.anim_canvas[6].stroke_style = "red"
+            # self.anim_canvas[6].line_width = 2.0
+            # # get vector with frequencies
+            # omega_0 = np.sqrt(2 * self.c / (3 * self.m))
+            # omega_vec = np.linspace(
+            #     0, omega_0, self.t.size
+            # )  # np.linspace(0, 2 * omega_0, self.t.size)
+            # fps = 60
+            # # get current frequency
+            # freq = omega_vec[self.frame]
+            # # smooth animation of arrow
+            # direction = np.sin(2 * np.pi * freq * (self.frame / fps))
 
-            # Compute arrow end position based on the smooth transition
-            end_x = mapped_curr_pos + direction * radius
-            end_y = self.zero_pos[1]
+            # # Compute arrow end position based on the smooth transition
+            # end_x = mapped_curr_pos + direction * radius
+            # end_y = self.zero_pos[1]
 
-            self.anim_canvas[6].stroke_line(
-                mapped_curr_pos, self.zero_pos[1], end_x, end_y
-            )
+            # self.anim_canvas[6].stroke_line(
+            #     mapped_curr_pos, self.zero_pos[1], end_x, end_y
+            # )
 
             # arrow_length_map = map_value(
             #     omega_vec[self.frame], min_omega_vec, max_omega_vec, -radius, radius

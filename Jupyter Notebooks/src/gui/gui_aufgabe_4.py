@@ -21,8 +21,8 @@ from ..utils.constants import (
     CANVAS_HEIGHT,
     X_LIM_START,
     X_LIM_END_AUFGABE_4,
-    Y_LIM_START,
-    Y_LIM_END,
+    Y_LIM_START_AUFGABE_4,
+    Y_LIM_END_AUFGABE_4,
 )
 
 
@@ -55,7 +55,7 @@ class GUI:
 
             # set limits for axes
             plt.xlim([X_LIM_START, X_LIM_END_AUFGABE_4])
-            plt.ylim([Y_LIM_START, Y_LIM_END])
+            plt.ylim([Y_LIM_START_AUFGABE_4, Y_LIM_END_AUFGABE_4])
 
             # Optional: Add grid or styling
             self.ax1.grid(True)
@@ -366,6 +366,13 @@ class GUI:
         x = [self.t[self.animation_instance.frame]]
         y = [self.animation_instance.solution[self.animation_instance.frame]]
         self.blob.set_data(x, y)
+
+        # update axes
+        self.ax1.relim()
+        self.ax1.autoscale_view()
+
+        # Redraw Bode figure
+        self.fig.canvas.draw_idle()
 
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes."""

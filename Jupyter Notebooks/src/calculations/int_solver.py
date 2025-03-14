@@ -54,7 +54,6 @@ class IntSolverAufgabe1:
         return z_p
 
     def integrate(self, func, t, start_deflection, start_velocity, *args):
-        print(args)
         z0 = (start_deflection, start_velocity)
         return odeint(func=func, y0=z0, t=t, args=args)[:, 0]
 
