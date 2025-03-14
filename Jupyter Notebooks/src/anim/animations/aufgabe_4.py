@@ -14,12 +14,11 @@ from ...utils.helper import (
     rotate_point,
 )
 from .anim_superclass import AnimationInstance
-from ...calculations.int_solver import IntSolver
 from ..modules.shapes import Rectangle, Circle
 from ...utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
-    NUM_TIME_UNITS,
+    NUM_TIME_UNITS_AUFGABE_4,
     NUM_DATAPOINTS,
     DEFAULT_C,
     DEFAULT_D,
@@ -40,7 +39,7 @@ class Aufgabe4(AnimationInstance):
         self.mass = mass
         self.circ = Circle(center=(-1, -1), radius=-1)
         self.rec = Rectangle(width=-1, height=-1)
-        self.t = np.linspace(0, NUM_TIME_UNITS, NUM_DATAPOINTS)
+        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_4, NUM_DATAPOINTS)
         self.spring_nodes = 20
 
     def _initial_visual(self):
@@ -239,162 +238,6 @@ class Aufgabe4(AnimationInstance):
         self.anim_canvas[2].clear()
         self.ghetto_feder_daempfer_element()
         # self.feder_daempfer_element(curr_sol_vis)
-
-    # def feder_daempfer_element(self, angle):
-    #     # print(f"{self.bearings_point[0]=}")
-    #     # print(f"{self.bearings_point[1]=}")
-    #     # self.anim_canvas[2].fill_style = "red"
-    #     # self.anim_canvas[2].fill_circle(
-    #     #     self.bearings_point[0], self.bearings_point[1], 5
-    #     # )
-
-    #     # calculate alpha
-    #     alpha = np.arctan2(
-    #         np.cos(angle) + self.bearings_point[0],
-    #         -np.sin(angle) + self.bearings_point[1],
-    #     )
-
-    #     # punkt 1 für obere gabel
-    #     r_P2_2 = np.array(
-    #         [
-    #             self.bearings_point[0] - abs_value(self.anim_canvas.width, 5),
-    #             self.bearings_point[1] + abs_value(self.anim_canvas.width, 5),
-    #             1,
-    #         ]
-    #     )
-
-    #     # punkt 2 für obere gabel
-    #     r_P3_2 = np.array(
-    #         [
-    #             self.bearings_point[0] + abs_value(self.anim_canvas.width, 5),
-    #             self.bearings_point[1] + abs_value(self.anim_canvas.width, 5),
-    #             1,
-    #         ]
-    #     )
-
-    #     # translate spring anker point
-    #     self.spring_anker_point = (
-    #         self.spring_anker_point[0] - self.triangle_endpoint_x,
-    #         self.spring_anker_point[1] - self.triangle_endpoint_y,
-    #     )
-    #     # self.anim_canvas[3].fill_style = "red"
-    #     # self.anim_canvas[3].fill_circle(
-    #     #     self.spring_anker_point[0], self.spring_anker_point[1], 5
-    #     # )
-
-    #     # punkt 1 für untere gabel
-    #     r_P5_3 = np.array(
-    #         [
-    #             self.spring_anker_point[0] - abs_value(self.anim_canvas.width, 5),
-    #             self.spring_anker_point[1] + abs_value(self.anim_canvas.width, 5),
-    #             1,
-    #         ]
-    #     )
-
-    #     # punkt 2 für untere gabel
-    #     r_P6_3 = np.array(
-    #         [
-    #             self.spring_anker_point[0] + abs_value(self.anim_canvas.width, 5),
-    #             self.spring_anker_point[1] + abs_value(self.anim_canvas.width, 5),
-    #             1,
-    #         ]
-    #     )
-
-    #     # untere Transformationsmatrix
-    #     K_u = np.array(
-    #         [
-    #             [np.sin(alpha), -np.cos(alpha), -np.cos(angle)],
-    #             [np.cos(alpha), -np.sin(alpha), np.sin(angle)],
-    #             [0, 0, 1],
-    #         ]
-    #     )
-
-    #     # obere Transformationmatrix
-    #     K_o = np.array(
-    #         [
-    #             [np.sin(alpha), -np.cos(alpha), 0],
-    #             [-np.cos(alpha), np.sin(alpha), 0],
-    #             [0, 0, 1],
-    #         ]
-    #     )
-
-    #     # Punkte in globalen Koordinaten
-    #     r_P2_1 = np.matmul(K_o, r_P2_2)
-    #     r_P3_1 = np.matmul(K_o, r_P3_2)
-    #     r_P5_1 = np.matmul(K_u, r_P5_3)
-    #     r_P6_1 = np.matmul(K_u, r_P6_3)
-
-    #     with hold_canvas():
-    #         self.anim_canvas[2].clear_rect(
-    #             -self.triangle_endpoint_x,
-    #             -self.triangle_endpoint_y,
-    #             self.anim_canvas.width,
-    #             self.anim_canvas.height,
-    #         )
-
-    #         self.anim_canvas[2].stroke_line(r_P2_1[0], r_P2_1[1], r_P3_1[0], r_P3_1[1])
-    #         self.anim_canvas[2].stroke_line(r_P5_1[0], r_P5_1[1], r_P6_1[0], r_P6_1[1])
-
-    #         self.anim_canvas[2].fill_text("r_P2_1", r_P2_1[0], r_P2_1[1])
-    #         self.anim_canvas[2].fill_text("r_P3_1", r_P3_1[0], r_P3_1[1])
-    #         self.anim_canvas[2].fill_text("r_P5_1", r_P5_1[0], r_P5_1[1])
-    #         self.anim_canvas[2].fill_text("r_P6_1", r_P6_1[0], r_P6_1[1])
-
-    #     ##################################################################
-    #     ### draw rest of element ###
-    #     ##################################################################
-    #     # # spring anker point to element connector
-    #     # mid_x = (r_P5_1[0] + r_P6_1[0]) / 2
-    #     # mid_y = (r_P5_1[1] + r_P6_1[1]) / 2
-    #     # angle = math.atan2(r_P6_1[1] - r_P5_1[1], r_P6_1[0] - r_P5_1[0])
-
-    #     # # Calculate the angle of the perpendicular line
-    #     # perp_angle = angle + math.pi / 2  # Rotate by 90 degrees
-
-    #     # # Calculate the end points of the perpendicular line
-    #     # perp_x = mid_x + math.cos(perp_angle) * abs_value(self.anim_canvas.width, 5)
-    #     # perp_y = mid_y + math.sin(perp_angle) * abs_value(self.anim_canvas.width, 5)
-
-    #     # # draw line
-    #     # self.anim_canvas[2].stroke_line(mid_x, mid_y, perp_x, perp_y)
-
-    #     ##################################################################
-
-    #     ##################################################################
-
-    #     # draw spring
-    #     x_coords, y_coords = spring_module.spring(
-    #         (r_P6_1[0], r_P6_1[1]),
-    #         (r_P3_1[0], r_P3_1[1]),
-    #         self.spring_nodes,
-    #         self.spring_width,
-    #     )
-    #     with hold_canvas():
-    #         self.anim_canvas[3].clear_rect(
-    #             -self.triangle_endpoint_x,
-    #             -self.triangle_endpoint_y,
-    #             self.anim_canvas.width,
-    #             self.anim_canvas.height,
-    #         )
-    #         if np.isscalar(x_coords):
-    #             self.anim_canvas[3].stroke_line(
-    #                 self._start[0], self._start[1], x_coords, y_coords
-    #             )
-    #             self.anim_canvas[3].stroke_line(
-    #                 x_coords,
-    #                 y_coords,
-    #                 x_coords + abs_value(self.anim_canvas.width, 2),
-    #                 y_coords,
-    #             )
-    #         else:
-    #             self.anim_canvas[3].stroke_lines(list(zip(x_coords, y_coords)))
-    #             index = len(x_coords) - 1
-    #             self.anim_canvas[3].stroke_line(
-    #                 x_coords[index],
-    #                 y_coords[index],
-    #                 x_coords[index] + abs_value(self.anim_canvas.width, 2),
-    #                 y_coords[index],
-    #             )
 
     def ghetto_feder_daempfer_element(self):
         # translate spring anker point

@@ -1,6 +1,7 @@
 import math
 from ipycanvas import hold_canvas
 import numpy as np
+from scipy import signal as signal
 
 from ...utils.helper import (
     abs_value,
@@ -14,26 +15,33 @@ from .anim_superclass import AnimationInstance
 from ...utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
-    NUM_TIME_UNITS,
     NUM_DATAPOINTS,
+    NUM_TIME_UNITS_AUFGABE_1,
     MASS,
     START_DEFLECTION,
     START_VELOCITY,
     DEFAULT_C,
     DEFAULT_D,
+    DEFAULT_OMEGA,
     DEFAULT_FRAME,
 )
 
 
 class Aufgabe1(AnimationInstance):
-    def __init__(self):
+    def __init__(self, calculator):
         super().__init__()
+        self.calculator = calculator
         self.c = DEFAULT_C
         self.d = DEFAULT_D
+        self.m = MASS
+        self.omega = DEFAULT_OMEGA
         self.frame = DEFAULT_FRAME
         self.start_deflection = START_DEFLECTION
         self.start_velocity = START_VELOCITY
-        self.t = np.linspace(0, NUM_TIME_UNITS, NUM_DATAPOINTS)
+        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
+        omega_0 = np.sqrt(2 * self.c / (3 * self.m))
+        self.omega_vec = np.linspace(0, 2 * omega_0, self.t.size)
+        self.b0 = 2 / (3 * self.m)
         self.spring_nodes = 20
         self.angle = 0
 
@@ -116,9 +124,50 @@ class Aufgabe1(AnimationInstance):
         self.bottom_line_y = bottom_left[1]
 
     def _calculate(self):
-        t = np.linspace(0, NUM_TIME_UNITS, NUM_DATAPOINTS)
-        self.solution = np.sin(t)
-        return self.solution
+        # Dauerlauf
+        if self.mode == "Dauerlauf":
+            solution = self.calculator.integrate(
+                self.calculator.state_space_settled,
+                self.t,
+                self.start_deflection,
+                self.start_velocity,
+                self.d,
+                self.m,
+                self.c,
+                self.omega,
+            )
+
+        if self.mode == "Hochlauf":
+            solution = self.calculator.integrate(
+                self.calculator.state_space_accelerated,
+                self.t,
+                self.start_deflection,
+                self.start_velocity,
+                self.d,
+                self.m,
+                self.c,
+                self.omega,
+            )
+        self.solution = solution
+        return solution
+
+    def calc_bode_diagram(self):
+        delta = self.d / (3 * self.m)
+        omega_0 = np.sqrt(2 * self.c / (3 * self.m))
+        b0 = 2 / (3 * self.m)
+        num = np.array([b0])
+        omega_vec = np.linspace(0, 2 * omega_0, self.t.size)
+        den = np.array([1, 2 * delta, omega_0**2])
+        g = signal.TransferFunction(num, den)
+        # bode-values
+        _, mag, phase = signal.bode(g, omega_vec)
+        mag = 10 ** (mag / 20)  # Umrechnung von dB auf absoluten Wert
+
+        g_undamped = signal.TransferFunction([b0], [1, 0, omega_0**2])
+        _, mag_undamped, phase_undamped = signal.bode(g_undamped, omega_vec)
+        mag_undamped = 10 ** (mag_undamped / 20)
+
+        return omega_vec, omega_0, mag, mag_undamped, phase
 
     def _animate_visual(self):
         # get current solution from frame
@@ -135,14 +184,6 @@ class Aufgabe1(AnimationInstance):
             self.top_left_x + abs_value(self.anim_canvas.width, 40),
             self.bottom_right_x - abs_value(self.anim_canvas.width, 20),
         )
-
-        # self.anim_canvas[6].fill_text(self.top_left_x, 200, "self.top_left_x")
-        # self.anim_canvas[6].fill_circle(self.bottom_right_x, 200, 5)
-        # self.anim_canvas[6].fill_circle(
-        #     self.top_left_x + abs_value(self.anim_canvas.width, 30), 200, 5
-        # )
-        # # self.anim_canvas[6].fill_text(mapped_curr_pos, 200, "mapped_curr_pos")
-        # self.anim_canvas[6].fill_circle(mapped_curr_pos, 200, 5)
 
         with hold_canvas():
             # clear the canvas for animation
@@ -190,16 +231,35 @@ class Aufgabe1(AnimationInstance):
             # draw arrow indicating force
             self.anim_canvas[6].stroke_style = "red"
             self.anim_canvas[6].line_width = 2.0
-            arrow_length_map = map_value(
-                curr_sol_vis, min_sol, max_sol, -radius, radius
+            # get vector with frequencies
+            omega_0 = np.sqrt(2 * self.c / (3 * self.m))
+            omega_vec = np.linspace(
+                0, omega_0, self.t.size
+            )  # np.linspace(0, 2 * omega_0, self.t.size)
+            fps = 60
+            # get current frequency
+            freq = omega_vec[self.frame]
+            # smooth animation of arrow
+            direction = np.sin(2 * np.pi * freq * (self.frame / fps))
+
+            # Compute arrow end position based on the smooth transition
+            end_x = mapped_curr_pos + direction * radius
+            end_y = self.zero_pos[1]
+
+            self.anim_canvas[6].stroke_line(
+                mapped_curr_pos, self.zero_pos[1], end_x, end_y
             )
-            draw_arrow(
-                canvas=self.anim_canvas[6],
-                x1=mapped_curr_pos,
-                y1=self.zero_pos[1],
-                x2=mapped_curr_pos + arrow_length_map,
-                y2=self.zero_pos[1],
-            )
+
+            # arrow_length_map = map_value(
+            #     omega_vec[self.frame], min_omega_vec, max_omega_vec, -radius, radius
+            # )
+            # draw_arrow(
+            #     canvas=self.anim_canvas[6],
+            #     x1=mapped_curr_pos,
+            #     y1=self.zero_pos[1],
+            #     x2=mapped_curr_pos + arrow_length_map,
+            #     y2=self.zero_pos[1],
+            # )
 
             # feder daempfer element
             anker_point_extension = abs_value(self.anim_canvas.width, 3)

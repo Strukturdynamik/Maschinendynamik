@@ -1,8 +1,10 @@
 from typing import List, Tuple
+import numpy as np
 from scipy.integrate import odeint
+from scipy import signal as signal
 
 
-class IntSolver:
+class IntSolverAufgabe4:
     def __init__(self) -> None:
         return None
 
@@ -20,6 +22,41 @@ class IntSolver:
         x = odeint(func=func, y0=y_0, t=t, args=args)
 
         return x
+
+
+class IntSolverAufgabe1:
+    def __init__(self) -> None:
+        return None
+
+    # Dauerlauf
+    def state_space_settled(self, z, t, d, m, c, omega):
+        delta = d / (3 * m)
+        omega_0 = np.sqrt(2 * c / (3 * m))
+        b0 = 2 / (3 * m)
+        [x, x_p] = z  # Zustandsvektor
+        z_p = [
+            x_p,
+            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(omega * t),
+        ]  # Zustands-DGL
+        return z_p
+
+    # Hochlauf
+    def state_space_accelerated(self, z, t, d, m, c, omega):
+        delta = d / (3 * m)
+        omega_0 = np.sqrt(2 * c / (3 * m))
+        alpha = omega / 100
+        b0 = 2 / (3 * m)
+        [x, x_p] = z
+        z_p = [
+            x_p,
+            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(0.5 * alpha * t**2),
+        ]
+        return z_p
+
+    def integrate(self, func, t, start_deflection, start_velocity, *args):
+        print(args)
+        z0 = (start_deflection, start_velocity)
+        return odeint(func=func, y0=z0, t=t, args=args)[:, 0]
 
 
 def validate_solution(solution, correct_solution, relative_threshold=0.05):
@@ -45,24 +82,23 @@ def validate_solution(solution, correct_solution, relative_threshold=0.05):
         return False
 
     # compare the solutions at each time step
-    for i in range(len(solution)):
-        for j in range(len(solution[i])):
-            # avoid division by zero for very small correct_solution values
-            if abs(correct_solution[i][j]) < 1e-10:
-                if abs(solution[i][j] - correct_solution[i][j]) > 1e-10:
-                    print(f"Solution mismatch at time step {i}, variable {j}.")
-                    print(f"Yours: {solution[i][j]}, Correct: {correct_solution[i][j]}")
-                    return False
-            else:
-                relative_error = abs(
-                    (solution[i][j] - correct_solution[i][j]) / correct_solution[i][j]
+    for j in range(len(solution)):
+        # avoid division by zero for very small correct_solution values
+        if abs(correct_solution[j]) < 1e-10:
+            if abs(solution[j] - correct_solution[j]) > 1e-10:
+                print(f"Solution mismatch at time step {j}.")
+                print(f"Yours: {solution[j]}, Correct: {correct_solution[j]}")
+                return False
+        else:
+            relative_error = abs(
+                (solution[j] - correct_solution[j]) / correct_solution[j]
+            )
+            if relative_error > relative_threshold:
+                print(f"Solution mismatch at time step {j}.")
+                print(
+                    f"Yours: {solution[j]}, Correct: {correct_solution[j]}, Relative Error: {relative_error}"
                 )
-                if relative_error > relative_threshold:
-                    print(f"Solution mismatch at time step {i}, variable {j}.")
-                    print(
-                        f"Yours: {solution[i][j]}, Correct: {correct_solution[i][j]}, Relative Error: {relative_error}"
-                    )
-                    return False
+                return False
 
     # If all checks pass, the solution is valid
     print("Yor solution is correct!")
