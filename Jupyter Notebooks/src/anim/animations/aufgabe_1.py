@@ -23,6 +23,7 @@ from ...utils.constants import (
     DEFAULT_C,
     DEFAULT_D,
     DEFAULT_OMEGA,
+    DEFAULT_ALPHA,
     DEFAULT_FRAME,
 )
 
@@ -35,15 +36,15 @@ class Aufgabe1(AnimationInstance):
         self.d = DEFAULT_D
         self.m = MASS
         self.omega = DEFAULT_OMEGA
+        self.alpha = DEFAULT_ALPHA
         self.frame = DEFAULT_FRAME
         self.start_deflection = START_DEFLECTION
         self.start_velocity = START_VELOCITY
         self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
-        omega_0 = np.sqrt(2 * self.c / (3 * self.m))
-        self.omega_vec = np.linspace(0, 2 * omega_0, self.t.size)
-        self.b0 = 2 / (3 * self.m)
+        # omega_0 = np.sqrt(2 * self.c / (3 * self.m))
+        # self.omega_vec = np.linspace(0, 2 * omega_0, self.t.size)
+        # self.b0 = 2 / (3 * self.m)
         self.spring_nodes = 20
-        self.angle = 0
 
     def _initial_visual(self):
         self.top_left_x = abs_value(self.anim_canvas.width, 10)
@@ -146,7 +147,7 @@ class Aufgabe1(AnimationInstance):
                 self.d,
                 self.m,
                 self.c,
-                self.omega,
+                self.alpha,
             )
         self.solution = solution
         return solution
@@ -164,7 +165,7 @@ class Aufgabe1(AnimationInstance):
         mag = 10 ** (mag / 20)  # Umrechnung von dB auf absoluten Wert
 
         g_undamped = signal.TransferFunction([b0], [1, 0, omega_0**2])
-        _, mag_undamped, phase_undamped = signal.bode(g_undamped, omega_vec)
+        _, mag_undamped, _ = signal.bode(g_undamped, omega_vec)
         mag_undamped = 10 ** (mag_undamped / 20)
 
         return omega_vec, omega_0, mag, mag_undamped, phase
@@ -174,7 +175,6 @@ class Aufgabe1(AnimationInstance):
         curr_sol_vis = self.solution[self.frame]
 
         # map current position onto the canvas
-
         min_sol = min(self.solution)
         max_sol = max(self.solution)
         mapped_curr_pos = map_value(

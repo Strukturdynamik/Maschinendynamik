@@ -41,11 +41,40 @@ class GUI:
         # set constants as class variables
         self.default_c = default_c
         self.default_d = default_d
+        self.animation_instance = animation_instance
 
+        # set up anim canvas
+        self.mult_canvas_anim = MultiCanvas(
+            n_canvases=5,
+            width=CANVAS_WIDTH,
+            height=CANVAS_HEIGHT,
+            layout=widgets.Layout(
+                width="100%",
+                height="100%",
+            ),
+        )
+        self.animation_instance.anim_canvas = self.mult_canvas_anim
+
+        # set up calc button
+        # self.calc_button = widgets.Button(
+        #     description="Calculate",
+        #     disabled=False,
+        #     button_style="",
+        #     layout=widgets.Layout(width="15%", display="flex", top="5%"),
+        # )
+        # self.calc_button.on_click(lambda b: self.calc_button_click(b))
+
+        # set up mpl figure
+        self.set_up_mpl()
+
+        # after inital set up, set up gui elements
+        app_layout = self.gui_elements()
+
+        return app_layout
+
+    def set_up_mpl(self):
         # Clear all existing figures to avoid duplicates
         plt.close("all")
-        # animtion instance
-        self.animation_instance = animation_instance
 
         # set up output widget
         self.output = widgets.Output()
@@ -92,24 +121,9 @@ class GUI:
             # make blob
             (self.blob,) = self.ax1.plot([], [], "ro", label="Blob")
 
-            # invert y axis
-            # self.ax1.invert_yaxis()
-
             plt.tight_layout()
             plt.autoscale()
             plt.show()
-
-        # set up anim canvas
-        self.mult_canvas_anim = MultiCanvas(
-            n_canvases=5,
-            width=CANVAS_WIDTH,
-            height=CANVAS_HEIGHT,
-            layout=widgets.Layout(
-                width="100%",
-                height="100%",
-            ),
-        )
-        self.animation_instance.anim_canvas = self.mult_canvas_anim
 
         # plot default solution
         self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_4, NUM_DATAPOINTS)
@@ -117,20 +131,6 @@ class GUI:
         (self.line,) = self.ax1.plot(
             self.t, solution, color="red", linewidth=0.75, linestyle="--"
         )
-
-        # set up calc button
-        # self.calc_button = widgets.Button(
-        #     description="Calculate",
-        #     disabled=False,
-        #     button_style="",
-        #     layout=widgets.Layout(width="15%", display="flex", top="5%"),
-        # )
-        # self.calc_button.on_click(lambda b: self.calc_button_click(b))
-
-        # after inital set up, set up gui elements
-        app_layout = self.gui_elements()
-
-        return app_layout
 
     def gui_elements(self):
         """General function to coordinate gui elements."""

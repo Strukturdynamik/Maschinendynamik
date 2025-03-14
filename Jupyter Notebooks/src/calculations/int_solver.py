@@ -41,10 +41,9 @@ class IntSolverAufgabe1:
         return z_p
 
     # Hochlauf
-    def state_space_accelerated(self, z, t, d, m, c, omega):
+    def state_space_accelerated(self, z, t, d, m, c, alpha):
         delta = d / (3 * m)
         omega_0 = np.sqrt(2 * c / (3 * m))
-        alpha = omega / 100
         b0 = 2 / (3 * m)
         [x, x_p] = z
         z_p = [
