@@ -117,6 +117,10 @@ class GUI:
             # make blob
             (self.blob,) = self.ax1.plot([], [], "ro", label="Blob")
 
+            # set limits for axes
+            self.ax1.set_xlim(X_LIM_START, X_LIM_END_AUFGABE_1)
+            self.ax1.set_ylim(Y_LIM_START_AUFGABE_1, Y_LIM_END_AUFGABE_1)
+
             plt.tight_layout()
             plt.show()
 
@@ -162,6 +166,12 @@ class GUI:
             self.fig_bode.canvas.header_visible = False
             self.fig_bode.canvas.footer_visible = False
 
+            # set limits for axes
+            self.ax1_bode.set_xlim(0, 2)
+            self.ax1_bode.set_ylim(0, 10)
+            self.ax2_bode.set_xlim(0, 2)
+            self.ax2_bode.set_ylim(-200, 10)
+
             plt.tight_layout()  # Adjust layout to prevent overlapping
             plt.show()
 
@@ -171,10 +181,6 @@ class GUI:
         plt.rcParams["mathtext.rm"] = "serif"
         plt.rcParams["mathtext.it"] = "serif:italic"
         plt.rcParams["mathtext.bf"] = "serif:bold"
-
-        # set limits for axes
-        plt.xlim([X_LIM_START, X_LIM_END_AUFGABE_1])
-        plt.ylim([Y_LIM_START_AUFGABE_1, Y_LIM_END_AUFGABE_1])
 
         # axes
         plt.axhline(0, color="black", linewidth=1)
@@ -483,6 +489,7 @@ class GUI:
         )
         self.play_slider = play_slider
         self.play = play
+        self.play.repeat.disabled = True
         widgets.jslink((play, "value"), (play_slider, "value"))
         play_control_widget = widgets.HBox([play, play_slider])
         play_slider.observe(self.on_value_change, names="value")
@@ -569,11 +576,11 @@ class GUI:
         self.ax1.relim()  # Recompute the limits
         self.ax1.autoscale_view()
 
-        # # update axes
+        # update axes
         # self.ax1.set_xlim([self.t[0], self.t[-1]])  # Dynamically adjust x limits
-        # self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
-        # self.ax1.relim()  # Recompute limits
-        # self.ax1.autoscale_view()  # Autoscale view
+        self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
+        self.ax1.relim()  # Recompute limits
+        self.ax1.autoscale_view()  # Autoscale view
 
         # calculate bode diagramm
         omega_vec, omega_0, mag, mag_undamped, phase = (
@@ -604,6 +611,8 @@ class GUI:
         """Unified observer for handling parameter slider value changes."""
         widget = change.owner
         new_value = change["new"]
+
+        print("new value: ", new_value)
 
         match widget:
             case self.radio_buttons:
