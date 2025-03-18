@@ -91,7 +91,7 @@ class GUI:
         # set up output widget for deflection graph
         self.output_deflection = widgets.Output()
         with self.output_deflection:
-            self.fig_deflection, self.ax1 = plt.subplots(figsize=(4.5, 4.5))
+            self.fig_deflection, self.ax1 = plt.subplots(figsize=(5, 5))
             self.ax1.grid(True)
 
             # set labels
@@ -116,6 +116,7 @@ class GUI:
 
             # make blob
             (self.blob,) = self.ax1.plot([], [], "ro", label="Blob")
+            # (self.blob_anregung,) = self.ax1.plot([], [], "bo", label="Anregung")
 
             # set limits for axes
             self.ax1.set_xlim(X_LIM_START, X_LIM_END_AUFGABE_1)
@@ -189,30 +190,19 @@ class GUI:
         # plot default solutions
         self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
         # amplitude solution
-        solution = self.animation_instance._calculate()
+        solution, anregung_sol = self.animation_instance._calculate()
         (self.line,) = self.ax1.plot(
             self.t, solution, color="red", linewidth=0.75, linestyle="--"
         )
 
         # Anregungsgraph
-        # alpha = self.animation_instance.omega / 100
-        # if animation_instance.mode == "Hochlauf":
-        #     self.ax1.plot(
-        #         self.t,
-        #         np.cos(0.5 * self.animation_instance.alpha * self.t**2),
-        #         linewidth=0.75,
-        #         linestyle="-",
-        #         color="blue",
-        #     )
-
-        # if animation_instance.mode == "Dauerlauf":
-        #     self.ax1.plot(
-        #         self.t,
-        #         np.cos(self.animation_instance.omega * self.t),
-        #         linewidth=0.75,
-        #         linestyle="-",
-        #         color="blue",
-        #     )
+        (self.line_anregung,) = self.ax1.plot(
+            self.t,
+            anregung_sol,
+            linewidth=0.75,
+            linestyle="-",
+            color="blue",
+        )
 
         # bode diagram
         omega_vec, omega_0, mag, mag_undamped, phase = (
@@ -564,7 +554,7 @@ class GUI:
     def calc_and_set_solution(self):
         """Calculate solution based on new parameters and set y data."""
         # calculate solution
-        solution = self.animation_instance._calculate()
+        solution, anregung_sol = self.animation_instance._calculate()
         # set new y data
         self.line.set_ydata(solution)
         self.fig_deflection.canvas.draw()  # Redraw the canvas
@@ -572,14 +562,11 @@ class GUI:
         x = [self.t[self.animation_instance.frame]]
         y = [self.animation_instance.solution[self.animation_instance.frame]]
         self.blob.set_data(x, y)
-        self.ax1.relim()  # Recompute the limits
-        self.ax1.autoscale_view()
 
         # update axes
-        # self.ax1.set_xlim([self.t[0], self.t[-1]])  # Dynamically adjust x limits
-        self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
-        self.ax1.relim()  # Recompute limits
-        self.ax1.autoscale_view()  # Autoscale view
+        # self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
+        # self.ax1.relim()  # Recompute limits
+        # self.ax1.autoscale_view()  # Autoscale view
 
         # calculate bode diagramm
         omega_vec, omega_0, mag, mag_undamped, phase = (
@@ -605,6 +592,20 @@ class GUI:
 
         # # Redraw Bode figure
         # self.fig_bode.canvas.draw_idle()
+
+        # Anregungsgraph
+        self.line_anregung.set_ydata(anregung_sol)
+        # self.blob_anregung.set_data(x, [anregung_sol[self.animation_instance.frame]])
+
+        # update axes
+        self.ax1.set_ylim(
+            [
+                min(min(anregung_sol), min(solution)) * 1.1,
+                max(max(anregung_sol), max(solution)) * 1.1,
+            ]
+        )  # scale y limits
+        self.ax1.relim()  # recompute limits
+        self.ax1.autoscale_view()  # autoscale view
 
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes."""
@@ -677,6 +678,9 @@ class GUI:
                 x = [self.t[new_value]]
                 y = [self.animation_instance.solution[new_value]]
                 self.blob.set_data(x, y)
+                # self.blob_anregung.set_data(
+                #    x, [self.animation_instance.anregung_sol[new_value]]
+                # )
                 self.fig_deflection.canvas.draw_idle()
 
                 # animate pendulum

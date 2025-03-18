@@ -227,8 +227,8 @@ class Aufgabe4(AnimationInstance):
             self.d,  # d
             self.mass,  # m
         )
-        self.solution = solution[:, 0]
-        return solution[:, 0]
+        self.solution = solution
+        return solution
 
     def _animate_visual(self):
         # animate current frame for visual

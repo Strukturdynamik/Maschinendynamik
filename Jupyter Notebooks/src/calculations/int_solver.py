@@ -18,8 +18,7 @@ class IntSolverAufgabe4:
 
     def integrate(self, func, start_deflection: float, start_velocity: float, t, *args):
         y_0 = (start_deflection, start_velocity)
-        # variabel
-        x = odeint(func=func, y0=y_0, t=t, args=args)
+        x = odeint(func=func, y0=y_0, t=t, args=args)[:, 0]
 
         return x
 
@@ -79,7 +78,13 @@ def validate_solution(solution, correct_solution, relative_threshold=0.05):
         print("Error: Your solution and the correct solution have different shapes.")
         return False
 
-    # compare the solutions at each time step
+    # if solutions are equal, return True
+    if np.array_equal(solution, correct_solution, equal_nan=False):
+        print("Yor solution is correct!")
+        return True
+
+    # if solutions are not equal, compare solutions at each time step
+    # if relative error is within threshold, consider the solution correct
     for j in range(len(solution)):
         # avoid division by zero for very small correct_solution values
         if abs(correct_solution[j]) < 1e-10:

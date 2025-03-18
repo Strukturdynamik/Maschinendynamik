@@ -7,9 +7,9 @@ from ...utils.helper import (
     abs_value,
     map_value,
     draw_line_with_strokes,
+    draw_arrow,
     ghetto_feder_daempfer_element_top,
     ghetto_feder_daempfer_element_bottom,
-    draw_arrow,
 )
 from .anim_superclass import AnimationInstance
 from ...utils.ext_utils.spring import spring_module
@@ -47,6 +47,11 @@ class Aufgabe1(AnimationInstance):
         self.spring_nodes = 20
 
     def _initial_visual(self):
+        # canvas settings
+        self.anim_canvas[6].stroke_style = "red"
+        self.anim_canvas[6].line_width = 2.0
+        self.anim_canvas[2].line_width = 1.5
+
         self.top_left_x = abs_value(self.anim_canvas.width, 10)
         top_left = [
             self.top_left_x,
@@ -120,11 +125,12 @@ class Aufgabe1(AnimationInstance):
             self.anker_point[0] + abs_value(self.anim_canvas.width, 45),
             self.anker_point[1],
         ]
-
         # bottom line to determine radius of circle
         self.bottom_line_y = bottom_left[1]
+        self.radius = self.bottom_line_y - self.zero_pos[1]
 
     def _calculate(self):
+        factor = 1
         # Dauerlauf
         if self.mode == "Dauerlauf":
             solution = self.calculator.integrate(
@@ -137,7 +143,9 @@ class Aufgabe1(AnimationInstance):
                 self.c,
                 self.omega,
             )
-
+            anregung_sol = np.cos(self.omega * self.t)
+            arrow_sol = factor * np.cos(self.omega * self.t)
+        # Hochlauf
         if self.mode == "Hochlauf":
             solution = self.calculator.integrate(
                 self.calculator.state_space_accelerated,
@@ -149,8 +157,14 @@ class Aufgabe1(AnimationInstance):
                 self.c,
                 self.alpha,
             )
+            anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
+            arrow_sol = factor * np.cos(0.5 * self.alpha * self.t**2)
+
         self.solution = solution
-        return solution
+        self.anregung_sol = anregung_sol
+        self.arrow_sol = arrow_sol
+
+        return solution, anregung_sol
 
     def calc_bode_diagram(self):
         delta = self.d / (3 * self.m)
@@ -198,9 +212,12 @@ class Aufgabe1(AnimationInstance):
             self.anim_canvas[3].line_width = 1.5
 
             # draw circle in current position
-            radius = self.bottom_line_y - self.zero_pos[1]
-            self.anim_canvas[3].fill_circle(mapped_curr_pos, self.zero_pos[1], radius)
-            self.anim_canvas[3].stroke_circle(mapped_curr_pos, self.zero_pos[1], radius)
+            self.anim_canvas[3].fill_circle(
+                mapped_curr_pos, self.zero_pos[1], self.radius
+            )
+            self.anim_canvas[3].stroke_circle(
+                mapped_curr_pos, self.zero_pos[1], self.radius
+            )
 
             # small circle in middle
             self.anim_canvas[3].fill_style = "#FFFFFF"
@@ -216,7 +233,7 @@ class Aufgabe1(AnimationInstance):
             dot_radius = abs_value(
                 self.anim_canvas.width / 2, 1
             )  # Size of the rotating dot
-            orbit_radius = radius - abs_value(
+            orbit_radius = self.radius - abs_value(
                 self.anim_canvas.width, 1
             )  # Keep it within the main circle
 
@@ -225,41 +242,37 @@ class Aufgabe1(AnimationInstance):
             dot_y = self.zero_pos[1] + orbit_radius * math.sin(curr_sol_vis)
 
             # Draw the rotating dot
-            self.anim_canvas[5].fill_style = "black"
             self.anim_canvas[5].fill_circle(dot_x, dot_y, dot_radius)
 
             # draw arrow indicating force
-            # self.anim_canvas[6].stroke_style = "red"
-            # self.anim_canvas[6].line_width = 2.0
-            # # get vector with frequencies
-            # omega_0 = np.sqrt(2 * self.c / (3 * self.m))
-            # omega_vec = np.linspace(
-            #     0, omega_0, self.t.size
-            # )  # np.linspace(0, 2 * omega_0, self.t.size)
-            # fps = 60
-            # # get current frequency
-            # freq = omega_vec[self.frame]
-            # # smooth animation of arrow
-            # direction = np.sin(2 * np.pi * freq * (self.frame / fps))
+            min_sol_arrow = min(self.arrow_sol)
+            max_sol_arrow = max(self.arrow_sol)
+            arr_pos = self.arrow_sol[self.frame]
+            # if arr_pos <= 0:
+            mapped_arr_sol = map_value(
+                arr_pos,
+                min_sol_arrow,
+                max_sol_arrow,
+                -self.radius,
+                self.radius,
+            )
+            # else:
+            #     mapped_arr_sol = map_value(
+            #         arr_pos,
+            #         min_sol_arrow,
+            #         max_sol_arrow,
+            #         mapped_curr_pos,
+            #         mapped_curr_pos + self.radius,
+            #     )
 
-            # # Compute arrow end position based on the smooth transition
-            # end_x = mapped_curr_pos + direction * radius
-            # end_y = self.zero_pos[1]
-
-            # self.anim_canvas[6].stroke_line(
-            #     mapped_curr_pos, self.zero_pos[1], end_x, end_y
-            # )
-
-            # arrow_length_map = map_value(
-            #     omega_vec[self.frame], min_omega_vec, max_omega_vec, -radius, radius
-            # )
-            # draw_arrow(
-            #     canvas=self.anim_canvas[6],
-            #     x1=mapped_curr_pos,
-            #     y1=self.zero_pos[1],
-            #     x2=mapped_curr_pos + arrow_length_map,
-            #     y2=self.zero_pos[1],
-            # )
+            draw_arrow(
+                canvas=self.anim_canvas[6],
+                x1=mapped_curr_pos,
+                y1=self.zero_pos[1],
+                x2=mapped_curr_pos + mapped_arr_sol,
+                y2=self.zero_pos[1],
+                arrow_length=abs_value(self.anim_canvas.width, 2),
+            )
 
             # feder daempfer element
             anker_point_extension = abs_value(self.anim_canvas.width, 3)
@@ -280,7 +293,7 @@ class Aufgabe1(AnimationInstance):
             # make bottom part of feder daempfer element
             spring_anker_point_bottom = ghetto_feder_daempfer_element_bottom(
                 canvas=self.anim_canvas[3],
-                anker_point_bottom=[mapped_curr_pos - radius, self.zero_pos[1]],
+                anker_point_bottom=[mapped_curr_pos - self.radius, self.zero_pos[1]],
                 bottom_fork_extension=anker_point_extension,
                 bottom_fork_width=fork_width,
                 daempfer_length=abs_value(self.anim_canvas.width, 12),
@@ -290,7 +303,7 @@ class Aufgabe1(AnimationInstance):
 
             # draw line from feder daempfer element to circle
             self.anim_canvas[3].stroke_line(
-                mapped_curr_pos - radius,
+                mapped_curr_pos - self.radius,
                 self.zero_pos[1],
                 mapped_curr_pos,
                 self.zero_pos[1],
@@ -311,7 +324,6 @@ class Aufgabe1(AnimationInstance):
             )
 
             # draw spring on canvas[2]
-            self.anim_canvas[2].line_width = 1.5
             spring_module.draw_spring(
                 canvas=self.anim_canvas[2],
                 x_coords=x_coords,
