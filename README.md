@@ -3,6 +3,8 @@
 
 This repository contains code used during the Spring 2020 semester of *MCHE485: Mechanical Vibrations* at UL Lafayette. It will contain Python code, [Jupyter Notebooks](http://jupyter.org), supporting data, and [LaTeX](http://www.latex-project.org) templates.
 
+Topics marked with a * contain additional content from the lecture “Machine Dynamics” in the summer semester 2025 at the University of Rostock.
+
 For more information see: http://www.ucs.louisiana.edu/~jev9637/MCHE485.html
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD)
@@ -34,64 +36,32 @@ For more information see: http://www.ucs.louisiana.edu/~jev9637/MCHE485.html
 * [Modal Damping Approximation][23]
 
 
-### Development Set Up
-
-**Note: python, npm and Node.js installation required**
-
-To set up and acitvate the virtual environment for this project, run following commands on your cmd inside the project folder:
-
-### Windows
-_make virtual environment:_
-```
-python -m venv venv
-```
-
-_activate environment:_
-```
-.\venv\Scripts\activate
-```
-
-_install requirements inside venv:_
-```
-pip install -r requirements.txt
-```
-
-_install ipympl for matplotlib widgets:_
-```
-pip install notebook ipympl matplotlib
-```
-
-_activate pre commit hooks:_
-```
-pre-commit install
-```
-
 ### Licenses
 Code is licensed under a 3-clause BSD-style license. See the licenses/LICENSE.md file.
 
 Other content is provided under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/), CC-BY-NC 4.0.
 
 
-   [1]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/MCHE485%20-%20Introduction.ipynb (Introduction Notebook)
-   [2]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass%20Spring%20Damper%20-%20Free%20Vibration.ipynb
-   [3]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass%20Spring%20Damper%20-%20Free%20Vibration%20-%20Interactive.ipynb
-   [4]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass%20Spring%20Damper%20-%20Step%20Input.ipynb
-   [5]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Undamped%20Response%20to%20Harmonic%20Seismic%20Inputs.ipynb
-   [6]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Undamped%20Response%20to%20Harmonic%20Direct-Force%20Inputs.ipynb
-   [7]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Transfer%20Function%20for%20Undamped%20Harmonic%20Seismic%20Inputs.ipynb
-   [8]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Frequency%20Response%20to%20Harmonic%20Direct-Force%20Inputs.ipynb
-   [9]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Frequency%20Response%20to%20Harmonic%20Seismic%20Inputs.ipynb
-   [10]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Rotating%20Imbalance.ipynb
-   [11]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass%20Spring%20-%20Free%20Vibration%20with%20Friction.ipynb
-   [12]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass-Spring-Damper%20with%20Disturbance.ipynb
-   [13]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Mass%20Spring%20Damper%20-%20Direct%20Force.ipynb
-   [14]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Fourier%20Analysis.ipynb
-   [15]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Interactive%20Fourier%20Analysis.ipynb (Interactive Fourier Analysis)
-   [16]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Fourier%20Analysis%20-%20Symbolic.ipynb (Symbolic Fourier Analysis using SymPy)
-   [17]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Eigenvalue-Eigenvector%20Analysis.ipynb
-   [18]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Vibration%20Absorbers.ipynb
-   [19]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/MultiDOF%20Example.ipynb (Multi-DOF Example)
-   [20]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Zeros%20in%20a%20Forced%20Response.ipynb (Zeros in a Forced Response)
-   [21]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/FFT%20-%20Introduction.ipynb (Introduction to the FFT)
-   [22]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/FFT%20-%20Interactive.ipynb (Interactive FFT)
-   [23]: http://nbviewer.jupyter.org/github/DocVaughan/MCHE485---Mechanical-Vibrations/blob/Spring2018/Jupyter%20Notebooks/Two-Mass-Spring-Damper%20-%20Modal%20Damping%20Approx.ipynb (Modal Damping Approximation)
+   [1]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMCHE485%20-%20Introduction.ipynb (Introduction Notebook)
+   [2]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Free%20Vibration.ipynb
+   [3]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Free%20Vibration%20-%20Interactive.ipynb
+   [4]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Step%20Input.ipynb
+   [5]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FUndamped%20Response%20to%20Harmonic%20Seismic%20Inputs.ipynb
+   [6]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FUndamped%20Response%20to%20Harmonic%20Direct-Force%20Inputs.ipynb
+   [7]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FTransfer%20Function%20for%20Undamped%20Harmonic%20Seismic%20Inputs.ipynb
+   [8]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFrequency%20Response%20to%20Harmonic%20Direct-Force%20Inputs.ipynb
+   [9]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFrequency%20Response%20to%20Harmonic%20Seismic%20Inputs.ipynb
+   [10]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FRotating%20Imbalance.ipynb
+   [11]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20-%20Free%20Vibration%20with%20Friction.ipynb
+   [12]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass-Spring-Damper%20with%20Disturbance.ipynb
+   [13]: hhttps://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Direct%20Force.ipynb
+   [14]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFourier%20Analysis.ipynb
+   [15]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FInteractive%20Fourier%20Analysis.ipynb (Interactive Fourier Analysis)
+   [16]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFourier%20Analysis%20-%20Symbolic.ipynb (Symbolic Fourier Analysis using SymPy)
+   [17]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FEigenvalue-Eigenvector%20Analysis%20-%20Symbolic.ipynb
+   [18]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FVibration%20Absorbers.ipynb
+   [19]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMultiDOF%20Example.ipynb (Multi-DOF Example)
+   [20]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FZeros%20in%20a%20Forced%20Response.ipynb (Zeros in a Forced Response)
+   [21]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFFT%20-%20Introduction.ipynb (Introduction to the FFT)
+   [22]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFFT%20-%20Interactive.ipynb (Interactive FFT)
+   [23]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FTwo-Mass-Spring-Damper%20-%20Modal%20Damping%20Approx.ipynb (Modal Damping Approximation)
