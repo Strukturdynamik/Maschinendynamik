@@ -1,10 +1,22 @@
 import math
 import numpy as np
+from ipycanvas import hold_canvas
+
+"""
+This file is based on code from nrsyed/utilities: https://github.com/nrsyed/utilities/blob/master/spring/spring.py
+Original author: nrsyed
+License: GNU General Public License v3.0 (GPL-3.0)
+
+This version may contain modifications. It is distributed under the same GPL-3.0 license.
+
+See LICENSE file for details.
+"""
 
 
 def spring(start, end, nodes, width):
     """!
-    Return a list of points corresponding to a spring.
+    Return a list of points corresponding to a spring. For details on the use see:
+    https://github.com/nrsyed/utilities/blob/master/spring/README.md
 
     @param r1 (array-like) The (x, y) coordinates of the first endpoint.
     @param r2 (array-like) The (x, y) coordinates of the second endpoint.
@@ -48,10 +60,6 @@ def spring(start, end, nodes, width):
         )
 
     return spring_coords[0, :], spring_coords[1, :]
-
-
-from ipycanvas import hold_canvas
-from src.utils.helper import abs_value
 
 
 def draw_spring(

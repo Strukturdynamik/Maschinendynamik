@@ -36,10 +36,7 @@ For more information see: http://www.ucs.louisiana.edu/~jev9637/MCHE485.html
 * [Modal Damping Approximation][23]
 
 
-### Licenses
-Code is licensed under a 3-clause BSD-style license. See the licenses/LICENSE.md file.
-
-Other content is provided under a [Creative Commons Attribution-NonCommercial 4.0 International License](http://creativecommons.org/licenses/by-nc/4.0/), CC-BY-NC 4.0.
+Copyright (c) 2013-2015, Joshua Vaughan All rights reserved.
 
 
    [1]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMCHE485%20-%20Introduction.ipynb (Introduction Notebook)
@@ -54,7 +51,7 @@ Other content is provided under a [Creative Commons Attribution-NonCommercial 4.
    [10]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FRotating%20Imbalance.ipynb
    [11]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20-%20Free%20Vibration%20with%20Friction.ipynb
    [12]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass-Spring-Damper%20with%20Disturbance.ipynb
-   [13]: hhttps://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Direct%20Force.ipynb
+   [13]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/5f48c4ed5ac792c6bc38300b7cc24dbb2d5ff499?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FMass%20Spring%20Damper%20-%20Direct%20Force.ipynb
    [14]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFourier%20Analysis.ipynb
    [15]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FInteractive%20Fourier%20Analysis.ipynb (Interactive Fourier Analysis)
    [16]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/90bcb82168ed7cdd3c387e7c9d72d5b90dbd936b?urlpath=lab%2Ftree%2FJupyter%20Notebooks%2FFourier%20Analysis%20-%20Symbolic.ipynb (Symbolic Fourier Analysis using SymPy)

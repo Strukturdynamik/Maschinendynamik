@@ -489,7 +489,6 @@ class GUI:
         )
         self.play_slider = play_slider
         self.play = play
-        self.play.repeat.disabled = True
         widgets.jslink((play, "value"), (play_slider, "value"))
         play_control_widget = widgets.HBox([play, play_slider])
         play_slider.observe(self.on_value_change, names="value")
