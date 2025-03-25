@@ -27,6 +27,9 @@ from ...utils.constants import (
     DEFAULT_FRAME,
 )
 
+"""Module to animate the mechanical oscillation system of Übung 2, Aufgabe 1.
+"""
+
 
 class Aufgabe1(AnimationInstance):
     def __init__(self, calculator):
@@ -41,12 +44,10 @@ class Aufgabe1(AnimationInstance):
         self.start_deflection = START_DEFLECTION
         self.start_velocity = START_VELOCITY
         self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
-        # omega_0 = np.sqrt(2 * self.c / (3 * self.m))
-        # self.omega_vec = np.linspace(0, 2 * omega_0, self.t.size)
-        # self.b0 = 2 / (3 * self.m)
         self.spring_nodes = 20
 
     def _initial_visual(self):
+        """Draw the inital visual for the visual representation of oscillation."""
         # canvas settings
         self.anim_canvas[6].stroke_style = "red"
         self.anim_canvas[6].line_width = 2.0
@@ -130,7 +131,12 @@ class Aufgabe1(AnimationInstance):
         self.radius = self.bottom_line_y - self.zero_pos[1]
 
     def _calculate(self):
-        factor = 1
+        """Function to calculate the solution given the current state
+            of parameters.
+
+        Returns:
+            List[float]: _description_
+        """
         # Dauerlauf
         if self.mode == "Dauerlauf":
             solution = self.calculator.integrate(
@@ -144,7 +150,7 @@ class Aufgabe1(AnimationInstance):
                 self.omega,
             )
             anregung_sol = np.cos(self.omega * self.t)
-            arrow_sol = factor * np.cos(self.omega * self.t)
+            arrow_sol = np.cos(self.omega * self.t)
         # Hochlauf
         if self.mode == "Hochlauf":
             solution = self.calculator.integrate(
@@ -158,7 +164,7 @@ class Aufgabe1(AnimationInstance):
                 self.alpha,
             )
             anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
-            arrow_sol = factor * np.cos(0.5 * self.alpha * self.t**2)
+            arrow_sol = np.cos(0.5 * self.alpha * self.t**2)
 
         self.solution = solution
         self.anregung_sol = anregung_sol
@@ -176,7 +182,7 @@ class Aufgabe1(AnimationInstance):
         g = signal.TransferFunction(num, den)
         # bode-values
         _, mag, phase = signal.bode(g, omega_vec)
-        mag = 10 ** (mag / 20)  # Umrechnung von dB auf absoluten Wert
+        mag = 10 ** (mag / 20)  # umrechnung von dB auf absoluten Wert
 
         g_undamped = signal.TransferFunction([b0], [1, 0, omega_0**2])
         _, mag_undamped, _ = signal.bode(g_undamped, omega_vec)
@@ -256,14 +262,6 @@ class Aufgabe1(AnimationInstance):
                 -self.radius,
                 self.radius,
             )
-            # else:
-            #     mapped_arr_sol = map_value(
-            #         arr_pos,
-            #         min_sol_arrow,
-            #         max_sol_arrow,
-            #         mapped_curr_pos,
-            #         mapped_curr_pos + self.radius,
-            #     )
 
             draw_arrow(
                 canvas=self.anim_canvas[6],

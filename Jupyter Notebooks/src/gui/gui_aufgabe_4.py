@@ -37,6 +37,15 @@ class GUI:
     def __init__(self, default_c, default_d, animation_instance: Any):
         """Function to build interactive ui for displaying
         and manipulating animations.
+
+        Args:
+            default_c (int): Default value for parameter c.
+            default_d (int): Default value for parameter d.
+            animation_instance (Any): Animation that will be run inside the
+                animation canvas (left side) of the GUI.
+
+        Returns:
+            Any: The application.
         """
         # set constants as class variables
         self.default_c = default_c
@@ -73,6 +82,8 @@ class GUI:
         return app_layout
 
     def set_up_mpl(self):
+        """Function to set up the matplotlib plots for the right canvas of the
+        GUI."""
         # Clear all existing figures to avoid duplicates
         plt.close("all")
 
@@ -119,7 +130,7 @@ class GUI:
             self.fig.canvas.footer_visible = False
 
             # make blob
-            (self.blob,) = self.ax1.plot([], [], "ro", label="Blob")
+            (self.blob,) = self.ax1.plot([], [], "bo", label="Blob")
 
             plt.tight_layout()
             plt.autoscale()
@@ -129,7 +140,7 @@ class GUI:
         self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_4, NUM_DATAPOINTS)
         solution = self.animation_instance._calculate()
         (self.line,) = self.ax1.plot(
-            self.t, solution, color="red", linewidth=0.75, linestyle="--"
+            self.t, solution, color="blue", linewidth=0.75, linestyle="--"
         )
 
     def gui_elements(self):
@@ -174,10 +185,10 @@ class GUI:
         self.animation_instance._draw_first_frame()
 
     def variables_control_elements(self) -> widgets:
-        """Function to create and place parameter control elements
+        """Function to create and place parameter control elements.
 
         Returns:
-            widgets: Returns parameter Slider.
+            widgets: Sliders and control elements for the parameters.
         """
         slider_d = widgets.FloatSlider(
             value=round(self.default_d, 2),
@@ -185,7 +196,6 @@ class GUI:
             max=5.0,
             step=0.01,
             description="d",
-            # continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -200,7 +210,6 @@ class GUI:
             max=round(DEFAULT_C_MAX, 2),
             step=0.01,
             description="c",
-            # continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -230,8 +239,7 @@ class GUI:
             min=min_v,
             max=max_v,
             step=0.0001,
-            description="v0",  # r"$v_{0}$",
-            # continuous_update=True,
+            description="v0",
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -247,8 +255,7 @@ class GUI:
             min=min_defl,
             max=max_defl,
             step=0.01,
-            description="defl",  # r"$defl_{0}$",
-            # continuous_update=True,
+            description="defl",
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -268,7 +275,8 @@ class GUI:
         return slider_d, slider_c, c_input_max, slider_defl, slider_v
 
     def play_control_element(self) -> widgets:
-        """Function to create play control element.
+        """Function to create the play control element. Stop/restart/
+            loop animation and slide through frames.
 
         Returns:
             widgets: Returns play control element.
@@ -363,14 +371,18 @@ class GUI:
         solution = self.animation_instance._calculate()
         # set new y data
         self.line.set_ydata(solution)
-        self.fig.canvas.draw()  # Redraw the canvas
+        self.fig.canvas.draw()  # redraw the canvas
         # set blob
         x = [self.t[self.animation_instance.frame]]
         y = [self.animation_instance.solution[self.animation_instance.frame]]
         self.blob.set_data(x, y)
 
     def on_value_change(self, change):
-        """Unified observer for handling parameter slider value changes."""
+        """Unified observer for handling parameter slider value changes.
+
+        Args:
+            change (Any): Incoming user input.
+        """
         widget = change.owner
         new_value = change["new"]
 
@@ -425,33 +437,3 @@ class GUI:
 
                 if new_value == NUM_DATAPOINTS - 1:
                     FIRST_FRAME_CHANGE = False
-
-        # def calc_button_click(self, b: widgets.Button):
-
-        #     """_summary_
-
-        #     Args:
-        #         b (widgets.Button): _description_
-        #     """
-        #     solution = self.animation_instance._calculate()
-
-        #     # set new y data
-        #     self.line.set_ydata(solution)
-        #     self.fig.canvas.draw()  # Redraw the canvas
-
-        #     # set blob
-        #     x = [self.t[self.animation_instance.frame]]
-        #     y = [self.animation_instance.solution[self.animation_instance.frame]]
-        #     self.blob.set_data(x, y)
-        #     # self.fig.canvas.draw_idle()
-
-        #     # draw first frame
-        #     self.animation_instance._draw_first_frame()
-
-        #     # enable play slider
-        #     if self.play_slider.disabled == True:
-        #         self.play_slider.disabled = False
-        #     if self.play.disabled == True:
-        #         self.play.disabled = False
-
-        #     self.calc_button.description = "✔️Done"
