@@ -1,12 +1,6 @@
-import time
-import math
-from ipycanvas import hold_canvas
 import numpy as np
-import matplotlib.pyplot as plt
-import ipywidgets.widgets as widgets
-import time
-
-from ..modules.shapes import Spring, Rectangle
+from ipycanvas import hold_canvas
+from ..modules.shapes import Rectangle
 from ...utils.helper import (
     abs_value,
     ghetto_feder_daempfer_element_top,
@@ -24,6 +18,9 @@ from ...utils.constants import (
     DEFAULT_D,
     DEFAULT_FRAME,
 )
+
+"""Module to animate the mechanical oscillation system of Übung 1, Aufgabe 4.
+"""
 
 
 class Aufgabe4(AnimationInstance):
@@ -206,6 +203,9 @@ class Aufgabe4(AnimationInstance):
         )
 
     def _draw_first_frame(self):
+        """Function to draw the first frame of animation before
+        user input on play element.
+        """
         # animate first frame
         first_sol_vis = self.solution[DEFAULT_FRAME]
         self.draw_rotating_angle(-first_sol_vis)
@@ -213,33 +213,41 @@ class Aufgabe4(AnimationInstance):
         self.ghetto_feder_daempfer_element()
 
     def _calculate(self):
-        """Function to calculate the solution given the current inputs."""
+        """Function to calculate the solution given the current state
+        of parameters.
+
+        Returns:
+            List[float]: List of deflection angles for animation.
+        """
         # clear visual representation
         self.anim_canvas[0].clear()
 
         # calculate
         solution = self.calculator.integrate(
             self.calculator.calculate,
-            self.start_deflection,  # START_DEFLECTION,
-            self.start_velocity,  # START_VELOCITY,
-            self.t,  # t
-            self.c,  # c
-            self.d,  # d
-            self.mass,  # m
+            self.start_deflection,
+            self.start_velocity,
+            self.t,
+            self.c,
+            self.d,
+            self.mass,
         )
         self.solution = solution
         return solution
 
     def _animate_visual(self):
+        """Function to animate the current solution."""
         # animate current frame for visual
         curr_sol_vis = self.solution[self.frame]
         self.draw_rotating_angle(-curr_sol_vis)
 
         self.anim_canvas[2].clear()
         self.ghetto_feder_daempfer_element()
-        # self.feder_daempfer_element(curr_sol_vis)
 
     def ghetto_feder_daempfer_element(self):
+        """Built the static Feder Daempfer Element for the current
+        state of the animation.
+        """
         # translate spring anker point
         self.spring_anker_point = (
             self.spring_anker_point[0] - self.triangle_endpoint_x,
@@ -294,7 +302,6 @@ class Aufgabe4(AnimationInstance):
                 self.spring_anker_point[1] - height,
                 self.spring_anker_point[0],
                 self.spring_anker_point[1],
-                # + abs_value(self.anim_canvas.width, 1),  # little padding
             )
 
         # draw spring
@@ -317,37 +324,6 @@ class Aufgabe4(AnimationInstance):
             clear_x=-self.triangle_endpoint_x,
             clear_y=-self.triangle_endpoint_y,
         )
-        # with hold_canvas():
-        #     self.anim_canvas[3].clear_rect(
-        #         -self.triangle_endpoint_x,
-        #         -self.triangle_endpoint_y,
-        #         self.anim_canvas.width,
-        #         self.anim_canvas.height,
-        #     )
-        #     if np.isscalar(x_coords):
-        #         self.anim_canvas[3].stroke_line(
-        #             self.spring_anker_point[0] + width,
-        #             self.spring_anker_point[1] - height,
-        #             x_coords,
-        #             y_coords,
-        #         )
-        #         self.anim_canvas[3].stroke_line(
-        #             x_coords,
-        #             y_coords,
-        #             x_coords + abs_value(self.anim_canvas.width, 2),
-        #             y_coords,
-        #         )
-        #     else:
-        #         self.anim_canvas[3].stroke_lines(list(zip(x_coords, y_coords)))
-        #         index = len(x_coords) - 1
-        #         self.anim_canvas[3].stroke_line(
-        #             x_coords[index],
-        #             y_coords[index],
-        #             x_coords[index] + abs_value(self.anim_canvas.width, 2),
-        #             y_coords[index],
-        #         )
-
-        return None
 
     def draw_rotating_angle(self, angle):
         """Function to draw the rectangle and circle at given angle.
@@ -383,7 +359,7 @@ class Aufgabe4(AnimationInstance):
 
         # anker point for spring
         self.spring_anker_point = (
-            self.mid_point,  # (top_left_rot[0] + top_right_rot[0]) / 2,
+            self.mid_point,
             (top_left_rot[1] + top_right_rot[1]) / 2,
         )
 

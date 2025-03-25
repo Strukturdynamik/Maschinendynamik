@@ -36,11 +36,6 @@ DIRECTIONS = {
     "bottom": (-1, 1),
     "top": (1, -1),
 }
-# DIRECTION_FDE = {
-#     "vertical": None,
-#     "left_to_right": None,
-#     "right_to_left": None,
-# }
 X_ORIGIN = 20
 Y_ORIGIN = 55
 Y_AX_TOP = 40

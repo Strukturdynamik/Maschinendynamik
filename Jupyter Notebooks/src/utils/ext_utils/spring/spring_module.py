@@ -72,17 +72,18 @@ def draw_spring(
     clear_x,
     clear_y,
 ):
-    """_summary_
+    """Function to draw a spring.
 
     Args:
-        canvas (_type_): _description_
-        x_coords (_type_): _description_
-        y_coords (_type_): _description_
-        spring_anker_point (_type_): _description_
-        width_offset (_type_): _description_
-        height_offset (_type_): _description_
-        clear_x (_type_): _description_
-        clear_y (_type_): _description_
+        canvas (Canvas): Canvas that is drawn on.
+        x_coords (np.array): X coordinates that form the spring.
+        y_coords (np.array): Y coordinates that form the spring.
+        spring_anker_point (tuple(int, int)): Point where the spring is
+            attached.
+        width_offset (int): Offset.
+        height_offset (int): Offset.
+        clear_x (int): Size of canvas to clear it.
+        clear_y (int): Size of canvas to clear it.
     """
     with hold_canvas():
         canvas.clear_rect(
@@ -101,7 +102,7 @@ def draw_spring(
             canvas.stroke_line(
                 x_coords,
                 y_coords,
-                x_coords,  # + abs_value(canvas.width, 2),
+                x_coords,
                 y_coords,
             )
         else:
@@ -110,6 +111,6 @@ def draw_spring(
             canvas.stroke_line(
                 x_coords[index],
                 y_coords[index],
-                x_coords[index],  # + abs_value(canvas.width, 2),
+                x_coords[index],
                 y_coords[index],
             )

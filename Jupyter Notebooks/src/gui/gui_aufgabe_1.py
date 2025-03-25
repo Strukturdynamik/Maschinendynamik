@@ -1,4 +1,3 @@
-from typing import Any
 import math
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
@@ -42,16 +41,27 @@ class GUI:
         self,
         default_c,
         default_d,
-        animation_instance: Any,
+        animation_instance,
     ):
         """Function to build interactive ui for displaying
         and manipulating animations.
+
+        Args:
+            default_c (int): Default value for parameter c.
+            default_d (int): Default value for parameter d.
+            animation_instance (Any): Animation that will be run inside the
+                animation canvas (left side) of the GUI.
+
+        Returns:
+            Any: The application.
         """
 
         # set constants as class variables
         self.default_c = default_c
         self.default_d = default_d
         self.animation_instance = animation_instance
+        self.animation_instance.c = default_c
+        self.animation_instance.d = default_d
         self.animation_instance.mode = "Hochlauf"
 
         # set up anim canvas
@@ -84,7 +94,8 @@ class GUI:
         return app_layout
 
     def set_up_mpl(self):
-        """Set up the matplotlib outputs."""
+        """Function to set up the matplotlib plots for the right canvas of the
+        GUI."""
         # Clear all existing figures to avoid duplicates
         plt.close("all")
 
@@ -101,13 +112,16 @@ class GUI:
 
             self.ax1.set_ylabel(
                 r"Deflection $ \boldsymbol{\Phi (t)}$ [ °]",
+                color="blue",
             )
 
+            # second y axis
+            self.ax1_second_yaxis = self.ax1.twinx()
+            self.ax1_second_yaxis.set_ylabel(r"F [N]", color="red")
+
             # remove spines
-            self.ax1.spines["top"].set_visible(False)
-            self.ax1.spines["right"].set_visible(False)
-            self.ax1.spines["left"].set_visible(False)
-            self.ax1.spines["bottom"].set_visible(False)
+            for spine in ["top", "right", "left", "bottom"]:
+                self.ax1.spines[spine].set_visible(False)
 
             # remove stuff
             self.fig_deflection.canvas.toolbar_visible = False
@@ -115,7 +129,7 @@ class GUI:
             self.fig_deflection.canvas.footer_visible = False
 
             # make blob
-            (self.blob,) = self.ax1.plot([], [], "ro", label="Blob")
+            (self.blob,) = self.ax1.plot([], [], "bo", label="Blob")
             # (self.blob_anregung,) = self.ax1.plot([], [], "bo", label="Anregung")
 
             # set limits for axes
@@ -128,7 +142,8 @@ class GUI:
         # set up output for bode diagramms
         self.output_bode = widgets.Output()
         with self.output_bode:
-            self.fig_bode = plt.figure(figsize=(4, 4))
+            self.fig_bode = plt.figure(figsize=(5, 5))
+
             # subplots (2 rows, 1 column)
             self.ax1_bode = self.fig_bode.add_subplot(2, 1, 1)  # first subplot
             self.ax2_bode = self.fig_bode.add_subplot(2, 1, 2)  # second subplot
@@ -137,43 +152,25 @@ class GUI:
             self.ax1_bode.grid(True)
             self.ax2_bode.grid(True)
 
-            # labels ax1
-            self.ax1_bode.set_ylabel(
-                r"Magnitude [abs]",
-            )
+            # labels for ax1
+            self.ax1_bode.set_ylabel(r"Magnitude [abs]")
 
-            # labels ax2
-            self.ax2_bode.set_xlabel(
-                r"$\Omega$ / $\omega_{0}$",
-            )
+            # labels for ax2
+            self.ax2_bode.set_xlabel(r"$\Omega$ / $\omega_{0}$")
+            self.ax2_bode.set_ylabel(r"Phase [°]")
 
-            self.ax2_bode.set_ylabel(
-                r"Phase [°]",
-            )
+            # Remove spines
+            for ax in [self.ax1_bode, self.ax2_bode]:
+                for spine in ["top", "right", "left", "bottom"]:
+                    ax.spines[spine].set_visible(False)
 
-            # remove spines
-            self.ax1_bode.spines["top"].set_visible(False)
-            self.ax1_bode.spines["right"].set_visible(False)
-            self.ax1_bode.spines["left"].set_visible(False)
-            self.ax1_bode.spines["bottom"].set_visible(False)
+            # # Set limits for axes
+            # self.ax1_bode.set_xlim(0, 2)
+            # self.ax1_bode.set_ylim(0, 10)
+            # self.ax2_bode.set_xlim(0, 2)
+            # self.ax2_bode.set_ylim(-200, 10)
 
-            self.ax2_bode.spines["top"].set_visible(False)
-            self.ax2_bode.spines["right"].set_visible(False)
-            self.ax2_bode.spines["left"].set_visible(False)
-            self.ax2_bode.spines["bottom"].set_visible(False)
-
-            # remove stuff
-            self.fig_bode.canvas.toolbar_visible = False
-            self.fig_bode.canvas.header_visible = False
-            self.fig_bode.canvas.footer_visible = False
-
-            # set limits for axes
-            self.ax1_bode.set_xlim(0, 2)
-            self.ax1_bode.set_ylim(0, 10)
-            self.ax2_bode.set_xlim(0, 2)
-            self.ax2_bode.set_ylim(-200, 10)
-
-            plt.tight_layout()  # Adjust layout to prevent overlapping
+            plt.tight_layout()
             plt.show()
 
         # labels
@@ -192,16 +189,23 @@ class GUI:
         # amplitude solution
         solution, anregung_sol = self.animation_instance._calculate()
         (self.line,) = self.ax1.plot(
-            self.t, solution, color="red", linewidth=0.75, linestyle="--"
+            self.t,
+            solution,
+            color="blue",
+            linewidth=0.75,
+            linestyle="-",
+            label="Deflection",
         )
 
         # Anregungsgraph
         (self.line_anregung,) = self.ax1.plot(
             self.t,
             anregung_sol,
-            linewidth=0.75,
-            linestyle="-",
-            color="blue",
+            linewidth=0.65,
+            linestyle="--",
+            color="red",
+            alpha=0.75,
+            label="Force input",
         )
 
         # bode diagram
@@ -210,7 +214,12 @@ class GUI:
         )
         # ax1
         (self.line_bode_1_1,) = self.ax1_bode.plot(
-            omega_vec / omega_0, mag, linewidth=0.75, linestyle="--", color="red"
+            omega_vec / omega_0,
+            mag,
+            linewidth=0.75,
+            linestyle="--",
+            color="red",
+            label="mag",
         )
         (self.line_bode_1_2,) = self.ax1_bode.plot(
             omega_vec / omega_0,
@@ -219,11 +228,18 @@ class GUI:
             color="blue",
             alpha=0.25,
             linewidth=0.75,
+            label="mag undamped",
         )
         # ax2
         (self.line_bod_2,) = self.ax2_bode.plot(
             omega_vec / omega_0, phase, linestyle="--", linewidth=0.75, color="red"
         )
+
+        # add legend
+        self.ax1_bode.legend(
+            handles=[self.line_bode_1_1, self.line_bode_1_2], loc="upper right"
+        )
+        self.ax1.legend(handles=[self.line, self.line_anregung], loc="upper right")
 
     def gui_elements(self):
         """General function to coordinate gui elements."""
@@ -288,10 +304,10 @@ class GUI:
         self.animation_instance._draw_first_frame()
 
     def variables_control_elements(self) -> widgets:
-        """Function to create and place parameter control elements
+        """Function to create and place parameter control elements.
 
         Returns:
-            widgets: Returns parameter Slider.
+            widgets: Sliders and control elements for the parameters.
         """
 
         slider_d = widgets.FloatSlider(
@@ -455,7 +471,8 @@ class GUI:
         )
 
     def play_control_element(self) -> widgets:
-        """Function to create play control element.
+        """Function to create the play control element. Stop/restart/
+            loop animation and slide through frames.
 
         Returns:
             widgets: Returns play control element.
@@ -552,21 +569,27 @@ class GUI:
         return app_layout
 
     def calc_and_set_solution(self):
-        """Calculate solution based on new parameters and set y data."""
+        """Calculate new solution after user input to redraw graphs in
+        right canvas.
+        """
         # calculate solution
         solution, anregung_sol = self.animation_instance._calculate()
         # set new y data
         self.line.set_ydata(solution)
-        self.fig_deflection.canvas.draw()  # Redraw the canvas
+        self.fig_deflection.canvas.draw()  # redraw the canvas
         # set blob
         x = [self.t[self.animation_instance.frame]]
         y = [self.animation_instance.solution[self.animation_instance.frame]]
         self.blob.set_data(x, y)
 
+        # anregungsgraph
+        self.line_anregung.set_ydata(anregung_sol)
+        # self.blob_anregung.set_data(x, [anregung_sol[self.animation_instance.frame]])
+
         # update axes
-        # self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # Scale y limits
-        # self.ax1.relim()  # Recompute limits
-        # self.ax1.autoscale_view()  # Autoscale view
+        self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # scale y limits
+        self.ax1.relim()  # Recompute limits
+        self.ax1.autoscale_view()  # Autoscale view
 
         # calculate bode diagramm
         omega_vec, omega_0, mag, mag_undamped, phase = (
@@ -578,41 +601,23 @@ class GUI:
         self.line_bode_1_2.set_ydata(mag_undamped)
         self.line_bode_1_2.set_xdata(omega_vec / omega_0)
 
-        # # update axes
-        # self.ax1_bode.relim()
-        # self.ax1_bode.autoscale_view()
-
         # second plot
         self.line_bod_2.set_ydata(phase)
         self.line_bod_2.set_xdata(omega_vec / omega_0)
 
-        # # update axes
-        # self.ax2_bode.relim()
-        # self.ax2_bode.autoscale_view()
-
-        # # Redraw Bode figure
-        # self.fig_bode.canvas.draw_idle()
-
-        # Anregungsgraph
-        self.line_anregung.set_ydata(anregung_sol)
-        # self.blob_anregung.set_data(x, [anregung_sol[self.animation_instance.frame]])
-
         # update axes
-        self.ax1.set_ylim(
-            [
-                min(min(anregung_sol), min(solution)) * 1.1,
-                max(max(anregung_sol), max(solution)) * 1.1,
-            ]
-        )  # scale y limits
-        self.ax1.relim()  # recompute limits
-        self.ax1.autoscale_view()  # autoscale view
+        self.ax1_bode.set_ylim(0, max(mag) * 1.1)
+        self.ax2_bode.relim()
+        self.ax2_bode.autoscale_view()
 
     def on_value_change(self, change):
-        """Unified observer for handling parameter slider value changes."""
+        """Unified observer for handling parameter slider value changes.
+
+        Args:
+            change (Any): Incoming user input.
+        """
         widget = change.owner
         new_value = change["new"]
-
-        print("new value: ", new_value)
 
         match widget:
             case self.radio_buttons:
