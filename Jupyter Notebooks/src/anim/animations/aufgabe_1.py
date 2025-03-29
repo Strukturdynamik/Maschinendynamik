@@ -131,14 +131,13 @@ class Aufgabe1(AnimationInstance):
         self.radius = self.bottom_line_y - self.zero_pos[1]
 
     def _calculate(self):
-        """Function to calculate the solution given the current state
-            of parameters.
+        """_summary_
 
         Returns:
-            List[float]: _description_
+            _type_: _description_
         """
         # Dauerlauf
-        if self.mode == "Dauerlauf":
+        if self.mode == "Constant":
             solution = self.calculator.integrate(
                 self.calculator.state_space_settled,
                 self.t,
@@ -152,7 +151,7 @@ class Aufgabe1(AnimationInstance):
             anregung_sol = np.cos(self.omega * self.t)
             arrow_sol = np.cos(self.omega * self.t)
         # Hochlauf
-        if self.mode == "Hochlauf":
+        if self.mode == "Lineary Increasing":
             solution = self.calculator.integrate(
                 self.calculator.state_space_accelerated,
                 self.t,
