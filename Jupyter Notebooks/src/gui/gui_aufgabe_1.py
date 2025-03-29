@@ -62,7 +62,8 @@ class GUI:
         self.animation_instance = animation_instance
         self.animation_instance.c = default_c
         self.animation_instance.d = default_d
-        self.animation_instance.mode = "Hochlauf"
+        self.animation_instance.mode = "Lineary Increasing"
+        self.freeze_change = False
 
         # set up anim canvas
         self.mult_canvas_anim = MultiCanvas(
@@ -164,6 +165,11 @@ class GUI:
                 for spine in ["top", "right", "left", "bottom"]:
                     ax.spines[spine].set_visible(False)
 
+            # remove stuff
+            self.fig_bode.canvas.toolbar_visible = False
+            self.fig_bode.canvas.header_visible = False
+            self.fig_bode.canvas.footer_visible = False
+
             # # Set limits for axes
             # self.ax1_bode.set_xlim(0, 2)
             # self.ax1_bode.set_ylim(0, 10)
@@ -255,7 +261,30 @@ class GUI:
             slider_omega,
             slider_alpha,
             radio_buttons,
+            reset_button,
         ) = self.variables_control_elements()
+
+        # labels
+        labels_grid = widgets.HBox(
+            [
+                widgets.VBox(
+                    [
+                        widgets.Label(value="d - damping coefficient"),
+                        widgets.Label(value="c - spring constant"),
+                        widgets.Label(value="m - mass"),
+                        widgets.Label(value="Ω - ..."),
+                    ]
+                ),
+                widgets.VBox(
+                    [
+                        widgets.Label(value="α - ..."),
+                        widgets.Label(value="defl - initial deflection"),
+                        widgets.Label(value="v0 - initial velocity"),
+                    ],
+                    layout=widgets.Layout(left="5%"),
+                ),
+            ],
+        )
 
         # make slider grid
         slider_grid = VBox(
@@ -268,14 +297,15 @@ class GUI:
                 slider_alpha,
                 slider_defl,
                 slider_v,
-                radio_buttons,
-            ]
+                labels_grid,
+            ],
+            layout=widgets.Layout(top="-2%"),
         )
 
         # make titles
-        animation_title = widgets.HTML(
-            '<strong style="font-family: Arial, sans-serif;">Animation</strong>'
-        )
+        # animation_title = widgets.HTML(
+        #     '<strong style="font-family: Arial, sans-serif;">Animation</strong>'
+        # )
         slider_title = widgets.HTML(
             '<strong style="font-family: Arial, sans-serif;">Variables</strong>'
         )
@@ -295,7 +325,11 @@ class GUI:
         play_control_widget = self.play_control_element()
 
         self.app_layout = self.place_gui_elements(
-            animation_title, play_control_widget, slider_grid, title_grid
+            play_control_widget,
+            slider_grid,
+            title_grid,
+            reset_button,
+            radio_buttons,
         )
 
         # draw inital visual
@@ -434,29 +468,47 @@ class GUI:
         self.slider_alpha = slider_alpha
 
         radio_buttons = widgets.RadioButtons(
-            options=["Hochlauf", "Dauerlauf"],
-            value="Hochlauf",
-            layout={"width": "max-content"},
-            description="",
+            options=["Lineary Increasing", "Constant"],
+            value="Lineary Increasing",
+            layout=widgets.Layout(top="-5%"),
+            description="Exitation Frequency",
             disabled=False,
             orientation="horizontal",
         )
         self.radio_buttons = radio_buttons
 
-        self.slider = [
-            slider_d,
-            slider_c,
-            slider_v,
-            slider_m,
-            slider_defl,
-            slider_omega,
-            slider_alpha,
+        reset_button = widgets.Button(
+            description="Reset",
+            layout=widgets.Layout(top="-5%", display="flex"),
+            diabled=False,
+        )
+        self.reset_button = reset_button
+        self.reset_button.on_click(self.reset_parameters)
+
+        self.sliders = [
+            self.slider_d,
+            self.slider_c,
+            self.slider_v,
+            self.slider_m,
+            self.slider_defl,
+            self.slider_omega,
+            self.slider_alpha,
+        ]
+
+        self.sliders_and_radio_buttons = [
+            self.slider_d,
+            self.slider_c,
+            self.slider_v,
+            self.slider_m,
+            self.slider_defl,
+            self.slider_omega,
+            self.slider_alpha,
+            self.radio_buttons,
         ]
 
         # define observe functions
-        for s in self.slider:
+        for s in self.sliders_and_radio_buttons:
             s.observe(self.on_value_change, names="value")
-        radio_buttons.observe(self.on_value_change, names="value")
 
         return (
             slider_d,
@@ -467,6 +519,7 @@ class GUI:
             slider_m,
             slider_omega,
             slider_alpha,
+            reset_button,
             radio_buttons,
         )
 
@@ -505,10 +558,11 @@ class GUI:
 
     def place_gui_elements(
         self,
-        animation_title: widgets,
         play_control_widget: widgets,
         slider_grid: widgets,
         title_grid: widgets,
+        reset_button,
+        radio_buttons,
     ) -> widgets:
         """Function to place and coordinate all gui elements.
 
@@ -516,21 +570,17 @@ class GUI:
             widgets: Returns the App Layout.
         """
 
-        # make grid for animation interaction
-        anim_inter_grid = AppLayout(
-            header=animation_title,
-            left_sidebar=play_control_widget,
-            center=None,
+        # make layout for the interactive part of gui
+        interactive_grid = AppLayout(
+            header=slider_grid,
+            left_sidebar=None,
+            center=widgets.VBox([reset_button, radio_buttons]),
             right_sidebar=None,
-            footer=None,
-            pane_widths=["100%", "0%", "0%"],
-            pane_heights=["15%", "15%", "15%"],
+            footer=VBox([play_control_widget]),
+            pane_widths=["0%", "100%", "0%"],
+            pane_heights=["65%", "20%", "15%"],
+            layout=widgets.Layout(left="2%"),
         )
-
-        # make grid for interacitve part
-        interactive_grid = GridspecLayout(2, 1)
-        interactive_grid[0, 0] = slider_grid
-        interactive_grid[1, 0] = anim_inter_grid
 
         # make tab for graphs
         tab = widgets.Tab()
@@ -610,6 +660,32 @@ class GUI:
         self.ax2_bode.relim()
         self.ax2_bode.autoscale_view()
 
+    def reset_parameters(self, button):
+        """Function to reset all parameters to default values.
+
+        Args:
+            button (widgets.Button): Button that triggers the reset.
+        """
+
+        # freeze the change of the graph
+        self.freeze_change = True
+
+        self.slider_d.value = self.default_d
+        self.slider_c.value = self.default_c
+        self.c_input_max.value = DEFAULT_C_MAX
+        self.slider_m.value = DEFAULT_M
+        self.slider_omega.value = DEFAULT_OMEGA
+        self.slider_alpha.value = DEFAULT_ALPHA
+        self.slider_defl.value = START_DEFLECTION
+        self.slider_v.value = START_VELOCITY
+        self.radio_buttons.value = "Lineary Increasing"
+
+        # unfreeze the change of the graph
+        self.freeze_change = False
+
+        # calculate default solution
+        self.calc_and_set_solution()
+
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes.
 
@@ -622,11 +698,13 @@ class GUI:
         match widget:
             case self.radio_buttons:
                 self.animation_instance.mode = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_d:
                 self.animation_instance.d = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_c:
                 self.animation_instance.c = new_value
@@ -634,15 +712,18 @@ class GUI:
                     2 * self.animation_instance.c / (3 * self.animation_instance.m)
                 )
                 self.slider_omega.max = omega_0
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_v:
                 self.animation_instance.start_velocity = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_defl:
                 self.animation_instance.start_deflection = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.c_input_max:
                 self.slider_c.max = new_value
@@ -653,26 +734,29 @@ class GUI:
                     2 * self.animation_instance.c / (3 * self.animation_instance.m)
                 )
                 self.slider_omega.max = omega_0
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_omega:
                 self.animation_instance.omega = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.slider_alpha:
                 self.animation_instance.alpha = new_value
-                self.calc_and_set_solution()
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
 
             case self.play:
                 if new_value == True:
-                    for s in self.slider:
+                    for s in self.sliders:
                         s.disabled = True
                     self.c_input_max.disabled = True
 
             case self.play_slider:
                 # if reset button pressed, enable controls
                 if new_value == self.play.min:
-                    for s in self.slider:
+                    for s in self.sliders:
                         s.disabled = False
                     self.c_input_max.disabled = False
                     # disable repeat
