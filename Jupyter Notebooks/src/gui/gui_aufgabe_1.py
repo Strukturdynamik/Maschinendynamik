@@ -445,7 +445,7 @@ class GUI:
             description="Ω",
             continuous_update=False,
             orientation="horizontal",
-            disabled=False,
+            disabled=True,
             readout=True,
             readout_format=".2f",
             layout=widgets.Layout(left="-10%", width="90%", display="flex"),
@@ -698,6 +698,15 @@ class GUI:
         match widget:
             case self.radio_buttons:
                 self.animation_instance.mode = new_value
+
+                if self.animation_instance.mode == "Lineary Increasing":
+                    self.slider_omega.disabled = True
+                    self.slider_alpha.disabled = False
+
+                else:
+                    self.slider_omega.disabled = False
+                    self.slider_alpha.disabled = True
+
                 if not self.freeze_change:
                     self.calc_and_set_solution()
 
@@ -759,6 +768,15 @@ class GUI:
                     for s in self.sliders:
                         s.disabled = False
                     self.c_input_max.disabled = False
+                    # handle omega and alpha slider
+                    if self.animation_instance.mode == "Lineary Increasing":
+                        self.slider_omega.disabled = True
+                        self.slider_alpha.disabled = False
+
+                    else:
+                        self.slider_omega.disabled = False
+                        self.slider_alpha.disabled = True
+
                     # disable repeat
                     self.play.repeat = False
 
