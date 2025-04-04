@@ -17,13 +17,11 @@ from ...utils.ext_utils.spring import spring_module
 from ...utils.constants import (
     NUM_DATAPOINTS,
     NUM_TIME_UNITS_AUFGABE_1,
-    MASS,
-    START_DEFLECTION,
-    START_VELOCITY,
-    DEFAULT_C,
-    DEFAULT_D,
-    DEFAULT_OMEGA,
-    DEFAULT_ALPHA,
+    START_DEFLECTION_1,
+    START_VELOCITY_1,
+    DEFAULT_M_1,
+    DEFAULT_OMEGA_1,
+    DEFAULT_ALPHA_1,
     DEFAULT_FRAME,
 )
 
@@ -35,16 +33,16 @@ class Aufgabe1(AnimationInstance):
     def __init__(self, calculator):
         super().__init__()
         self.calculator = calculator
-        self.c = DEFAULT_C
-        self.d = DEFAULT_D
-        self.m = MASS
-        self.omega = DEFAULT_OMEGA
-        self.alpha = DEFAULT_ALPHA
+        self.m = DEFAULT_M_1
+        self.omega = DEFAULT_OMEGA_1
+        self.alpha = DEFAULT_ALPHA_1
         self.frame = DEFAULT_FRAME
-        self.start_deflection = START_DEFLECTION
-        self.start_velocity = START_VELOCITY
-        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
+        self.start_deflection = START_DEFLECTION_1
+        self.start_velocity = START_VELOCITY_1
         self.spring_nodes = 20
+
+        # make t
+        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
 
     def _initial_visual(self):
         """Draw the inital visual for the visual representation of oscillation."""
@@ -77,7 +75,7 @@ class Aufgabe1(AnimationInstance):
             y_2=bottom_left[1],
             len_strokes=abs_value(self.anim_canvas.height, 5),
             num_strokes=7,
-            alpha=40,
+            angle=40,
             direction_strokes="left",
         )
         draw_line_with_strokes(
@@ -88,7 +86,7 @@ class Aufgabe1(AnimationInstance):
             y_2=bottom_right[1],
             len_strokes=abs_value(self.anim_canvas.height, 5),
             num_strokes=14,
-            alpha=40,
+            angle=40,
             direction_strokes="bottom",
         )
 

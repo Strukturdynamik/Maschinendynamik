@@ -1,31 +1,42 @@
-import math
+import numpy as np
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
-import matplotlib.pyplot as plt
-import numpy as np
 from ipywidgets import (
     VBox,
     AppLayout,
     GridspecLayout,
 )
 
-
+from .mpl_manager_3 import PlotManager
 from ..utils.constants import (
-    START_DEFLECTION_1,
-    START_VELOCITY_1,
-    DEFAULT_C_MAX_1,
-    DEFAULT_M_1,
-    DEFAULT_M_MAX_1,
-    DEFAULT_OMEGA_1,
-    DEFAULT_ALPHA_1,
-    NUM_DATAPOINTS,
-    NUM_TIME_UNITS_AUFGABE_1,
+    DEFAULT_D_MIN_3,
+    DEFAULT_D_MAX_3,
+    DEFAULT_M_3,
+    DEFAULT_M_MIN_3,
+    DEFAULT_M_MAX_3,
+    DEFAULT_MU_3,
+    DEFAULT_MU_MIN_3,
+    DEFAULT_MU_MAX_3,
+    DEFAULT_C_MIN_3,
+    DEFAULT_C_MAX_3,
+    DEFAULT_EPS_3,
+    DEFAULT_EPS_MIN_3,
+    DEFAULT_EPS_MAX_3,
+    DEFAULT_Z0_3,
+    DEFAULT_Z0_MIN_3,
+    DEFAULT_Z0_MAX_3,
+    DEFAULT_Z0D_3,
+    DEFAULT_Z0D_MIN_3,
+    DEFAULT_Z0D_MAX_3,
+    DEFAULT_OMEGA_3,
+    DEFAULT_OMEGA_MAX_3,
+    DEFAULT_OMEGA_MIN_3,
+    DEFAULT_ALPHA_3,
+    DEFAULT_ALPHA_MIN_3,
+    DEFAULT_ALPHA_MAX_3,
+    NUM_DATAPOINTS_3,
     CANVAS_WIDTH,
     CANVAS_HEIGHT,
-    X_LIM_START,
-    X_LIM_END_AUFGABE_1,
-    Y_LIM_START_AUFGABE_1,
-    Y_LIM_END_AUFGABE_1,
 )
 
 
@@ -62,7 +73,7 @@ class GUI:
         self.animation_instance = animation_instance
         self.animation_instance.c = default_c
         self.animation_instance.d = default_d
-        self.animation_instance.mode = "Lineary Increasing"
+        self.animation_instance.mode = "Acceleration"
         self.freeze_change = False
 
         # set up anim canvas
@@ -78,7 +89,7 @@ class GUI:
         self.animation_instance.anim_canvas = self.mult_canvas_anim
 
         # set up mpl
-        self.set_up_mpl()
+        self.plot_manager = PlotManager(animation_instance)
 
         # set up calc button
         # self.calc_button = widgets.Button(
@@ -94,159 +105,6 @@ class GUI:
 
         return app_layout
 
-    def set_up_mpl(self):
-        """Function to set up the matplotlib plots for the right canvas of the
-        GUI."""
-        # Clear all existing figures to avoid duplicates
-        plt.close("all")
-
-        # set up output widget for deflection graph
-        self.output_deflection = widgets.Output()
-        with self.output_deflection:
-            self.fig_deflection, self.ax1 = plt.subplots(figsize=(5, 5))
-            self.ax1.grid(True)
-
-            # set labels
-            self.ax1.set_xlabel(
-                r"$\boldsymbol{t} \: \boldsymbol{(s)}$",
-            )
-
-            self.ax1.set_ylabel(
-                r"Deflection $ \boldsymbol{\Phi (t)}$ [ °]",
-                color="blue",
-            )
-
-            # second y axis
-            self.ax1_second_yaxis = self.ax1.twinx()
-            self.ax1_second_yaxis.set_ylabel(r"F [N]", color="red")
-
-            # remove spines
-            for spine in ["top", "right", "left", "bottom"]:
-                self.ax1.spines[spine].set_visible(False)
-
-            # remove stuff
-            self.fig_deflection.canvas.toolbar_visible = False
-            self.fig_deflection.canvas.header_visible = False
-            self.fig_deflection.canvas.footer_visible = False
-
-            # make blob
-            (self.blob,) = self.ax1.plot([], [], "bo", label="Blob")
-            # (self.blob_anregung,) = self.ax1.plot([], [], "bo", label="Anregung")
-
-            # set limits for axes
-            self.ax1.set_xlim(X_LIM_START, X_LIM_END_AUFGABE_1)
-            self.ax1.set_ylim(Y_LIM_START_AUFGABE_1, Y_LIM_END_AUFGABE_1)
-
-            plt.tight_layout()
-            plt.show()
-
-        # set up output for bode diagramms
-        self.output_bode = widgets.Output()
-        with self.output_bode:
-            self.fig_bode = plt.figure(figsize=(5, 5))
-
-            # subplots (2 rows, 1 column)
-            self.ax1_bode = self.fig_bode.add_subplot(2, 1, 1)  # first subplot
-            self.ax2_bode = self.fig_bode.add_subplot(2, 1, 2)  # second subplot
-
-            # add grid
-            self.ax1_bode.grid(True)
-            self.ax2_bode.grid(True)
-
-            # labels for ax1
-            self.ax1_bode.set_ylabel(r"Magnitude [abs]")
-
-            # labels for ax2
-            self.ax2_bode.set_xlabel(r"$\Omega$ / $\omega_{0}$")
-            self.ax2_bode.set_ylabel(r"Phase [°]")
-
-            # Remove spines
-            for ax in [self.ax1_bode, self.ax2_bode]:
-                for spine in ["top", "right", "left", "bottom"]:
-                    ax.spines[spine].set_visible(False)
-
-            # remove stuff
-            self.fig_bode.canvas.toolbar_visible = False
-            self.fig_bode.canvas.header_visible = False
-            self.fig_bode.canvas.footer_visible = False
-
-            # # Set limits for axes
-            # self.ax1_bode.set_xlim(0, 2)
-            # self.ax1_bode.set_ylim(0, 10)
-            # self.ax2_bode.set_xlim(0, 2)
-            # self.ax2_bode.set_ylim(-200, 10)
-
-            plt.tight_layout()
-            plt.show()
-
-        # labels
-        plt.rcParams["font.family"] = "Arial"
-        plt.rcParams["mathtext.fontset"] = "stix"
-        plt.rcParams["mathtext.rm"] = "serif"
-        plt.rcParams["mathtext.it"] = "serif:italic"
-        plt.rcParams["mathtext.bf"] = "serif:bold"
-
-        # axes
-        plt.axhline(0, color="black", linewidth=1)
-        plt.axvline(0, color="black", linewidth=1)
-
-        # plot default solutions
-        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
-        # amplitude solution
-        solution, anregung_sol = self.animation_instance._calculate()
-        (self.line,) = self.ax1.plot(
-            self.t,
-            solution,
-            color="blue",
-            linewidth=0.75,
-            linestyle="-",
-            label="Deflection",
-        )
-
-        # Anregungsgraph
-        (self.line_anregung,) = self.ax1.plot(
-            self.t,
-            anregung_sol,
-            linewidth=0.65,
-            linestyle="--",
-            color="red",
-            alpha=0.75,
-            label="Force input",
-        )
-
-        # bode diagram
-        omega_vec, omega_0, mag, mag_undamped, phase = (
-            self.animation_instance.calc_bode_diagram()
-        )
-        # ax1
-        (self.line_bode_1_1,) = self.ax1_bode.plot(
-            omega_vec / omega_0,
-            mag,
-            linewidth=0.75,
-            linestyle="--",
-            color="red",
-            label="mag",
-        )
-        (self.line_bode_1_2,) = self.ax1_bode.plot(
-            omega_vec / omega_0,
-            mag_undamped,
-            linestyle="--",
-            color="blue",
-            alpha=0.25,
-            linewidth=0.75,
-            label="mag undamped",
-        )
-        # ax2
-        (self.line_bod_2,) = self.ax2_bode.plot(
-            omega_vec / omega_0, phase, linestyle="--", linewidth=0.75, color="red"
-        )
-
-        # add legend
-        self.ax1_bode.legend(
-            handles=[self.line_bode_1_1, self.line_bode_1_2], loc="upper right"
-        )
-        self.ax1.legend(handles=[self.line, self.line_anregung], loc="upper right")
-
     def gui_elements(self):
         """General function to coordinate gui elements."""
 
@@ -255,13 +113,15 @@ class GUI:
             slider_d,
             slider_c,
             c_input_max,
-            slider_defl,
-            slider_v,
             slider_m,
+            slider_mu,
+            slider_eps,
+            slider_z0,
+            slider_z0d,
             slider_omega,
             slider_alpha,
-            radio_buttons,
             reset_button,
+            radio_buttons,
         ) = self.variables_control_elements()
 
         # make slider grid
@@ -271,23 +131,22 @@ class GUI:
                 slider_c,
                 c_input_max,
                 slider_m,
+                slider_mu,
+                slider_eps,
+                slider_z0,
+                slider_z0d,
                 slider_omega,
                 slider_alpha,
-                slider_defl,
-                slider_v,
             ],
             layout=widgets.Layout(top="-2%"),
         )
 
         # make titles
-        # animation_title = widgets.HTML(
-        #     '<strong style="font-family: Arial, sans-serif;">Animation</strong>'
-        # )
         slider_title = widgets.HTML(
             '<strong style="font-family: Arial, sans-serif;">Variables</strong>'
         )
         anim_title = widgets.HTML(
-            '<strong style="font-family: Arial, sans-serif;">Pendulum Animation</strong>'
+            '<strong style="font-family: Arial, sans-serif;">Animation</strong>'
         )
         graph_title = widgets.HTML(
             '<strong style="font-family: Arial, sans-serif;">Graphs</strong>'
@@ -322,9 +181,9 @@ class GUI:
         """
 
         slider_d = widgets.FloatSlider(
-            value=round(self.default_d, 2),
-            min=0.1,
-            max=5.0,
+            value=self.default_d,
+            min=DEFAULT_D_MIN_3,
+            max=DEFAULT_D_MAX_3,
             step=1.0,
             description="d",
             continuous_update=False,
@@ -338,9 +197,9 @@ class GUI:
         self.slider_d = slider_d
 
         slider_c = widgets.FloatSlider(
-            value=round(self.default_c, 2),
-            min=10,
-            max=100,
+            value=self.default_c,
+            min=DEFAULT_C_MIN_3,
+            max=DEFAULT_C_MAX_3,
             step=1.0,
             description="c",
             continuous_update=False,
@@ -353,10 +212,23 @@ class GUI:
         )
         self.slider_c = slider_c
 
+        c_input_max = widgets.BoundedFloatText(
+            value=round(DEFAULT_C_MAX_3, 2),
+            min=DEFAULT_C_MIN_3,
+            max=2 * DEFAULT_C_MAX_3,
+            step=1.0,
+            description="c max:",
+            readout_format=".2f",
+            disabled=False,
+            layout=widgets.Layout(display="flex", width="50%"),
+        )
+        c_input_max.observe(self.on_value_change, names="value")
+        self.c_input_max = c_input_max
+
         slider_m = widgets.FloatSlider(
-            value=round(DEFAULT_M_1, 2),
-            min=0.1,
-            max=round(DEFAULT_M_MAX_1, 2),
+            value=DEFAULT_M_3,
+            min=DEFAULT_M_MIN_3,
+            max=DEFAULT_M_MAX_3,
             step=1.0,
             description="m",
             continuous_update=False,
@@ -369,60 +241,74 @@ class GUI:
         )
         self.slider_m = slider_m
 
-        c_input_max = widgets.BoundedFloatText(
-            value=round(DEFAULT_C_MAX_1, 2),
-            min=0.1,
-            max=100,
+        slider_mu = widgets.FloatSlider(
+            value=DEFAULT_MU_3,
+            min=DEFAULT_MU_MIN_3,
+            max=DEFAULT_MU_MAX_3,
             step=1.0,
-            description="c max:",
+            description="mu",
+            continuous_update=False,
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
             readout_format=".2f",
-            disabled=False,
-            layout=widgets.Layout(display="flex", width="50%"),
+            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            tooltip="mu",
         )
-        c_input_max.observe(self.on_value_change, names="value")
-        self.c_input_max = c_input_max
+        self.slider_mu = slider_mu
 
-        # starting conditions sliders
-        min_v = round(0.0, 4)
-        max_v = round(2.25, 4)
-        slider_v = widgets.FloatSlider(
-            value=round(START_VELOCITY_1, 4),
-            min=min_v,
-            max=max_v,
+        slider_eps = widgets.FloatSlider(
+            value=DEFAULT_EPS_3,
+            min=DEFAULT_EPS_MIN_3,
+            max=DEFAULT_EPS_MAX_3,
             step=1.0,
-            description="v0",  # r"$v_{0}$",
+            description="ε",
             continuous_update=False,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="88%", display="flex"),
-            tooltip="initial velocity",
+            readout_format=".2f",
+            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            tooltip="eps",
         )
-        self.slider_v = slider_v
+        self.slider_eps = slider_eps
 
-        max_defl = round(math.pi, 4) / 10
-        min_defl = round(math.pi, 4) / 30
-        slider_defl = widgets.FloatSlider(
-            value=round(START_DEFLECTION_1, 4),
-            min=min_defl,
-            max=max_defl,
+        slider_z0 = widgets.FloatSlider(
+            value=DEFAULT_Z0_3,
+            min=DEFAULT_Z0_MIN_3,
+            max=DEFAULT_Z0_MAX_3,
             step=1.0,
-            description="defl",  # r"$defl_{0}$",
+            description="z0",
             continuous_update=False,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="88%", display="flex"),
-            tooltip="initial deflection",
+            readout_format=".2f",
+            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            tooltip="z0",
         )
-        self.slider_defl = slider_defl
+        self.slider_z0 = slider_z0
+
+        slider_z0d = widgets.FloatSlider(
+            value=DEFAULT_Z0D_3,
+            min=DEFAULT_Z0D_MIN_3,
+            max=DEFAULT_Z0D_MAX_3,
+            step=1.0,
+            description="z0d",
+            continuous_update=False,
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
+            readout_format=".2f",
+            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            tooltip="z0d",
+        )
+        self.slider_z0d = slider_z0d
 
         slider_omega = widgets.FloatSlider(
-            value=DEFAULT_OMEGA_1,
-            min=0.0,
-            max=5.0,
+            value=DEFAULT_OMEGA_3,
+            min=DEFAULT_OMEGA_MIN_3,
+            max=DEFAULT_OMEGA_MAX_3,
             step=1.0,
             description="Ω",
             continuous_update=False,
@@ -431,15 +317,15 @@ class GUI:
             readout=True,
             readout_format=".2f",
             layout=widgets.Layout(left="-10%", width="90%", display="flex"),
-            tooltip="angular frequency of the input",
+            tooltip="omega",
         )
         self.slider_omega = slider_omega
 
         slider_alpha = widgets.FloatSlider(
-            value=DEFAULT_ALPHA_1,
-            min=0.0,
-            max=5.0,
-            step=0.01,
+            value=DEFAULT_ALPHA_3,
+            min=DEFAULT_ALPHA_MIN_3,
+            max=DEFAULT_ALPHA_MAX_3,
+            step=1.0,
             description="α",
             continuous_update=False,
             orientation="horizontal",
@@ -447,14 +333,14 @@ class GUI:
             readout=True,
             readout_format=".2f",
             layout=widgets.Layout(left="-10%", width="90%", display="flex"),
-            tooltip="angular acceleration of the input",
+            tooltip="alpha",
         )
         self.slider_alpha = slider_alpha
 
         radio_buttons = widgets.RadioButtons(
-            options=["Lineary Increasing", "Constant"],
-            value="Lineary Increasing",
-            layout=widgets.Layout(top="-5%"),
+            options=["Acceleration", "Steady State"],
+            value="Acceleration",
+            # layout=widgets.Layout(top="-5%"),
             description="Exitation Frequency",
             disabled=False,
             orientation="horizontal",
@@ -463,7 +349,7 @@ class GUI:
 
         reset_button = widgets.Button(
             description="Reset",
-            layout=widgets.Layout(top="-5%", display="flex"),
+            layout=widgets.Layout(display="flex"),
             diabled=False,
         )
         self.reset_button = reset_button
@@ -472,9 +358,11 @@ class GUI:
         self.sliders = [
             self.slider_d,
             self.slider_c,
-            self.slider_v,
             self.slider_m,
-            self.slider_defl,
+            self.slider_mu,
+            self.slider_eps,
+            self.slider_z0,
+            self.slider_z0d,
             self.slider_omega,
             self.slider_alpha,
         ]
@@ -482,9 +370,11 @@ class GUI:
         self.sliders_and_radio_buttons = [
             self.slider_d,
             self.slider_c,
-            self.slider_v,
             self.slider_m,
-            self.slider_defl,
+            self.slider_mu,
+            self.slider_eps,
+            self.slider_z0,
+            self.slider_z0d,
             self.slider_omega,
             self.slider_alpha,
             self.radio_buttons,
@@ -495,16 +385,18 @@ class GUI:
             s.observe(self.on_value_change, names="value")
 
         return (
-            slider_d,
-            slider_c,
-            c_input_max,
-            slider_defl,
-            slider_v,
-            slider_m,
-            slider_omega,
-            slider_alpha,
-            reset_button,
-            radio_buttons,
+            self.slider_d,
+            self.slider_c,
+            self.c_input_max,
+            self.slider_m,
+            self.slider_mu,
+            self.slider_eps,
+            self.slider_z0,
+            self.slider_z0d,
+            self.slider_omega,
+            self.slider_alpha,
+            self.reset_button,
+            self.radio_buttons,
         )
 
     def play_control_element(self) -> widgets:
@@ -517,7 +409,7 @@ class GUI:
         play = widgets.Play(
             value=0,
             min=0,
-            max=NUM_DATAPOINTS - 1,
+            max=NUM_DATAPOINTS_3 - 1,
             step=1,
             interval=25,
             description="Press play",
@@ -527,7 +419,7 @@ class GUI:
         play_slider = widgets.IntSlider(
             disabled=False,
             min=0,
-            max=NUM_DATAPOINTS - 1,
+            max=NUM_DATAPOINTS_3 - 1,
             step=1,
             interval=25,
         )
@@ -562,15 +454,19 @@ class GUI:
             right_sidebar=None,
             footer=VBox([play_control_widget]),
             pane_widths=["0%", "100%", "0%"],
-            pane_heights=["55%", "25%", "20%"],
+            pane_heights=["60%", "20%", "20%"],
             layout=widgets.Layout(left="2%"),
         )
 
         # make tab for graphs
         tab = widgets.Tab()
-        children = [self.fig_deflection.canvas, self.fig_bode.canvas]
+        children = [
+            self.plot_manager.fig_steady_state.canvas,
+            self.plot_manager.fig_acceleration.canvas,
+            self.plot_manager.fig_bode.canvas,
+        ]
         tab.children = children
-        tab.titles = ["Deflection", "Bode Diagram"]
+        tab.titles = ["Steady State", "Acceleration", "Bode Diagram"]
 
         app_layout = AppLayout(
             header=title_grid,
@@ -582,67 +478,49 @@ class GUI:
             pane_heights=["10%", "90%", "0%"],
         )
 
-        # make border on left side
-        self.animation_instance.anim_canvas[4].begin_path()
-        self.animation_instance.anim_canvas[4].move_to(0, 0)
-        self.animation_instance.anim_canvas[4].line_to(
-            0, self.animation_instance.anim_canvas[4].height
-        )
-        self.animation_instance.anim_canvas[4].stroke()
-        # make border on right side
-        self.animation_instance.anim_canvas[4].begin_path()
-        self.animation_instance.anim_canvas[4].move_to(
-            self.animation_instance.anim_canvas[4].width, 0
-        )
-        self.animation_instance.anim_canvas[4].line_to(
-            self.animation_instance.anim_canvas[4].width,
-            self.animation_instance.anim_canvas[4].height,
-        )
-        self.animation_instance.anim_canvas[4].stroke()
+        # # make border on left side
+        # self.animation_instance.anim_canvas[4].begin_path()
+        # self.animation_instance.anim_canvas[4].move_to(0, 0)
+        # self.animation_instance.anim_canvas[4].line_to(
+        #     0, self.animation_instance.anim_canvas[4].height
+        # )
+        # self.animation_instance.anim_canvas[4].stroke()
+        # # make border on right side
+        # self.animation_instance.anim_canvas[4].begin_path()
+        # self.animation_instance.anim_canvas[4].move_to(
+        #     self.animation_instance.anim_canvas[4].width, 0
+        # )
+        # self.animation_instance.anim_canvas[4].line_to(
+        #     self.animation_instance.anim_canvas[4].width,
+        #     self.animation_instance.anim_canvas[4].height,
+        # )
+        # self.animation_instance.anim_canvas[4].stroke()
 
         return app_layout
 
     def calc_and_set_solution(self):
-        """Calculate new solution after user input to redraw graphs in
-        right canvas.
-        """
-        # calculate solution
-        solution, anregung_sol = self.animation_instance._calculate()
-        # set new y data
-        self.line.set_ydata(solution)
-        self.fig_deflection.canvas.draw()  # redraw the canvas
-        # set blob
-        x = [self.t[self.animation_instance.frame]]
-        y = [self.animation_instance.solution[self.animation_instance.frame]]
-        self.blob.set_data(x, y)
-
-        # anregungsgraph
-        self.line_anregung.set_ydata(anregung_sol)
-        # self.blob_anregung.set_data(x, [anregung_sol[self.animation_instance.frame]])
-
-        # update axes
-        self.ax1.set_ylim([min(solution) * 1.1, max(solution) * 1.1])  # scale y limits
-        self.ax1.relim()  # Recompute limits
-        self.ax1.autoscale_view()  # Autoscale view
-
-        # calculate bode diagramm
+        """Calculate new solution and update plots"""
+        sol_acc, sol_acc_force, sol_steady, sol_steady_force = (
+            self.animation_instance._calculate()
+        )
         omega_vec, omega_0, mag, mag_undamped, phase = (
             self.animation_instance.calc_bode_diagram()
         )
-        # first plot
-        self.line_bode_1_1.set_ydata(mag)
-        self.line_bode_1_1.set_xdata(omega_vec / omega_0)
-        self.line_bode_1_2.set_ydata(mag_undamped)
-        self.line_bode_1_2.set_xdata(omega_vec / omega_0)
 
-        # second plot
-        self.line_bod_2.set_ydata(phase)
-        self.line_bod_2.set_xdata(omega_vec / omega_0)
+        self.plot_manager.update_plots(
+            sol_acc,
+            sol_acc_force,
+            sol_steady,
+            sol_steady_force,
+            omega_vec,
+            omega_0,
+            mag,
+            mag_undamped,
+            phase,
+        )
 
-        # update axes
-        self.ax1_bode.set_ylim(0, max(mag) * 1.1)
-        self.ax2_bode.relim()
-        self.ax2_bode.autoscale_view()
+        # Update blob position
+        self.plot_manager.update_blobs(self.animation_instance.frame)
 
     def reset_parameters(self, button):
         """Function to reset all parameters to default values.
@@ -656,13 +534,10 @@ class GUI:
 
         self.slider_d.value = self.default_d
         self.slider_c.value = self.default_c
-        self.c_input_max.value = DEFAULT_C_MAX_1
-        self.slider_m.value = DEFAULT_M_1
-        self.slider_omega.value = DEFAULT_OMEGA_1
-        self.slider_alpha.value = DEFAULT_ALPHA_1
-        self.slider_defl.value = START_DEFLECTION_1
-        self.slider_v.value = START_VELOCITY_1
-        self.radio_buttons.value = "Lineary Increasing"
+        self.c_input_max.value = DEFAULT_C_MAX_3
+        self.slider_m.value = DEFAULT_M_3
+
+        self.radio_buttons.value = "Acceleration"
 
         # unfreeze the change of the graph
         self.freeze_change = False
@@ -683,7 +558,7 @@ class GUI:
             case self.radio_buttons:
                 self.animation_instance.mode = new_value
 
-                if self.animation_instance.mode == "Lineary Increasing":
+                if self.animation_instance.mode == "Acceleration":
                     self.slider_omega.disabled = True
                     self.slider_alpha.disabled = False
 
@@ -701,32 +576,41 @@ class GUI:
 
             case self.slider_c:
                 self.animation_instance.c = new_value
-                omega_0 = np.sqrt(
-                    2 * self.animation_instance.c / (3 * self.animation_instance.m)
-                )
+                omega_0 = np.sqrt(self.animation_instance.c / self.animation_instance.m)
                 self.slider_omega.max = omega_0
-                if not self.freeze_change:
-                    self.calc_and_set_solution()
-
-            case self.slider_v:
-                self.animation_instance.start_velocity = new_value
-                if not self.freeze_change:
-                    self.calc_and_set_solution()
-
-            case self.slider_defl:
-                self.animation_instance.start_deflection = new_value
                 if not self.freeze_change:
                     self.calc_and_set_solution()
 
             case self.c_input_max:
+                # reset c max to min if user input is smaller than min
+                if new_value < self.c_input_max.min:
+                    self.c_input_max.value = self.c_input_max.min
                 self.slider_c.max = new_value
 
             case self.slider_m:
                 self.animation_instance.m = new_value
-                omega_0 = np.sqrt(
-                    2 * self.animation_instance.c / (3 * self.animation_instance.m)
-                )
+                omega_0 = np.sqrt(self.animation_instance.c / self.animation_instance.m)
                 self.slider_omega.max = omega_0
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
+
+            case self.slider_mu:
+                self.animation_instance.m_u = new_value
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
+
+            case self.slider_eps:
+                self.animation_instance.eps = new_value
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
+
+            case self.slider_z0:
+                self.animation_instance.z0 = new_value
+                if not self.freeze_change:
+                    self.calc_and_set_solution()
+
+            case self.slider_z0d:
+                self.animation_instance.z0d = new_value
                 if not self.freeze_change:
                     self.calc_and_set_solution()
 
@@ -753,7 +637,7 @@ class GUI:
                         s.disabled = False
                     self.c_input_max.disabled = False
                     # handle omega and alpha slider
-                    if self.animation_instance.mode == "Lineary Increasing":
+                    if self.animation_instance.mode == "Acceleration":
                         self.slider_omega.disabled = True
                         self.slider_alpha.disabled = False
 
@@ -765,20 +649,22 @@ class GUI:
                     self.play.repeat = False
 
                 global FIRST_FRAME_CHANGE
-                # animate blob in gaph
-                x = [self.t[new_value]]
-                y = [self.animation_instance.solution[new_value]]
-                self.blob.set_data(x, y)
-                # self.blob_anregung.set_data(
-                #    x, [self.animation_instance.anregung_sol[new_value]]
-                # )
-                self.fig_deflection.canvas.draw_idle()
+                # # blob in acc
+                # x = [self.t[new_value]]
+                # y_acc = [self.animation_instance.sol_acc[new_value]]
+                # y_steady = [self.animation_instance.sol_steady[new_value]]
+                # self.blob_acc.set_data(x, y_acc)
+                # self.blob_steady.set_data(x, y_steady)
 
-                # animate pendulum
+                # self.fig_steady_state.canvas.draw_idle()
+                # self.fig_acceleration.canvas.draw_idle()
+                self.plot_manager.update_blobs(self.animation_instance.frame)
+
+                # animate oscillating system
                 self.animation_instance.frame = new_value
                 self.animation_instance._animate_visual()
                 if FIRST_FRAME_CHANGE == False:
                     FIRST_FRAME_CHANGE = True
 
-                if new_value == NUM_DATAPOINTS - 1:
+                if new_value == NUM_DATAPOINTS_3 - 1:
                     FIRST_FRAME_CHANGE = False

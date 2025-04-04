@@ -12,9 +12,9 @@ from ipywidgets import (
 
 
 from ..utils.constants import (
-    DEFAULT_C_MAX,
-    START_VELOCITY,
-    START_DEFLECTION,
+    DEFAULT_C_MAX_4,
+    START_VELOCITY_4,
+    START_DEFLECTION_4,
     NUM_DATAPOINTS,
     NUM_TIME_UNITS_AUFGABE_4,
     CANVAS_WIDTH,
@@ -207,7 +207,7 @@ class GUI:
         slider_c = widgets.FloatSlider(
             value=round(self.default_c, 2),
             min=0.1,
-            max=round(DEFAULT_C_MAX, 2),
+            max=round(DEFAULT_C_MAX_4, 2),
             step=0.01,
             description="c",
             orientation="horizontal",
@@ -219,7 +219,7 @@ class GUI:
         self.slider_c = slider_c
 
         c_input_max = widgets.BoundedFloatText(
-            value=round(DEFAULT_C_MAX, 2),
+            value=round(DEFAULT_C_MAX_4, 2),
             min=0.1,
             max=100,
             step=0.1,
@@ -235,7 +235,7 @@ class GUI:
         min_v = round(0.0, 4)
         max_v = round(2.25, 4)
         slider_v = widgets.FloatSlider(
-            value=round(START_VELOCITY, 4),
+            value=round(START_VELOCITY_4, 4),
             min=min_v,
             max=max_v,
             step=0.0001,
@@ -251,7 +251,7 @@ class GUI:
         max_defl = round(math.pi, 4) / 10
         min_defl = round(math.pi, 4) / 30
         slider_defl = widgets.FloatSlider(
-            value=round(START_DEFLECTION, 4),
+            value=round(START_DEFLECTION_4, 4),
             min=min_defl,
             max=max_defl,
             step=0.01,
