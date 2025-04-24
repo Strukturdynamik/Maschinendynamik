@@ -1,4 +1,5 @@
 import math
+from typing import Any, List
 from ipycanvas import hold_canvas
 import numpy as np
 from scipy import signal as signal
@@ -15,39 +16,53 @@ from .anim_superclass import AnimationInstance
 from ...utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
-    NUM_DATAPOINTS,
-    NUM_TIME_UNITS_AUFGABE_1,
-    MASS,
-    START_DEFLECTION,
-    START_VELOCITY,
-    DEFAULT_C,
-    DEFAULT_D,
-    DEFAULT_OMEGA,
-    DEFAULT_ALPHA,
+    A1_U2_T,
+    A1_U2_START_DEFLECTION,
+    A1_U2_START_VELOCITY,
+    A1_U2_DEFAULT_M,
+    A1_U2_DEFAULT_OMEGA,
+    A1_U2_DEFAULT_ALPHA,
     DEFAULT_FRAME,
 )
 
-"""Module to animate the mechanical oscillation system of Übung 2, Aufgabe 1.
+"""
+    Concrete implementation of AnimationInstance to animate the mechanical
+    oscillation system in Übung 2, Aufgabe 1
+    (Jupyter Notebooks\resources\documents\Übung_2_Aufg1.pdf)
+
+    This class handles the setup, calculation, and visualization of the
+    forced damped oscillation system using a spring-damper model. It includes:
+    - Drawing static elements of the animation that won't change over time
+    - Calculating the system's response over time for two excitation modes
+    - Animate the oscillating system to represent the solution
 """
 
 
 class Aufgabe1(AnimationInstance):
-    def __init__(self, calculator):
+    def __init__(self, calculator: Any) -> None:
         super().__init__()
-        self.calculator = calculator
-        self.c = DEFAULT_C
-        self.d = DEFAULT_D
-        self.m = MASS
-        self.omega = DEFAULT_OMEGA
-        self.alpha = DEFAULT_ALPHA
+        self.calculator: Any = calculator
+        self.m = A1_U2_DEFAULT_M
+        self.omega = A1_U2_DEFAULT_OMEGA
+        self.alpha = A1_U2_DEFAULT_ALPHA
         self.frame = DEFAULT_FRAME
-        self.start_deflection = START_DEFLECTION
-        self.start_velocity = START_VELOCITY
-        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_1, NUM_DATAPOINTS)
+        self.start_deflection = A1_U2_START_DEFLECTION
+        self.start_velocity = A1_U2_START_VELOCITY
         self.spring_nodes = 20
+        self.t = A1_U2_T
 
     def _initial_visual(self):
-        """Draw the inital visual for the visual representation of oscillation."""
+        """
+        Draws the static base layout of the animation canvas.
+
+        This includes:
+        - Walls and floor using line strokes
+        - "x" arrow to indicate force direction
+        - Anchor points and zero position for the oscillating mass
+        - Initializes spring and damper layout
+
+        Should be called once before animation begins.
+        """
         # canvas settings
         self.anim_canvas[6].stroke_style = "red"
         self.anim_canvas[6].line_width = 2.0
@@ -77,7 +92,7 @@ class Aufgabe1(AnimationInstance):
             y_2=bottom_left[1],
             len_strokes=abs_value(self.anim_canvas.height, 5),
             num_strokes=7,
-            alpha=40,
+            angle=40,
             direction_strokes="left",
         )
         draw_line_with_strokes(
@@ -88,7 +103,7 @@ class Aufgabe1(AnimationInstance):
             y_2=bottom_right[1],
             len_strokes=abs_value(self.anim_canvas.height, 5),
             num_strokes=14,
-            alpha=40,
+            angle=40,
             direction_strokes="bottom",
         )
 
@@ -130,12 +145,22 @@ class Aufgabe1(AnimationInstance):
         self.bottom_line_y = bottom_left[1]
         self.radius = self.bottom_line_y - self.zero_pos[1]
 
-    def _calculate(self):
-        """_summary_
+    def _calculate(self) -> tuple[np.ndarray, np.ndarray]:
+        """Calculates the deflection response of the system over time.
+
+        Depending on user input, it can simulate two modes of
+        excitation:
+        - "Constant": Simulates a constant external force.
+        - "Lineary Increasing": Simulates a linearly increasing frequency.
+
+        Uses the system's calculator to solve the differential equations.
 
         Returns:
-            _type_: _description_
+            tuple[np.ndarray, np.ndarray]:
+                solution (displacement values over time),
+                anregung_sol (excitation function values).
         """
+
         # Dauerlauf
         if self.mode == "Constant":
             solution = self.calculator.integrate(
@@ -171,7 +196,23 @@ class Aufgabe1(AnimationInstance):
 
         return solution, anregung_sol
 
-    def calc_bode_diagram(self):
+    def calc_bode_diagram(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray, List[float], List[float], List[float]]:
+        """Computes the data for the Bode diagram for the current system
+            configuration.
+
+        This analysis shows how the system reacts to different frequencies,
+        including both damped and undamped magnitude responses.
+
+        Returns:
+            tuple[np.ndarray, np.ndarray, List[float], List[float], List[float]]:
+                omega_vec: Array of frequency values,
+                omega_0: Natural frequency of the system,
+                mag: Magnitude response (damped),
+                mag_undamped: Magnitude response (undamped),
+                phase: Phase shift response.
+        """
         delta = self.d / (3 * self.m)
         omega_0 = np.sqrt(2 * self.c / (3 * self.m))
         b0 = 2 / (3 * self.m)
