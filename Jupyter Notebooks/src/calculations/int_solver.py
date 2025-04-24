@@ -112,11 +112,11 @@ class IntSolverAufgabe3:
         b2 = -m_u / m
         omega_0 = np.sqrt(c / m)
         delta = d / (2 * m)
-        [z, z_p] = x  # Zustandsvektor --> Vom Studi auszufuellen
+        [z, z_p] = x
         x_p = [
             z_p,
             -2 * delta * z_p - omega_0**2 * z + b2 * e * omega**2 * np.sin(omega * t),
-        ]  # Zustands-DGL --> Vom Studi auszufuellen
+        ]
         return x_p
 
     def state_space_accelerated(self, x, t, m_u, m, d, c, e, alpha):
@@ -135,6 +135,48 @@ class IntSolverAufgabe3:
     def integrate(self, func, t, z0, z0d, *args):
 
         x0 = (z0, z0d)
+        return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
+
+
+class IntSolverAufgabe2:
+
+    def __init__(self):
+        return None
+
+    def state_space_steady(self, x, t, l, j_a, u_hat, d, c, omega):
+        delta = (d * l**2) / (2 * j_a)
+        b1 = (d * l) / j_a
+        b0 = (c * l) / j_a
+        omega_0 = np.sqrt((c * l**2) / j_a)
+
+        [phi, phi_dot] = x
+        x_p = [
+            phi_dot,
+            -2 * delta * phi_dot
+            - omega_0**2 * phi
+            + b0 * u_hat * np.cos(omega * t)
+            - b1 * u_hat * omega * np.sin(omega * t),
+        ]
+        return x_p
+
+    def state_space_accelerated(self, x, t, l, j_a, u_hat, d, c, alpha):
+        delta = (d * l**2) / (2 * j_a)
+        b1 = (d * l) / j_a
+        b0 = (c * l) / j_a
+        omega_0 = np.sqrt((c * l**2) / j_a)
+
+        [phi, phi_dot] = x
+        x_p = [
+            phi_dot,
+            -2 * delta * phi_dot
+            - omega_0**2 * phi
+            + b0 * u_hat * np.cos(0.5 * alpha * t**2)
+            - b1 * u_hat * alpha * t * np.sin(0.5 * alpha * t**2),
+        ]
+        return x_p
+
+    def integrate(self, func, t, phi_0, phi_0_dot, *args):
+        x0 = (phi_0, phi_0_dot)
         return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
 
 
