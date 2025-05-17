@@ -1,7 +1,6 @@
 import math
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
-import matplotlib.pyplot as plt
 import numpy as np
 from ipywidgets import (
     VBox,
@@ -10,6 +9,7 @@ from ipywidgets import (
 )
 
 from .mpl_managers.a1_u2_mpl_manager import PlotManagerA1U2
+from .gui_superclass import GUISuperclass
 
 from ..utils.constants import (
     A1_U2_T,
@@ -17,10 +17,23 @@ from ..utils.constants import (
     A1_U2_START_DEFLECTION,
     A1_U2_START_VELOCITY,
     A1_U2_DEFAULT_C_MAX,
+    A1_U2_DEFAULT_C_MIN,
+    A1_U2_DEFAULT_D_MAX,
+    A1_U2_DEFAULT_D_MIN,
+    A1_U2_DEFAULT_D_MAX,
     A1_U2_DEFAULT_M,
+    A1_U2_DEFAULT_M_MIN,
+    A1_U2_DEFAULT_M_MIN,
     A1_U2_DEFAULT_M_MAX,
+    A1_U2_DEFAULT_F_HAT,
+    A1_U2_DEFAULT_F_HAT_MIN,
+    A1_U2_DEFAULT_F_HAT_MAX,
     A1_U2_DEFAULT_OMEGA,
+    A1_U2_DEFAULT_OMEGA_MIN,
+    A1_U2_DEFAULT_OMEGA_MAX,
     A1_U2_DEFAULT_ALPHA,
+    A1_U2_DEFAULT_ALPHA_MIN,
+    A1_U2_DEFAULT_ALPHA_MAX,
     CANVAS_WIDTH,
     CANVAS_HEIGHT,
 )
@@ -33,7 +46,7 @@ from ..utils.constants import (
 FIRST_FRAME_CHANGE: bool = False
 
 
-class GUI:
+class GUI(GUISuperclass):
     def __init__(
         self,
         default_c,
@@ -79,11 +92,11 @@ class GUI:
         self.plot_manager = PlotManagerA1U2(self.animation_instance)
 
         # after inital set up, set up gui elements
-        app_layout = self.gui_elements()
+        app_layout = self.make_gui()
 
         return app_layout
 
-    def gui_elements(self):
+    def make_gui(self):
         """General function to coordinate gui elements."""
 
         # make control elements for parameters
@@ -96,9 +109,10 @@ class GUI:
             slider_m,
             slider_omega,
             slider_alpha,
+            slider_f_hat,
             radio_buttons,
             reset_button,
-        ) = self.variables_control_elements()
+        ) = self.make_parameter_control_elements()
 
         # make slider grid
         slider_grid = VBox(
@@ -109,6 +123,7 @@ class GUI:
                 slider_m,
                 slider_omega,
                 slider_alpha,
+                slider_f_hat,
                 slider_defl,
                 slider_v,
             ],
@@ -131,9 +146,9 @@ class GUI:
         title_grid[0, 2] = graph_title
 
         # make play control widget
-        play_control_widget = self.play_control_element()
+        play_control_widget = self.make_play_control_element()
 
-        self.app_layout = self.place_gui_elements(
+        self.app_layout = self.place_and_coordinate_gui_elements(
             play_control_widget,
             slider_grid,
             title_grid,
@@ -146,7 +161,7 @@ class GUI:
         # draw first frame
         self.animation_instance._draw_first_frame()
 
-    def variables_control_elements(self) -> widgets:
+    def make_parameter_control_elements(self) -> widgets:
         """Function to create and place parameter control elements.
 
         Returns:
@@ -154,9 +169,9 @@ class GUI:
         """
 
         slider_d = widgets.FloatSlider(
-            value=round(self.default_d, 2),
-            min=0.1,
-            max=5.0,
+            value=self.default_d,
+            min=A1_U2_DEFAULT_D_MIN,
+            max=A1_U2_DEFAULT_D_MAX,
             step=1.0,
             description="d",
             continuous_update=False,
@@ -170,9 +185,9 @@ class GUI:
         self.slider_d = slider_d
 
         slider_c = widgets.FloatSlider(
-            value=round(self.default_c, 2),
-            min=10,
-            max=100,
+            value=self.default_c,
+            min=A1_U2_DEFAULT_C_MIN,
+            max=A1_U2_DEFAULT_C_MAX,
             step=1.0,
             description="c",
             continuous_update=False,
@@ -186,9 +201,9 @@ class GUI:
         self.slider_c = slider_c
 
         slider_m = widgets.FloatSlider(
-            value=round(A1_U2_DEFAULT_M, 2),
-            min=0.1,
-            max=round(A1_U2_DEFAULT_M_MAX, 2),
+            value=A1_U2_DEFAULT_M,
+            min=A1_U2_DEFAULT_M_MIN,
+            max=A1_U2_DEFAULT_M_MAX,
             step=1.0,
             description="m",
             continuous_update=False,
@@ -206,7 +221,7 @@ class GUI:
             min=0.1,
             max=100,
             step=1.0,
-            description="c max:",
+            description="cₘₐₓ : ",
             readout_format=".2f",
             disabled=False,
             layout=widgets.Layout(display="flex", width="50%"),
@@ -215,14 +230,14 @@ class GUI:
         self.c_input_max = c_input_max
 
         # starting conditions sliders
-        min_v = round(0.0, 4)
-        max_v = round(2.25, 4)
+        min_v = 0.0
+        max_v = 5.0
         slider_v = widgets.FloatSlider(
             value=round(A1_U2_START_VELOCITY, 4),
             min=min_v,
             max=max_v,
             step=1.0,
-            description="v0",  # r"$v_{0}$",
+            description="v₀",
             continuous_update=False,
             orientation="horizontal",
             disabled=False,
@@ -233,14 +248,14 @@ class GUI:
         )
         self.slider_v = slider_v
 
-        max_defl = round(math.pi, 4) / 10
-        min_defl = round(math.pi, 4) / 30
+        max_defl = math.pi / 5
+        min_defl = math.pi / 30
         slider_defl = widgets.FloatSlider(
             value=round(A1_U2_START_DEFLECTION, 4),
             min=min_defl,
             max=max_defl,
-            step=1.0,
-            description="defl",  # r"$defl_{0}$",
+            step=0.1,
+            description="defl₀",
             continuous_update=False,
             orientation="horizontal",
             disabled=False,
@@ -253,8 +268,8 @@ class GUI:
 
         slider_omega = widgets.FloatSlider(
             value=A1_U2_DEFAULT_OMEGA,
-            min=0.0,
-            max=5.0,
+            min=A1_U2_DEFAULT_OMEGA_MIN,
+            max=A1_U2_DEFAULT_OMEGA_MAX,
             step=1.0,
             description="Ω",
             continuous_update=False,
@@ -269,8 +284,8 @@ class GUI:
 
         slider_alpha = widgets.FloatSlider(
             value=A1_U2_DEFAULT_ALPHA,
-            min=0.0,
-            max=5.0,
+            min=A1_U2_DEFAULT_ALPHA_MIN,
+            max=A1_U2_DEFAULT_ALPHA_MAX,
             step=0.01,
             description="α",
             continuous_update=False,
@@ -282,6 +297,22 @@ class GUI:
             tooltip="angular acceleration of the input",
         )
         self.slider_alpha = slider_alpha
+
+        slider_f_hat = widgets.FloatSlider(
+            value=A1_U2_DEFAULT_F_HAT,
+            min=A1_U2_DEFAULT_F_HAT_MIN,
+            max=A1_U2_DEFAULT_F_HAT_MAX,
+            step=0.01,
+            description="F̂",
+            continuous_update=False,
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
+            readout_format=".2f",
+            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            tooltip="F_Hat",
+        )
+        self.slider_f_hat = slider_f_hat
 
         radio_buttons = widgets.RadioButtons(
             options=["Lineary Increasing", "Constant"],
@@ -309,6 +340,7 @@ class GUI:
             self.slider_defl,
             self.slider_omega,
             self.slider_alpha,
+            self.slider_f_hat,
         ]
 
         self.sliders_and_radio_buttons = [
@@ -319,6 +351,7 @@ class GUI:
             self.slider_defl,
             self.slider_omega,
             self.slider_alpha,
+            self.slider_f_hat,
             self.radio_buttons,
         ]
 
@@ -335,11 +368,12 @@ class GUI:
             slider_m,
             slider_omega,
             slider_alpha,
+            slider_f_hat,
             reset_button,
             radio_buttons,
         )
 
-    def play_control_element(self) -> widgets:
+    def make_play_control_element(self) -> widgets:
         """Function to create the play control element. Stop/restart/
             loop animation and slide through frames.
 
@@ -372,7 +406,7 @@ class GUI:
 
         return play_control_widget
 
-    def place_gui_elements(
+    def place_and_coordinate_gui_elements(
         self,
         play_control_widget: widgets,
         slider_grid: widgets,
@@ -530,6 +564,11 @@ class GUI:
 
             case self.slider_alpha:
                 self.animation_instance.alpha = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_f_hat:
+                self.animation_instance.f_hat = new_value
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 

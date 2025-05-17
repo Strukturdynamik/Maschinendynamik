@@ -8,7 +8,7 @@ from scipy import signal as signal
 """
 
 
-class IntSolverAufgabe4:
+class IntSolverAufgabe4Uebung1:
     def __init__(self) -> None:
         return None
 
@@ -70,31 +70,31 @@ class IntSolverAufgabe4:
         return x
 
 
-class IntSolverAufgabe1:
+class IntSolverAufgabe1Uebung2:
     def __init__(self) -> None:
         return None
 
     # Dauerlauf
-    def state_space_settled(self, z, t, d, m, c, omega):
-        delta = d / (3 * m)
-        omega_0 = np.sqrt(2 * c / (3 * m))
-        b0 = 2 / (3 * m)
+    def state_space_settled(self, z, t, d, m, c, omega, f_hat):
         [x, x_p] = z  # Zustandsvektor
+        delta = d / (3 * m)
+        omega_0 = np.sqrt(2 * c / (3 * m))  # Resonanzfrequenz
+        b0 = 2 / (3 * m)
         z_p = [
             x_p,
-            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(omega * t),
-        ]  # Zustands-DGL
+            -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(omega * t),
+        ]
         return z_p
 
     # Hochlauf
-    def state_space_accelerated(self, z, t, d, m, c, alpha):
+    def state_space_accelerated(self, z, t, d, m, c, f_hat, alpha):
+        [x, x_p] = z
         delta = d / (3 * m)
         omega_0 = np.sqrt(2 * c / (3 * m))
         b0 = 2 / (3 * m)
-        [x, x_p] = z
         z_p = [
             x_p,
-            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(0.5 * alpha * t**2),
+            -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(0.5 * alpha * t**2),
         ]
         return z_p
 
@@ -103,7 +103,7 @@ class IntSolverAufgabe1:
         return odeint(func=func, y0=z0, t=t, args=args)[:, 0]
 
 
-class IntSolverAufgabe3:
+class IntSolverAufgabe1Uebung3:
 
     def __init__(self) -> None:
         return None
@@ -138,7 +138,7 @@ class IntSolverAufgabe3:
         return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
 
 
-class IntSolverAufgabe2:
+class IntSolverAufgabe2Uebung2:
 
     def __init__(self):
         return None

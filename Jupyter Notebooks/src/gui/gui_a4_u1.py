@@ -8,7 +8,7 @@ from ipywidgets import (
     GridspecLayout,
 )
 
-from .mpl_managers.a4_u1_mpl_manager import PlotManager
+from .mpl_managers.a4_u1_mpl_manager import PlotManagerA4U1
 from .gui_superclass import GUISuperclass
 from ..utils.constants import (
     A4_U1_DEFAULT_C_MAX,
@@ -59,7 +59,7 @@ class GUI(GUISuperclass):
         )
         self.animation_instance.anim_canvas = self.mult_canvas_anim
         # set up plot manager
-        self.plot_manager = PlotManager(animation_instance)
+        self.plot_manager = PlotManagerA4U1(animation_instance)
 
         # after inital set up, set up gui elements
         app_layout = self.make_gui()
@@ -263,7 +263,7 @@ class GUI(GUISuperclass):
             header=title_grid,
             left_sidebar=interactive_grid,
             center=self.mult_canvas_anim,
-            right_sidebar=self.plot_manager.output,  # self.plot_manager.fig.canvas,
+            right_sidebar=self.plot_manager.output_deflection,  # self.plot_manager.fig.canvas,
             footer=None,
             pane_widths=["33%", "33%", "33%"],
             pane_heights=["10%", "90%", "0%"],

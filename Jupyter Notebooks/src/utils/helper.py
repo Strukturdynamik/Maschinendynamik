@@ -478,21 +478,27 @@ def draw_arrow(
     canvas.stroke_line(x1, y1, x2, y2)
 
     # angle of the arrow shaft
-    angle = math.atan2(y2 - y1, x2 - x1)
+    dx = x2 - x1
+    dy = y2 - y1
+    angle = math.atan2(dy, dx)  # angle of vector (arrow) in relation to posiitve x axis
     arrow_angle_rad = math.radians(arrow_angle)
 
     # arrowhead lines
-    x3 = x2 - arrow_length * math.cos(angle - arrow_angle_rad)
+    x3 = x2 - arrow_length * math.cos(
+        angle - arrow_angle_rad
+    )  # line angled to the left (counter-clockwise)
     y3 = y2 - arrow_length * math.sin(angle - arrow_angle_rad)
-    x4 = x2 - arrow_length * math.cos(angle + arrow_angle_rad)
+    x4 = x2 - arrow_length * math.cos(
+        angle + arrow_angle_rad
+    )  # line angled to the right (clockwise)
     y4 = y2 - arrow_length * math.sin(angle + arrow_angle_rad)
 
     canvas.stroke_line(x2, y2, x3, y3)
     canvas.stroke_line(x2, y2, x4, y4)
 
+    perp_angle = angle + math.pi / 2  # rotate 90° to draw the base
     if base_length is not None:
         # Calculate perpendicular vector to arrow shaft
-        perp_angle = angle + math.pi / 2  # rotate 90°
         half_base = base_length / 2
         base_start_x = x1 + half_base * math.cos(perp_angle)
         base_start_y = y1 + half_base * math.sin(perp_angle)
@@ -523,12 +529,11 @@ def draw_arrow(
 
     # Draw description
     if description is not None:
-        offset_x = abs_value(canvas.width, description_padding_x)
-        offset_y = abs_value(canvas.height, description_padding_y)
+        offset_x = description_padding_x
+        offset_y = description_padding_y
 
         # place the text relative to the start point, perpendicular to arrow direction
-        perp_angle = angle + math.pi / 2
-        text_x = x1 + offset_x * math.cos(perp_angle)
+        text_x = x1 + offset_x * math.sin(perp_angle)
         text_y = y1 + offset_y * math.sin(perp_angle)
 
         canvas.line_width = 0.9

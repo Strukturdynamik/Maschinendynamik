@@ -51,6 +51,11 @@ class PlotManagerSuperclass:
     def update_plots(self):
         """Update all plots with new data"""
         for line, (t_arr, sol_arr) in self.lines_sol_dict.items():
+            print(f"type(sol_arr): {type(sol_arr)}")
+            if isinstance(sol_arr, tuple):
+                print("is tuple")
+            print(f"type(sol_arr): {type(sol_arr)}")
+
             line.set_data(t_arr, sol_arr)
 
         for fig, _ in self.figure_lines_dict.items():

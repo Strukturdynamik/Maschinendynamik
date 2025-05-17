@@ -2,24 +2,23 @@ import ipywidgets.widgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ...utils.constants import A1_U2_T
+from ...utils.constants import A4_U1_T
 from .mpl_manager_superclass import PlotManagerSuperclass
 
 
-class PlotManagerA1U2(PlotManagerSuperclass):
+class PlotManagerA4U1(PlotManagerSuperclass):
     def __init__(self, animation_instance):
         self.animation_instance = animation_instance
         self.blobs_dict = {}  # keys: blob, values: solutions for the blobs
         self.figure_lines_dict = {}  # keys: figure, values: list[lines for the figure]
         self.lines_sol_dict = {}  # key: lines, value: tuple(t arr, solution arr)
         self.axes = []  # list of axes
-        self.t = A1_U2_T
+        self.t = A4_U1_T
         self.setup_plots()
 
     def setup_plots(self):
         """Initialize all matplotlib plots"""
         self.setup_deflection_plot()
-        self.setup_bode_plot()
         self.set_plot_styles()
         self.calc_and_plot_solutions()
 
@@ -82,48 +81,21 @@ class PlotManagerA1U2(PlotManagerSuperclass):
     def calc_and_plot_solutions(self):
         """Plot initial solutions"""
 
-        sol_deflection, sol_force = self.animation_instance._calculate()
-        omega_vec, omega_0, mag, mag_undamped, phase = (
-            self.animation_instance.calc_bode_diagram()
-        )
+        sol_deflection = self.animation_instance._calculate()
 
         # fill in the solutions in the line dict
-        self.lines_sol_dict[self.line_deflection] = (
-            self.t,
-            sol_deflection,
-        )
-        self.lines_sol_dict[self.line_force] = (
-            self.t,
-            sol_force,
-        )
-        self.lines_sol_dict[self.line_bode_1_1] = (
-            omega_vec / omega_0,
-            mag,
-        )
-        self.lines_sol_dict[self.line_bode_1_2] = (
-            omega_vec / omega_0,
-            mag_undamped,
-        )
-        self.lines_sol_dict[self.line_bode_2] = (
-            omega_vec / omega_0,
-            phase,
-        )
+        self.lines_sol_dict[self.line_deflection] = (self.t, sol_deflection)
 
         # update plots
         self.update_plots()
 
         # update axes limits
-        self.update_axes_limits(sol_deflection, mag)
+        self.update_axes_limits(sol_deflection)
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
-    def update_axes_limits(self, sol_deflection, mag):
+    def update_axes_limits(self, sol_deflection):
         """Update axes limits based on current data"""
         self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
-
-        self.ax_bode.set_ylim(0, max(mag) * 1.1)
-        for ax in [self.ax1, self.ax2_bode, self.ax_bode]:
-            ax.relim()
-            ax.autoscale_view()
