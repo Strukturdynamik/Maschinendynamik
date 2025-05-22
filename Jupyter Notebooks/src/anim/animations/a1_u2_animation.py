@@ -169,9 +169,9 @@ class Aufgabe1(AnimationInstance):
         if self.mode == "Constant":
             solution = self.calculator.integrate(
                 self.calculator.state_space_settled,
-                self.t,
                 self.start_deflection,
                 self.start_velocity,
+                self.t,
                 self.d,
                 self.m,
                 self.c,
@@ -184,15 +184,16 @@ class Aufgabe1(AnimationInstance):
         if self.mode == "Lineary Increasing":
             solution = self.calculator.integrate(
                 self.calculator.state_space_accelerated,
-                self.t,
                 self.start_deflection,
                 self.start_velocity,
+                self.t,
                 self.d,
                 self.m,
                 self.c,
                 self.f_hat,
                 self.alpha,
             )
+
             anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
             arrow_sol = np.cos(0.5 * self.alpha * self.t**2)
 

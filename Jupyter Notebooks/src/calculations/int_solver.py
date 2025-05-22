@@ -98,9 +98,10 @@ class IntSolverAufgabe1Uebung2:
         ]
         return z_p
 
-    def integrate(self, func, t, start_deflection, start_velocity, *args):
-        z0 = (start_deflection, start_velocity)
-        return odeint(func=func, y0=z0, t=t, args=args)[:, 0]
+    def integrate(self, func, start_deflection, start_velocity, t, *args):
+        y0 = (start_deflection, start_velocity)
+        x = odeint(func=func, y0=y0, t=t, args=args)[:, 0]
+        return x
 
 
 class IntSolverAufgabe1Uebung3:
