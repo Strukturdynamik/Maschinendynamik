@@ -26,8 +26,6 @@ class PlotManagerA4U1(PlotManagerSuperclass):
         self.output_deflection = widgets.Output()
         with self.output_deflection:
             self.fig_deflection, self.ax1 = plt.subplots(figsize=(5, 5))
-            # second y axis
-            self.ax1_second_yaxis = self.ax1.twinx()
             # blob
             (self.blob,) = self.ax1.plot([], [], "bo")
             # lines
@@ -39,35 +37,19 @@ class PlotManagerA4U1(PlotManagerSuperclass):
                 linestyle="-",
                 label="Deflection",
             )
-            (self.line_force,) = self.ax1.plot(
-                [],
-                [],
-                linewidth=0.65,
-                linestyle="--",
-                color="red",
-                alpha=0.75,
-                label="Force input",
-            )
 
             self.configure_axes(
                 self.ax1,
-                r"$\boldsymbol{t} \: \boldsymbol{(s)}$",
-                r"Deflection $ \boldsymbol{x (t)}$ [ °]",
+                r"$t \: (s)$",
+                r"Deflection $x (t)$ [ °]",
                 "blue",
             )
-            self.ax1_second_yaxis.set_ylabel(r"F [N]", color="red")
 
             # add to dict
             # blob
             self.blobs_dict[self.blob] = None
             # add figure and lines to figure_lines dict
-            self.figure_lines_dict[self.fig_deflection] = [
-                self.line_deflection,
-                self.line_force,
-            ]
-            # add solutions for lines
-            self.lines_sol_dict[self.line_deflection] = (self.t, None)
-            self.lines_sol_dict[self.line_force] = (self.t, None)
+            self.figure_lines_dict[self.fig_deflection] = [self.line_deflection]
 
             # remove stuff
             self.remove_stuff()
@@ -99,3 +81,5 @@ class PlotManagerA4U1(PlotManagerSuperclass):
     def update_axes_limits(self, sol_deflection):
         """Update axes limits based on current data"""
         self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
+        self.ax1.relim()
+        self.ax1.autoscale_view()

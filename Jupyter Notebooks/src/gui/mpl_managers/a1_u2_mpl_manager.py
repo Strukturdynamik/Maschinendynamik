@@ -52,8 +52,8 @@ class PlotManagerA1U2(PlotManagerSuperclass):
 
             self.configure_axes(
                 self.ax1,
-                r"$\boldsymbol{t} \: \boldsymbol{(s)}$",
-                r"Deflection $ \boldsymbol{x (t)}$ [ °]",
+                r"$t \: (s)$",
+                r"Deflection $ x (t)$ [ °]",
                 "blue",
             )
             self.ax1_second_yaxis.set_ylabel(r"F [N]", color="red")

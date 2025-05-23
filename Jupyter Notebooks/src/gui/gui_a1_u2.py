@@ -179,7 +179,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="damping coefficient",
         )
         self.slider_d = slider_d
@@ -195,7 +195,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="spring constant",
         )
         self.slider_c = slider_c
@@ -211,7 +211,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="mass",
         )
         self.slider_m = slider_m
@@ -243,7 +243,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="88%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="88%", display="flex"),
             tooltip="initial velocity",
         )
         self.slider_v = slider_v
@@ -261,7 +261,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="88%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="88%", display="flex"),
             tooltip="initial deflection",
         )
         self.slider_defl = slider_defl
@@ -277,7 +277,7 @@ class GUI(GUISuperclass):
             disabled=True,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="angular frequency of the input",
         )
         self.slider_omega = slider_omega
@@ -293,7 +293,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="angular acceleration of the input",
         )
         self.slider_alpha = slider_alpha
@@ -309,7 +309,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="F_Hat",
         )
         self.slider_f_hat = slider_f_hat
