@@ -29,6 +29,9 @@ class PlotManagerA1U2(PlotManagerSuperclass):
             self.fig_deflection, self.ax1 = plt.subplots(figsize=(5, 5))
             # second y axis
             self.ax1_second_yaxis = self.ax1.twinx()
+            # on ax1_second_yaxis the force will be displayed
+            # force is always inside range[-1, 1]
+            self.ax1_second_yaxis.set_ylim([-1.1, 1.5])
             # blob
             (self.blob,) = self.ax1.plot([], [], "bo")
             # lines
@@ -40,7 +43,7 @@ class PlotManagerA1U2(PlotManagerSuperclass):
                 linestyle="-",
                 label="Deflection",
             )
-            (self.line_force,) = self.ax1.plot(
+            (self.line_force,) = self.ax1_second_yaxis.plot(
                 [],
                 [],
                 linewidth=0.65,
@@ -66,14 +69,23 @@ class PlotManagerA1U2(PlotManagerSuperclass):
                 self.line_deflection,
                 self.line_force,
             ]
-            # add solutions for lines
-            self.lines_sol_dict[self.line_deflection] = (self.t, None)
-            self.lines_sol_dict[self.line_force] = (self.t, None)
 
             # remove stuff
             self.remove_stuff()
             # legend
-            self.ax1.legend()
+            ax1_line, ax1_label = self.ax1.get_legend_handles_labels()
+            ax1_second_yaxis_line, ax1_second_yaxis_label = (
+                self.ax1_second_yaxis.get_legend_handles_labels()
+            )
+            lines = ax1_line + ax1_second_yaxis_line
+            labels = ax1_label + ax1_second_yaxis_label
+
+            self.ax1_second_yaxis.legend(
+                lines,
+                labels,
+                loc="upper right",
+                framealpha=1.0,
+            )
 
             plt.autoscale()
             plt.tight_layout()
@@ -113,17 +125,18 @@ class PlotManagerA1U2(PlotManagerSuperclass):
         self.update_plots()
 
         # update axes limits
-        self.update_axes_limits(sol_deflection, mag)
+        self.update_axes_limits(sol_deflection, sol_force, mag)
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
-    def update_axes_limits(self, sol_deflection, mag):
+    def update_axes_limits(self, sol_deflection, sol_force, mag):
         """Update axes limits based on current data"""
         self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
 
         self.ax_bode.set_ylim(0, max(mag) * 1.1)
-        for ax in [self.ax1, self.ax2_bode, self.ax_bode]:
+
+        for ax in [self.ax1, self.ax2_bode, self.ax_bode, self.ax1_second_yaxis]:
             ax.relim()
             ax.autoscale_view()

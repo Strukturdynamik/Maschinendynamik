@@ -41,7 +41,7 @@ class PlotManagerA4U1(PlotManagerSuperclass):
             self.configure_axes(
                 self.ax1,
                 r"$t \: (s)$",
-                r"Deflection $x (t)$ [ °]",
+                r"Deflection $\Phi (t)$ [ °]",
                 "blue",
             )
 
