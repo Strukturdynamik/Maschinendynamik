@@ -22,6 +22,7 @@ from ...utils.constants import (
     A1_U2_DEFAULT_M,
     A1_U2_DEFAULT_OMEGA,
     A1_U2_DEFAULT_ALPHA,
+    A1_U2_DEFAULT_F_HAT,
     DEFAULT_FRAME,
 )
 
@@ -45,6 +46,7 @@ class Aufgabe1(AnimationInstance):
         self.m = A1_U2_DEFAULT_M
         self.omega = A1_U2_DEFAULT_OMEGA
         self.alpha = A1_U2_DEFAULT_ALPHA
+        self.f_hat = A1_U2_DEFAULT_F_HAT
         self.frame = DEFAULT_FRAME
         self.start_deflection = A1_U2_START_DEFLECTION
         self.start_velocity = A1_U2_START_VELOCITY
@@ -115,16 +117,18 @@ class Aufgabe1(AnimationInstance):
             y1=abs_value(self.anim_canvas.width, 20),
             x2=abs_value(self.anim_canvas.width, 60),
             y2=abs_value(self.anim_canvas.width, 20),
-            alpha=80,
+            alpha=50,
             base_length=abs_value(self.anim_canvas.width, 5),
             num_base_strokes=3,
-            stroke_len=abs_value(self.anim_canvas.width / 2, 3),
+            stroke_len=abs_value(self.anim_canvas.width / 2, 5),
             spacing_padding=abs_value(self.anim_canvas.width, 1),
             description="x",
-            description_padding_x=abs_value(self.anim_canvas.width / 4, 2),
-            description_padding_y=abs_value(self.anim_canvas.width / 3, 1),
-            description_max_width=abs_value(self.anim_canvas.width, 5),
-            description_font_size=abs_value(self.anim_canvas.width / 4, 4),
+            description_padding_x=abs_value(self.anim_canvas.width / 4, 10),
+            description_padding_y=-abs_value(self.anim_canvas.width / 3, 2),
+            description_max_width=abs_value(self.anim_canvas.width, 2),
+            description_font_size=abs_value(
+                self.anim_canvas.width / 10, 10
+            ),  # abs_value(self.anim_canvas.width / 10, 8),
             description_style="italic",
         )
 
@@ -165,13 +169,14 @@ class Aufgabe1(AnimationInstance):
         if self.mode == "Constant":
             solution = self.calculator.integrate(
                 self.calculator.state_space_settled,
-                self.t,
                 self.start_deflection,
                 self.start_velocity,
+                self.t,
                 self.d,
                 self.m,
                 self.c,
                 self.omega,
+                self.f_hat,
             )
             anregung_sol = np.cos(self.omega * self.t)
             arrow_sol = np.cos(self.omega * self.t)
@@ -179,14 +184,16 @@ class Aufgabe1(AnimationInstance):
         if self.mode == "Lineary Increasing":
             solution = self.calculator.integrate(
                 self.calculator.state_space_accelerated,
-                self.t,
                 self.start_deflection,
                 self.start_velocity,
+                self.t,
                 self.d,
                 self.m,
                 self.c,
+                self.f_hat,
                 self.alpha,
             )
+
             anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
             arrow_sol = np.cos(0.5 * self.alpha * self.t**2)
 

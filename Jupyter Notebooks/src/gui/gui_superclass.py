@@ -29,15 +29,11 @@ class GUISuperclass:
         pass
 
     @abstractmethod
-    def place_and_coordinate_gui_elements(self) -> widgets:
+    def place_and_coordinate_gui_elements(
+        self, play_control_widget, slider_grid, title_grid, reset_button, radio_button
+    ) -> widgets:
         """Function to place and coordinate all gui elements. This method
         should be implemented by subclasses."""
-        pass
-
-    @abstractmethod
-    def update_plots(self):
-        """Function to calculate current solution and update plots. This
-        method should be implemented by subclasses."""
         pass
 
     @abstractmethod

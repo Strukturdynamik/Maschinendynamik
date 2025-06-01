@@ -8,7 +8,7 @@ from ipywidgets import (
     GridspecLayout,
 )
 
-from .mpl_managers.a4_u1_mpl_manager import PlotManager
+from .mpl_managers.a4_u1_mpl_manager import PlotManagerA4U1
 from .gui_superclass import GUISuperclass
 from ..utils.constants import (
     A4_U1_DEFAULT_C_MAX,
@@ -59,7 +59,7 @@ class GUI(GUISuperclass):
         )
         self.animation_instance.anim_canvas = self.mult_canvas_anim
         # set up plot manager
-        self.plot_manager = PlotManager(animation_instance)
+        self.plot_manager = PlotManagerA4U1(animation_instance)
 
         # after inital set up, set up gui elements
         app_layout = self.make_gui()
@@ -123,7 +123,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_d = slider_d
 
@@ -137,7 +137,7 @@ class GUI(GUISuperclass):
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_c = slider_c
 
@@ -162,12 +162,12 @@ class GUI(GUISuperclass):
             min=min_v,
             max=max_v,
             step=0.0001,
-            description="v0",
+            description="v₀",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_v = slider_v
 
@@ -178,12 +178,12 @@ class GUI(GUISuperclass):
             min=min_defl,
             max=max_defl,
             step=0.01,
-            description="defl",
+            description="defl₀",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_defl = slider_defl
 
@@ -224,7 +224,9 @@ class GUI(GUISuperclass):
         self.play_slider = play_slider
         self.play = play
         widgets.jslink((play, "value"), (play_slider, "value"))
-        play_control_widget = widgets.HBox([play, play_slider])
+        play_control_widget = widgets.HBox(
+            [play, play_slider], layout=widgets.Layout(left="2%")
+        )
         play_slider.observe(self.on_value_change, names="value")
         play.observe(self.on_value_change, names="playing")
 
@@ -263,7 +265,7 @@ class GUI(GUISuperclass):
             header=title_grid,
             left_sidebar=interactive_grid,
             center=self.mult_canvas_anim,
-            right_sidebar=self.plot_manager.output,  # self.plot_manager.fig.canvas,
+            right_sidebar=self.plot_manager.output_deflection,  # self.plot_manager.fig.canvas,
             footer=None,
             pane_widths=["33%", "33%", "33%"],
             pane_heights=["10%", "90%", "0%"],

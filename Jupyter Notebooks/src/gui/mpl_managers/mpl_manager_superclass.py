@@ -51,7 +51,9 @@ class PlotManagerSuperclass:
     def update_plots(self):
         """Update all plots with new data"""
         for line, (t_arr, sol_arr) in self.lines_sol_dict.items():
-            line.set_data(t_arr, sol_arr)
+            # print(f"{line=}, {max(sol_arr)=}, {min(sol_arr)=}")
+            line.set_xdata(t_arr)
+            line.set_ydata(sol_arr)
 
         for fig, _ in self.figure_lines_dict.items():
             fig.canvas.draw_idle()
@@ -90,10 +92,6 @@ class PlotManagerSuperclass:
                 self.line_bode_1_2,
                 self.line_bode_2,
             ]
-            # add solutions for lines
-            self.lines_sol_dict[self.line_bode_1_1] = (None, None)
-            self.lines_sol_dict[self.line_bode_1_2] = (None, None)
-            self.lines_sol_dict[self.line_bode_2] = (None, None)
 
             # remove stuff
             self.remove_stuff()
