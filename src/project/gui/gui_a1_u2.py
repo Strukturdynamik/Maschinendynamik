@@ -249,7 +249,7 @@ class GUI(GUISuperclass):
         self.slider_v = slider_v
 
         max_defl = math.pi / 5
-        min_defl = math.pi / 30
+        min_defl = 0
         slider_defl = widgets.FloatSlider(
             value=round(A1_U2_START_DEFLECTION, 4),
             min=min_defl,
