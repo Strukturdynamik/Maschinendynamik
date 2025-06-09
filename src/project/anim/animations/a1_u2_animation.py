@@ -17,8 +17,8 @@ from ...utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
     A1_U2_T,
-    A1_U2_START_DEFLECTION,
-    A1_U2_START_VELOCITY,
+    A1_U2_START_DEFLECTION_DEFAULT,
+    A1_U2_START_VELOCITY_DEFAULT,
     A1_U2_DEFAULT_M,
     A1_U2_DEFAULT_OMEGA,
     A1_U2_DEFAULT_ALPHA,
@@ -48,8 +48,8 @@ class Aufgabe1(AnimationInstance):
         self.alpha = A1_U2_DEFAULT_ALPHA
         self.f_hat = A1_U2_DEFAULT_F_HAT
         self.frame = DEFAULT_FRAME
-        self.start_deflection = A1_U2_START_DEFLECTION
-        self.start_velocity = A1_U2_START_VELOCITY
+        self.start_deflection = A1_U2_START_DEFLECTION_DEFAULT
+        self.start_velocity = A1_U2_START_VELOCITY_DEFAULT
         self.spring_nodes = 20
         self.t = A1_U2_T
 
