@@ -14,8 +14,12 @@ from .gui_superclass import GUISuperclass
 from ..utils.constants import (
     A1_U2_T,
     A1_U2_NUM_DATA_POINTS,
-    A1_U2_START_DEFLECTION,
-    A1_U2_START_VELOCITY,
+    A1_U2_START_DEFLECTION_DEFAULT,
+    A1_U2_START_DEFLECTION_MIN,
+    A1_U2_START_DEFLECTION_MAX,
+    A1_U2_START_VELOCITY_DEFAULT,
+    A1_U2_START_VELOCITY_MIN,
+    A1_U2_START_VELOCITY_MAX,
     A1_U2_DEFAULT_C_MAX,
     A1_U2_DEFAULT_C_MIN,
     A1_U2_DEFAULT_D_MAX,
@@ -217,7 +221,7 @@ class GUI(GUISuperclass):
         self.slider_m = slider_m
 
         c_input_max = widgets.BoundedFloatText(
-            value=round(A1_U2_DEFAULT_C_MAX, 2),
+            value=A1_U2_DEFAULT_C_MAX,
             min=0.1,
             max=100,
             step=1.0,
@@ -230,12 +234,10 @@ class GUI(GUISuperclass):
         self.c_input_max = c_input_max
 
         # starting conditions sliders
-        min_v = 0.0
-        max_v = 5.0
         slider_v = widgets.FloatSlider(
-            value=round(A1_U2_START_VELOCITY, 4),
-            min=min_v,
-            max=max_v,
+            value=A1_U2_START_VELOCITY_DEFAULT,
+            min=A1_U2_START_VELOCITY_MIN,
+            max=A1_U2_START_VELOCITY_MAX,
             step=1.0,
             description="v₀",
             continuous_update=False,
@@ -248,12 +250,10 @@ class GUI(GUISuperclass):
         )
         self.slider_v = slider_v
 
-        max_defl = math.pi / 5
-        min_defl = 0
         slider_defl = widgets.FloatSlider(
-            value=round(A1_U2_START_DEFLECTION, 4),
-            min=min_defl,
-            max=max_defl,
+            value=A1_U2_START_DEFLECTION_DEFAULT,
+            min=A1_U2_START_DEFLECTION_MIN,
+            max=A1_U2_START_DEFLECTION_MAX,
             step=0.1,
             description="defl₀",
             continuous_update=False,
@@ -487,8 +487,8 @@ class GUI(GUISuperclass):
         self.slider_m.value = A1_U2_DEFAULT_M
         self.slider_omega.value = A1_U2_DEFAULT_OMEGA
         self.slider_alpha.value = A1_U2_DEFAULT_ALPHA
-        self.slider_defl.value = A1_U2_START_DEFLECTION
-        self.slider_v.value = A1_U2_START_VELOCITY
+        self.slider_defl.value = A1_U2_START_DEFLECTION_DEFAULT
+        self.slider_v.value = A1_U2_START_VELOCITY_DEFAULT
         self.radio_buttons.value = "Lineary Increasing"
 
         # unfreeze the change of the graph
