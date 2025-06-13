@@ -1,0 +1,2 @@
+a1_u2: -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(0.5 * alpha * t**2)
+a4_u1: (x_2, -d / m * x_2 - c / m * x_1)

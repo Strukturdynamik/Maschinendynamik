@@ -8,7 +8,7 @@ from scipy import signal as signal
 """
 
 
-class IntSolverAufgabe4:
+class IntSolverAufgabe4Uebung1:
     def __init__(self) -> None:
         return None
 
@@ -70,74 +70,115 @@ class IntSolverAufgabe4:
         return x
 
 
-class IntSolverAufgabe1:
+class IntSolverAufgabe1Uebung2:
     def __init__(self) -> None:
         return None
 
     # Dauerlauf
-    def state_space_settled(self, z, t, d, m, c, omega):
-        """_summary_
-
-        Args:
-            z (_type_): _description_
-            t (_type_): _description_
-            d (_type_): _description_
-            m (_type_): _description_
-            c (_type_): _description_
-            omega (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        delta = d / (3 * m)
-        omega_0 = np.sqrt(2 * c / (3 * m))
-        b0 = 2 / (3 * m)
+    def state_space_settled(self, z, t, d, m, c, omega, f_hat):
         [x, x_p] = z  # Zustandsvektor
-        z_p = [
-            x_p,
-            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(omega * t),
-        ]  # Zustands-DGL
-        return z_p
-
-    # Hochlauf
-    def state_space_accelerated(self, z, t, d, m, c, alpha):
-        """_summary_
-
-        Args:
-            z (_type_): _description_
-            t (_type_): _description_
-            d (_type_): _description_
-            m (_type_): _description_
-            c (_type_): _description_
-            alpha (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
         delta = d / (3 * m)
-        omega_0 = np.sqrt(2 * c / (3 * m))
+        omega_0 = np.sqrt(2 * c / (3 * m))  # Resonanzfrequenz
         b0 = 2 / (3 * m)
-        [x, x_p] = z
         z_p = [
             x_p,
-            -2 * delta * x_p - omega_0**2 * x + b0 * np.cos(0.5 * alpha * t**2),
+            -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(omega * t),
         ]
         return z_p
 
-    def integrate(self, func, t, start_deflection, start_velocity, *args):
-        """_summary_
+    # Hochlauf
+    def state_space_accelerated(self, z, t, d, m, c, f_hat, alpha):
+        [x, x_p] = z
+        delta = d / (3 * m)
+        omega_0 = np.sqrt(2 * c / (3 * m))
+        b0 = 2 / (3 * m)
+        z_p = [
+            x_p,
+            -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(0.5 * alpha * t**2),
+        ]
+        return z_p
 
-        Args:
-            func (_type_): _description_
-            t (_type_): _description_
-            start_deflection (_type_): _description_
-            start_velocity (_type_): _description_
+    def integrate(self, func, start_deflection, start_velocity, t, *args):
+        y0 = (start_deflection, start_velocity)
+        x = odeint(func=func, y0=y0, t=t, args=args)[:, 0]
+        return x
 
-        Returns:
-            _type_: _description_
-        """
-        z0 = (start_deflection, start_velocity)
-        return odeint(func=func, y0=z0, t=t, args=args)[:, 0]
+
+class IntSolverAufgabe1Uebung3:
+
+    def __init__(self) -> None:
+        return None
+
+    def state_space_steady(self, x, t, m_u, m, d, c, e, omega):
+        b2 = -m_u / m
+        omega_0 = np.sqrt(c / m)
+        delta = d / (2 * m)
+        [z, z_p] = x
+        x_p = [
+            z_p,
+            -2 * delta * z_p - omega_0**2 * z + b2 * e * omega**2 * np.sin(omega * t),
+        ]
+        return x_p
+
+    def state_space_accelerated(self, x, t, m_u, m, d, c, e, alpha):
+        delta = d / (2 * m)
+        omega_0 = np.sqrt(c / m)
+        b2 = -m_u / m
+        [z, z_p] = x
+        x_p = [
+            z_p,
+            -2 * delta * z_p
+            - omega_0**2 * z
+            - b2 * e * (alpha * t) ** 2 * np.sin(0.5 * alpha * t**2),
+        ]
+        return x_p
+
+    def integrate(self, func, t, z0, z0d, *args):
+
+        x0 = (z0, z0d)
+        return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
+
+
+class IntSolverAufgabe2Uebung2:
+
+    def __init__(self):
+        return None
+
+    def state_space_steady(self, x, t, l, j_a, u_hat, d, c, omega):
+        delta = (d * l**2) / (2 * j_a)
+        b1 = (d * l) / j_a
+        b0 = (c * l) / j_a
+        omega_0 = np.sqrt((c * l**2) / j_a)
+
+        [phi, phi_dot] = x
+        x_p = [
+            phi_dot,
+            -2 * delta * phi_dot
+            - omega_0**2 * phi
+            + b0 * u_hat * np.cos(omega * t)
+            - b1 * u_hat * omega * np.sin(omega * t),
+        ]
+        return x_p
+
+    def state_space_accelerated(self, x, t, l, j_a, u_hat, d, c, alpha):
+        delta = (d * l**2) / (2 * j_a)
+        b1 = (d * l) / j_a
+        b0 = (c * l) / j_a
+        omega_0 = np.sqrt((c * l**2) / j_a)
+
+        [phi, phi_dot] = x
+        x_p = [
+            phi_dot,
+            -2 * delta * phi_dot
+            - omega_0**2 * phi
+            + b0 * u_hat * np.cos(0.5 * alpha * t**2)
+            - b1 * u_hat * alpha * t * np.sin(0.5 * alpha * t**2),
+        ]
+        return x_p
+
+    def integrate(self, func, t, phi_0, phi_0_dot, *args):
+        x0 = (phi_0, phi_0_dot)
+        return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
 
 
 def validate_solution(solution, correct_solution, relative_threshold=0.05):

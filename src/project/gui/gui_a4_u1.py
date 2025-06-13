@@ -2,27 +2,21 @@ from typing import Any
 import math
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
-import matplotlib.pyplot as plt
-import numpy as np
 from ipywidgets import (
     VBox,
     AppLayout,
     GridspecLayout,
 )
 
-
+from .mpl_managers.a4_u1_mpl_manager import PlotManagerA4U1
+from .gui_superclass import GUISuperclass
 from ..utils.constants import (
-    DEFAULT_C_MAX,
-    START_VELOCITY,
-    START_DEFLECTION,
-    NUM_DATAPOINTS,
-    NUM_TIME_UNITS_AUFGABE_4,
+    A4_U1_DEFAULT_C_MAX,
+    A4_U1_START_VELOCITY,
+    A4_U1_START_DEFLECTION,
+    A4_U1_NUM_DATAPOINTS,
     CANVAS_WIDTH,
     CANVAS_HEIGHT,
-    X_LIM_START,
-    X_LIM_END_AUFGABE_4,
-    Y_LIM_START_AUFGABE_4,
-    Y_LIM_END_AUFGABE_4,
 )
 
 
@@ -33,7 +27,7 @@ from ..utils.constants import (
 FIRST_FRAME_CHANGE: bool = False
 
 
-class GUI:
+class GUI(GUISuperclass):
     def __init__(self, default_c, default_d, animation_instance: Any):
         """Function to build interactive ui for displaying
         and manipulating animations.
@@ -47,10 +41,11 @@ class GUI:
         Returns:
             Any: The application.
         """
+        super().__init__()
+        self.animation_instance = animation_instance
         # set constants as class variables
         self.default_c = default_c
         self.default_d = default_d
-        self.animation_instance = animation_instance
 
         # set up anim canvas
         self.mult_canvas_anim = MultiCanvas(
@@ -63,92 +58,20 @@ class GUI:
             ),
         )
         self.animation_instance.anim_canvas = self.mult_canvas_anim
-
-        # set up calc button
-        # self.calc_button = widgets.Button(
-        #     description="Calculate",
-        #     disabled=False,
-        #     button_style="",
-        #     layout=widgets.Layout(width="15%", display="flex", top="5%"),
-        # )
-        # self.calc_button.on_click(lambda b: self.calc_button_click(b))
-
-        # set up mpl figure
-        self.set_up_mpl()
+        # set up plot manager
+        self.plot_manager = PlotManagerA4U1(animation_instance)
 
         # after inital set up, set up gui elements
-        app_layout = self.gui_elements()
+        app_layout = self.make_gui()
 
         return app_layout
 
-    def set_up_mpl(self):
-        """Function to set up the matplotlib plots for the right canvas of the
-        GUI."""
-        # Clear all existing figures to avoid duplicates
-        plt.close("all")
-
-        # set up output widget
-        self.output = widgets.Output()
-        with self.output:
-            # Create the figure
-            self.fig, self.ax1 = plt.subplots(figsize=(4.5, 4.5))
-
-            # set limits for axes
-            plt.xlim([X_LIM_START, X_LIM_END_AUFGABE_4])
-            plt.ylim([Y_LIM_START_AUFGABE_4, Y_LIM_END_AUFGABE_4])
-
-            # Optional: Add grid or styling
-            self.ax1.grid(True)
-
-            # labels
-            plt.rcParams["font.family"] = "Arial"
-            plt.rcParams["mathtext.fontset"] = "stix"
-            plt.rcParams["mathtext.rm"] = "serif"
-            plt.rcParams["mathtext.it"] = "serif:italic"
-            plt.rcParams["mathtext.bf"] = "serif:bold"
-
-            self.ax1.set_xlabel(
-                r"$\boldsymbol{t} \: \boldsymbol{(s)}$",
-            )
-
-            self.ax1.set_ylabel(
-                r"Deflection $ \boldsymbol{\Phi (t)}$ [ °]",
-            )
-
-            # remove spines
-            plt.axhline(0, color="black", linewidth=1)
-            plt.axvline(0, color="black", linewidth=1)
-            self.ax1.spines["top"].set_visible(False)
-            self.ax1.spines["right"].set_visible(False)
-            self.ax1.spines["left"].set_visible(False)
-            self.ax1.spines["bottom"].set_visible(False)
-
-            # remove stuff
-            # self.fig.canvas.toolbar_position = "bottom"
-            self.fig.canvas.toolbar_visible = False
-            self.fig.canvas.header_visible = False
-            self.fig.canvas.footer_visible = False
-
-            # make blob
-            (self.blob,) = self.ax1.plot([], [], "bo", label="Blob")
-
-            plt.tight_layout()
-            plt.autoscale()
-            plt.show()
-
-        # plot default solution
-        self.t = np.linspace(0, NUM_TIME_UNITS_AUFGABE_4, NUM_DATAPOINTS)
-        solution = self.animation_instance._calculate()
-        (self.line,) = self.ax1.plot(
-            self.t, solution, color="blue", linewidth=0.75, linestyle="--"
-        )
-
-    def gui_elements(self):
+    def make_gui(self):
         """General function to coordinate gui elements."""
 
         # make control elements for parameters
         slider_d, slider_c, c_input_max, slider_defl, slider_v = (
-            self.variables_control_elements()
+            self.make_parameter_control_elements()
         )
         # make slider grid
         slider_grid = VBox([slider_d, slider_c, c_input_max, slider_defl, slider_v])
@@ -173,9 +96,9 @@ class GUI:
         title_grid[0, 2] = graph_title
 
         # make play control widget
-        play_control_widget = self.play_control_element()
+        play_control_widget = self.make_play_control_element()
 
-        self.app_layout = self.place_gui_elements(
+        self.app_layout = self.place_and_coordinate_gui_elements(
             animation_title, play_control_widget, slider_grid, title_grid
         )
 
@@ -184,7 +107,7 @@ class GUI:
         # draw first frame
         self.animation_instance._draw_first_frame()
 
-    def variables_control_elements(self) -> widgets:
+    def make_parameter_control_elements(self) -> widgets:
         """Function to create and place parameter control elements.
 
         Returns:
@@ -200,26 +123,26 @@ class GUI:
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_d = slider_d
 
         slider_c = widgets.FloatSlider(
             value=round(self.default_c, 2),
             min=0.1,
-            max=round(DEFAULT_C_MAX, 2),
+            max=round(A4_U1_DEFAULT_C_MAX, 2),
             step=0.01,
             description="c",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_c = slider_c
 
         c_input_max = widgets.BoundedFloatText(
-            value=round(DEFAULT_C_MAX, 2),
+            value=round(A4_U1_DEFAULT_C_MAX, 2),
             min=0.1,
             max=100,
             step=0.1,
@@ -235,32 +158,32 @@ class GUI:
         min_v = round(0.0, 4)
         max_v = round(2.25, 4)
         slider_v = widgets.FloatSlider(
-            value=round(START_VELOCITY, 4),
+            value=round(A4_U1_START_VELOCITY, 4),
             min=min_v,
             max=max_v,
             step=0.0001,
-            description="v0",
+            description="v₀",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_v = slider_v
 
         max_defl = round(math.pi, 4) / 10
         min_defl = round(math.pi, 4) / 30
         slider_defl = widgets.FloatSlider(
-            value=round(START_DEFLECTION, 4),
+            value=round(A4_U1_START_DEFLECTION, 4),
             min=min_defl,
             max=max_defl,
             step=0.01,
-            description="defl",
+            description="defl₀",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".4f",
-            layout=widgets.Layout(left="-10%", width="90%", display="flex"),
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
         self.slider_defl = slider_defl
 
@@ -274,7 +197,7 @@ class GUI:
 
         return slider_d, slider_c, c_input_max, slider_defl, slider_v
 
-    def play_control_element(self) -> widgets:
+    def make_play_control_element(self) -> widgets:
         """Function to create the play control element. Stop/restart/
             loop animation and slide through frames.
 
@@ -284,7 +207,7 @@ class GUI:
         play = widgets.Play(
             value=0,
             min=0,
-            max=NUM_DATAPOINTS - 1,
+            max=A4_U1_NUM_DATAPOINTS - 1,
             step=1,
             interval=25,
             description="Press play",
@@ -294,20 +217,22 @@ class GUI:
         play_slider = widgets.IntSlider(
             disabled=False,
             min=0,
-            max=NUM_DATAPOINTS - 1,
+            max=A4_U1_NUM_DATAPOINTS - 1,
             step=1,
             interval=25,
         )
         self.play_slider = play_slider
         self.play = play
         widgets.jslink((play, "value"), (play_slider, "value"))
-        play_control_widget = widgets.HBox([play, play_slider])
+        play_control_widget = widgets.HBox(
+            [play, play_slider], layout=widgets.Layout(left="2%")
+        )
         play_slider.observe(self.on_value_change, names="value")
         play.observe(self.on_value_change, names="playing")
 
         return play_control_widget
 
-    def place_gui_elements(
+    def place_and_coordinate_gui_elements(
         self,
         animation_title: widgets,
         play_control_widget: widgets,
@@ -340,7 +265,7 @@ class GUI:
             header=title_grid,
             left_sidebar=interactive_grid,
             center=self.mult_canvas_anim,
-            right_sidebar=self.fig.canvas,
+            right_sidebar=self.plot_manager.output_deflection,  # self.plot_manager.fig.canvas,
             footer=None,
             pane_widths=["33%", "33%", "33%"],
             pane_heights=["10%", "90%", "0%"],
@@ -366,16 +291,25 @@ class GUI:
 
         return app_layout
 
-    def calc_and_set_solution(self):
-        """Calculate solution based on new parameters and set y data."""
-        solution = self.animation_instance._calculate()
-        # set new y data
-        self.line.set_ydata(solution)
-        self.fig.canvas.draw()  # redraw the canvas
-        # set blob
-        x = [self.t[self.animation_instance.frame]]
-        y = [self.animation_instance.solution[self.animation_instance.frame]]
-        self.blob.set_data(x, y)
+    def reset_parameters(self, button):
+        """Function to reset all parameters to default values.
+
+        Args:
+            button (widgets.Button): Button that triggers the reset.
+        """
+
+        # freeze the change of the graph
+        self.freeze_change = True
+
+        self.slider_d.value = self.default_d
+        self.slider_c.value = self.default_c
+        self.c_input_max.value = A4_U1_DEFAULT_C_MAX
+
+        # unfreeze the change of the graph
+        self.freeze_change = False
+
+        # calculate default solution
+        self.plot_manager.calc_and_plot_solutions()
 
     def on_value_change(self, change):
         """Unified observer for handling parameter slider value changes.
@@ -389,19 +323,19 @@ class GUI:
         match widget:
             case self.slider_d:
                 self.animation_instance.d = new_value
-                self.calc_and_set_solution()
+                self.plot_manager.calc_and_plot_solutions()
 
             case self.slider_c:
                 self.animation_instance.c = new_value
-                self.calc_and_set_solution()
+                self.plot_manager.calc_and_plot_solutions()
 
             case self.slider_v:
                 self.animation_instance.start_velocity = new_value
-                self.calc_and_set_solution()
+                self.plot_manager.calc_and_plot_solutions()
 
             case self.slider_defl:
                 self.animation_instance.start_deflection = new_value
-                self.calc_and_set_solution()
+                self.plot_manager.calc_and_plot_solutions()
 
             case self.c_input_max:
                 self.slider_c.max = new_value
@@ -423,10 +357,7 @@ class GUI:
 
                 global FIRST_FRAME_CHANGE
                 # animate blob in gaph
-                x = [self.t[new_value]]
-                y = [self.animation_instance.solution[new_value]]
-                self.blob.set_data(x, y)
-                self.fig.canvas.draw_idle()
+                self.plot_manager.update_blobs()
 
                 # animate pendulum
                 self.animation_instance.frame = new_value
@@ -435,5 +366,5 @@ class GUI:
                     FIRST_FRAME_CHANGE = True
                     # self.calc_button.description = "Calculate"
 
-                if new_value == NUM_DATAPOINTS - 1:
+                if new_value == A4_U1_NUM_DATAPOINTS - 1:
                     FIRST_FRAME_CHANGE = False
