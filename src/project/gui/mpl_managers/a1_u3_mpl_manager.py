@@ -95,9 +95,9 @@ class PlotManagerA1U3(PlotManagerSuperclass):
         """Plot initial solutions"""
 
         sol_deflection, sol_force = self.animation_instance._calculate()
-        # omega_vec, omega_0, mag, mag_undamped, phase = (
-        #     self.animation_instance.calc_bode_diagram()
-        # )
+        omega_vec, omega_0, mag, mag_undamped, phase = (
+            self.animation_instance.calc_bode_diagram()
+        )
 
         # fill in the solutions in the line dict
         self.lines_sol_dict[self.line_deflection] = (
@@ -108,24 +108,24 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             self.t,
             sol_force,
         )
-        # self.lines_sol_dict[self.line_bode_1_1] = (
-        #     omega_vec / omega_0,
-        #     mag,
-        # )
-        # self.lines_sol_dict[self.line_bode_1_2] = (
-        #     omega_vec / omega_0,
-        #     mag_undamped,
-        # )
-        # self.lines_sol_dict[self.line_bode_2] = (
-        #     omega_vec / omega_0,
-        #     phase,
-        # )
+        self.lines_sol_dict[self.line_bode_1_1] = (
+            omega_vec / omega_0,
+            mag,
+        )
+        self.lines_sol_dict[self.line_bode_1_2] = (
+            omega_vec / omega_0,
+            mag_undamped,
+        )
+        self.lines_sol_dict[self.line_bode_2] = (
+            omega_vec / omega_0,
+            phase,
+        )
 
         # update plots
         self.update_plots()
 
         # update axes limits
-        # self.update_axes_limits(sol_deflection, sol_force, mag)
+        self.update_axes_limits(sol_deflection, sol_force, mag)
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection

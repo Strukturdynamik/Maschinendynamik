@@ -152,7 +152,7 @@ class Aufgabe1(AnimationInstance):
         # Dauerlauf
         if self.mode == "Constant":
             solution = self.calculator.integrate(
-                self.calculator.state_space_settled,
+                self.calculator.state_space_steady,
                 self.start_deflection,
                 self.start_velocity,
                 self.t,
@@ -191,8 +191,22 @@ class Aufgabe1(AnimationInstance):
 
     def calc_bode_diagram(
         self,
-    ) -> tuple[np.ndarray, np.ndarray, List[float], List[float], List[float]]:
-        return None
+    ):
+        b2 = -self.m_u / self.m
+        delta = self.d / (2 * self.m)
+        omega_vec = np.linspace(0, 2 * self.omega, len(self.t))
+
+        num = np.array([b2, 0, 0])
+        den = np.array([1, 2 * delta, self.omega**2])
+        G = signal.TransferFunction(num, den)
+        _, mag, phase = signal.bode(G, omega_vec)
+        mag = 10 ** (mag / 20)  # Umrechnung von dB auf abs
+
+        G_undamped = signal.TransferFunction([b2, 0, 0], [1, 0, self.omega**2])
+        _, mag_undamped, _ = signal.bode(G_undamped, omega_vec)
+        mag_undamped = 10 ** (mag_undamped / 20)
+
+        return omega_vec, self.omega, mag, mag_undamped, phase
 
     def _animate_visual(self):
         return None

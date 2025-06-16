@@ -111,7 +111,6 @@ class GUI(GUISuperclass):
         (
             slider_d,
             slider_c,
-            c_input_max,
             slider_defl,
             slider_v,
             slider_m,
@@ -128,7 +127,6 @@ class GUI(GUISuperclass):
             [
                 slider_d,
                 slider_c,
-                c_input_max,
                 slider_m,
                 slider_omega,
                 slider_alpha,
@@ -156,7 +154,7 @@ class GUI(GUISuperclass):
         title_grid[0, 2] = graph_title
 
         # make play control widget
-        play_control_widget = self.make_play_control_element()
+        play_control_widget = self.make_play_control_element(A1_U3_NUM_DATA_POINTS)
 
         self.app_layout = self.place_and_coordinate_gui_elements(
             play_control_widget,
@@ -209,19 +207,6 @@ class GUI(GUISuperclass):
             tooltip="spring constant",
         )
         self.slider_c = slider_c
-
-        c_input_max = widgets.BoundedFloatText(
-            value=round(A1_U3_DEFAULT_C_MAX, 2),
-            min=0.1,
-            max=100,
-            step=1.0,
-            description="cₘₐₓ : ",
-            readout_format=".2f",
-            disabled=False,
-            layout=widgets.Layout(display="flex", width="50%"),
-        )
-        c_input_max.observe(self.on_value_change, names="value")
-        self.c_input_max = c_input_max
 
         slider_m = widgets.FloatSlider(
             value=A1_U3_DEFAULT_M,
@@ -385,7 +370,6 @@ class GUI(GUISuperclass):
         return (
             slider_d,
             slider_c,
-            c_input_max,
             slider_defl,
             slider_v,
             slider_m,
@@ -396,39 +380,6 @@ class GUI(GUISuperclass):
             reset_button,
             radio_buttons,
         )
-
-    def make_play_control_element(self) -> widgets:
-        """Function to create the play control element. Stop/restart/
-            loop animation and slide through frames.
-
-        Returns:
-            widgets: Returns play control element.
-        """
-        play = widgets.Play(
-            value=0,
-            min=0,
-            max=A1_U3_NUM_DATA_POINTS - 1,
-            step=1,
-            interval=25,
-            description="Press play",
-            disabled=False,
-        )
-
-        play_slider = widgets.IntSlider(
-            disabled=False,
-            min=0,
-            max=A1_U3_NUM_DATA_POINTS - 1,
-            step=1,
-            interval=25,
-        )
-        self.play_slider = play_slider
-        self.play = play
-        widgets.jslink((play, "value"), (play_slider, "value"))
-        play_control_widget = widgets.HBox([play, play_slider])
-        play_slider.observe(self.on_value_change, names="value")
-        play.observe(self.on_value_change, names="playing")
-
-        return play_control_widget
 
     def place_and_coordinate_gui_elements(
         self,
@@ -507,7 +458,7 @@ class GUI(GUISuperclass):
 
         self.slider_d.value = self.default_d
         self.slider_c.value = self.default_c
-        self.c_input_max.value = A1_U3_DEFAULT_C_MAX
+
         self.slider_m.value = A1_U3_DEFAULT_M
         self.slider_omega.value = A1_U3_DEFAULT_OMEGA
         self.slider_alpha.value = A1_U3_DEFAULT_ALPHA
@@ -569,9 +520,6 @@ class GUI(GUISuperclass):
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
-            case self.c_input_max:
-                self.slider_c.max = new_value
-
             case self.slider_m:
                 self.animation_instance.m = new_value
                 omega_0 = np.sqrt(
@@ -591,8 +539,8 @@ class GUI(GUISuperclass):
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
-            case self.slider_f_hat:
-                self.animation_instance.f_hat = new_value
+            case self.slider_e:
+                self.animation_instance.eps = new_value
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
@@ -600,14 +548,12 @@ class GUI(GUISuperclass):
                 if new_value == True:
                     for s in self.sliders:
                         s.disabled = True
-                    self.c_input_max.disabled = True
 
             case self.play_slider:
                 # if reset button pressed, enable controls
                 if new_value == self.play.min:
                     for s in self.sliders:
                         s.disabled = False
-                    self.c_input_max.disabled = False
                     # handle omega and alpha slider
                     if self.animation_instance.mode == "Lineary Increasing":
                         self.slider_omega.disabled = True

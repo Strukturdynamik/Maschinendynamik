@@ -146,7 +146,7 @@ class GUI(GUISuperclass):
         title_grid[0, 2] = graph_title
 
         # make play control widget
-        play_control_widget = self.make_play_control_element()
+        play_control_widget = self.make_play_control_element(A1_U2_NUM_DATA_POINTS)
 
         self.app_layout = self.place_and_coordinate_gui_elements(
             play_control_widget,
@@ -372,39 +372,6 @@ class GUI(GUISuperclass):
             reset_button,
             radio_buttons,
         )
-
-    def make_play_control_element(self) -> widgets:
-        """Function to create the play control element. Stop/restart/
-            loop animation and slide through frames.
-
-        Returns:
-            widgets: Returns play control element.
-        """
-        play = widgets.Play(
-            value=0,
-            min=0,
-            max=A1_U2_NUM_DATA_POINTS - 1,
-            step=1,
-            interval=25,
-            description="Press play",
-            disabled=False,
-        )
-
-        play_slider = widgets.IntSlider(
-            disabled=False,
-            min=0,
-            max=A1_U2_NUM_DATA_POINTS - 1,
-            step=1,
-            interval=25,
-        )
-        self.play_slider = play_slider
-        self.play = play
-        widgets.jslink((play, "value"), (play_slider, "value"))
-        play_control_widget = widgets.HBox([play, play_slider])
-        play_slider.observe(self.on_value_change, names="value")
-        play.observe(self.on_value_change, names="playing")
-
-        return play_control_widget
 
     def place_and_coordinate_gui_elements(
         self,
