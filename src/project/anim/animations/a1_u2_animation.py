@@ -24,6 +24,8 @@ from ...utils.constants import (
     A1_U2_DEFAULT_ALPHA,
     A1_U2_DEFAULT_F_HAT,
     DEFAULT_FRAME,
+    A1_U2_START_DEFLECTION_MIN,
+    A1_U2_START_DEFLECTION_MAX,
 )
 
 """
@@ -79,10 +81,21 @@ class Aufgabe1(AnimationInstance):
             abs_value(self.anim_canvas.width, 10),
             abs_value(self.anim_canvas.width, 60),
         ]
+
         self.bottom_right_x = abs_value(self.anim_canvas.width, 90)
         bottom_right = [
             self.bottom_right_x,
             abs_value(self.anim_canvas.width, 60),
+        ]
+
+        # set boundaries for animating the circle
+        self.x_min_bound = self.top_left_x + abs_value(self.anim_canvas.width, 36)
+        self.x_max_bound = self.bottom_right_x - abs_value(self.anim_canvas.width, 15)
+
+        # position of zero deflection
+        self.zero_pos = [
+            (self.x_min_bound + self.x_max_bound) / 2,
+            (top_left[1] + bottom_left[1]) / 2,
         ]
 
         self.anim_canvas[4].line_width = 2.0
@@ -109,14 +122,23 @@ class Aufgabe1(AnimationInstance):
             direction_strokes="bottom",
         )
 
+        # set anker point for feder dämpfer element
+        self.anker_point = [
+            self.top_left_x,
+            (top_left[1] + bottom_left[1]) / 2,
+        ]
+
+        # set some class variables
+        self.spring_width = abs_value(self.anim_canvas.width, 5)
+
         # make arrow for x
         self.anim_canvas[0].line_width = 1.5
         draw_arrow(
             canvas=self.anim_canvas[4],
-            x1=abs_value(self.anim_canvas.width, 50),
-            y1=abs_value(self.anim_canvas.width, 20),
-            x2=abs_value(self.anim_canvas.width, 60),
-            y2=abs_value(self.anim_canvas.width, 20),
+            x1=self.zero_pos[0],
+            y1=self.zero_pos[1] - abs_value(self.anim_canvas.width, 21),
+            x2=self.zero_pos[0] + abs_value(self.anim_canvas.width, 10),
+            y2=self.zero_pos[1] - abs_value(self.anim_canvas.width, 21),
             alpha=50,
             base_length=abs_value(self.anim_canvas.width, 5),
             num_base_strokes=3,
@@ -132,22 +154,9 @@ class Aufgabe1(AnimationInstance):
             description_style="italic",
         )
 
-        # set anker point for feder dämpfer element
-        self.anker_point = [
-            self.top_left_x,
-            (top_left[1] + bottom_left[1]) / 2,
-        ]
-
-        # set some class variables
-        self.spring_width = abs_value(self.anim_canvas.width, 5)
-        # zero position of the circle
-        self.zero_pos = [
-            self.anker_point[0] + abs_value(self.anim_canvas.width, 45),
-            self.anker_point[1],
-        ]
         # bottom line to determine radius of circle
         self.bottom_line_y = bottom_left[1]
-        self.radius = self.bottom_line_y - self.zero_pos[1]
+        self.radius = bottom_left[1] - (top_left[1] + bottom_left[1]) / 2
 
     def _calculate(self) -> tuple[np.ndarray, np.ndarray]:
         """Calculates the deflection response of the system over time.
@@ -248,8 +257,8 @@ class Aufgabe1(AnimationInstance):
             curr_sol_vis,
             min_sol,
             max_sol,
-            self.top_left_x + abs_value(self.anim_canvas.width, 40),
-            self.bottom_right_x - abs_value(self.anim_canvas.width, 20),
+            self.x_min_bound,
+            self.x_max_bound,
         )
 
         with hold_canvas():
@@ -381,21 +390,42 @@ class Aufgabe1(AnimationInstance):
             )
 
     def _draw_first_frame(self):
+        self.anim_canvas[6].clear()  # force indicator
+        self.anim_canvas[5].clear()  # dot
+        self.anim_canvas[3].clear()  # circle
+        self.anim_canvas[2].clear()  # feder daempfer element
+        self.anim_canvas[1].clear()  # spring
+        self.anim_canvas[0].clear()  # feder daempfer element
         self.anim_canvas[0].fill_style = "#bebebe"
         self.anim_canvas[0].line_width = 1.5
 
-        # draw circle in zero position
-        radius = self.bottom_line_y - self.zero_pos[1]
-        self.anim_canvas[0].fill_circle(self.zero_pos[0], self.zero_pos[1], radius)
-        self.anim_canvas[0].stroke_circle(self.zero_pos[0], self.zero_pos[1], radius)
+        # draw circle in position relative to zero position based on defl_0
+        # map inital deflection
+        self.mapped_init_defl = map_value(
+            self.start_deflection,
+            A1_U2_START_DEFLECTION_MIN,
+            A1_U2_START_DEFLECTION_MAX,
+            self.x_min_bound,
+            self.x_max_bound,
+        )
+        self.anim_canvas[0].fill_circle(
+            self.mapped_init_defl, self.zero_pos[1], self.radius
+        )
+        self.anim_canvas[0].stroke_circle(
+            self.mapped_init_defl, self.zero_pos[1], self.radius
+        )
 
         # small circle in middle
         self.anim_canvas[0].fill_style = "#FFFFFF"
         self.anim_canvas[0].fill_circle(
-            self.zero_pos[0], self.zero_pos[1], abs_value(self.anim_canvas.width / 2, 2)
+            self.mapped_init_defl,
+            self.zero_pos[1],
+            abs_value(self.anim_canvas.width / 2, 2),
         )
         self.anim_canvas[0].stroke_circle(
-            self.zero_pos[0], self.zero_pos[1], abs_value(self.anim_canvas.width / 2, 2)
+            self.mapped_init_defl,
+            self.zero_pos[1],
+            abs_value(self.anim_canvas.width / 2, 2),
         )
 
         # feder daempfer element
@@ -416,7 +446,7 @@ class Aufgabe1(AnimationInstance):
         # make bottom part of feder daempfer element
         spring_anker_point_bottom = ghetto_feder_daempfer_element_bottom(
             canvas=self.anim_canvas[0],
-            anker_point_bottom=[self.zero_pos[0] - radius, self.zero_pos[1]],
+            anker_point_bottom=[self.mapped_init_defl - self.radius, self.zero_pos[1]],
             bottom_fork_extension=anker_point_extension,
             bottom_fork_width=fork_width,
             daempfer_length=abs_value(self.anim_canvas.width, 12),
@@ -426,9 +456,9 @@ class Aufgabe1(AnimationInstance):
 
         # draw line from feder daempfer element to circle
         self.anim_canvas[0].stroke_line(
-            self.zero_pos[0] - radius,
+            self.mapped_init_defl - self.radius,
             self.zero_pos[1],
-            self.zero_pos[0],
+            self.mapped_init_defl,
             self.zero_pos[1],
         )
 
