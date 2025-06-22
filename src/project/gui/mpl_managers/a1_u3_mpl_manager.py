@@ -20,6 +20,7 @@ class PlotManagerA1U3(PlotManagerSuperclass):
         """Initialize all matplotlib plots"""
         self.setup_deflection_plot()
         self.setup_bode_plot()
+        self.setup_ground_force()
         self.set_plot_styles()
         self.calc_and_plot_solutions()
 
@@ -91,13 +92,56 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             plt.tight_layout()
             plt.show()
 
-    def calc_and_plot_solutions(self):
-        """Plot initial solutions"""
+    def setup_ground_force(self):
+        """Set up the Bode Ground Force plot"""
+        self.output_ground_force = widgets.Output()
+        with self.output_ground_force:
+            self.fig_ground_force = plt.figure(figsize=(5, 5))
+            self.ax_ground_force = self.fig_ground_force.add_subplot(2, 1, 1)
+            self.ax2_ground_force = self.fig_ground_force.add_subplot(2, 1, 2)
+            self.configure_axes(self.ax_ground_force, "", r"$\hat{F}_{B}/e$ [abs]")
+            self.configure_axes(
+                self.ax2_ground_force,
+                r"$\Omega$ / $\omega_{0}$",
+                r"$\phi_{\hat{F}_{B}}$ [deg]",
+            )
 
-        sol_deflection, sol_force = self.animation_instance._calculate()
+            (self.line_ground_force_1,) = self.ax_ground_force.semilogx(
+                [], [], linewidth=0.75, linestyle="-", color="red"
+            )
+            (self.line_ground_force_2,) = self.ax2_ground_force.semilogx(
+                [], [], linestyle="-", linewidth=0.75, color="red"
+            )
+
+            # add figure and lines to figure_lines dict
+            self.figure_lines_dict[self.fig_ground_force] = [
+                self.line_ground_force_1,
+                self.line_ground_force_2,
+            ]
+
+            # remove stuff
+            self.remove_stuff()
+
+            self.ax_ground_force.legend()
+            plt.tight_layout()
+            plt.show()
+
+    def calc_and_plot_solutions(self):
+        (
+            sol_deflection,
+            sol_force,
+        ) = self.animation_instance._calculate()
+
         omega_vec, omega_0, mag, mag_undamped, phase = (
             self.animation_instance.calc_bode_diagram()
         )
+
+        (
+            omega_vec_ground_force,
+            omega_ground_force,
+            mag_ground_force,
+            phase_ground_force,
+        ) = self.animation_instance.calc_ground_force()
 
         # fill in the solutions in the line dict
         self.lines_sol_dict[self.line_deflection] = (
@@ -121,22 +165,51 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             phase,
         )
 
+        self.lines_sol_dict[self.line_ground_force_1] = (
+            omega_vec_ground_force / omega_ground_force,
+            mag_ground_force,
+        )
+
+        print(f"{(omega_vec_ground_force / omega_ground_force)[:5]=}")
+        print()
+        print(f"{phase_ground_force[:5]=}")
+        self.lines_sol_dict[self.line_ground_force_2] = (
+            omega_vec_ground_force / omega_ground_force,
+            phase_ground_force,
+        )
+
         # update plots
         self.update_plots()
 
         # update axes limits
-        self.update_axes_limits(sol_deflection, sol_force, mag)
+        self.update_axes_limits(
+            sol_deflection, mag, mag_ground_force, phase_ground_force
+        )
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
-    def update_axes_limits(self, sol_deflection, sol_force, mag):
+    def update_axes_limits(
+        self, sol_deflection, mag, mag_ground_force, phase_ground_force
+    ):
         """Update axes limits based on current data"""
         self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
 
         self.ax_bode.set_ylim(0, max(mag) * 1.1)
 
-        for ax in [self.ax1, self.ax2_bode, self.ax_bode, self.ax1_second_yaxis]:
+        self.ax_ground_force.set_ylim(0, max(mag_ground_force) * 1.1)
+        self.ax2_ground_force.set_ylim(
+            min(phase_ground_force) * 1.1, max(phase_ground_force) * 1.1
+        )
+
+        for ax in [
+            self.ax1,
+            self.ax2_bode,
+            self.ax_bode,
+            self.ax1_second_yaxis,
+            self.ax_ground_force,
+            self.ax2_ground_force,
+        ]:
             ax.relim()
             ax.autoscale_view()

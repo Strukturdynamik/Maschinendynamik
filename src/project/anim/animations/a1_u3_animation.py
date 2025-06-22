@@ -24,6 +24,8 @@ from ...utils.constants import (
     A1_U3_DEFAULT_ALPHA,
     A1_U3_DEFAULT_MU,
     A1_U3_DEFAULT_EPS,
+    A1_U3_START_DEFLECTION_MIN,
+    A1_U3_START_DEFLECTION_MAX,
     DEFAULT_FRAME,
 )
 
@@ -64,9 +66,10 @@ class Aufgabe1(AnimationInstance):
             self.anim_canvas.width / 2, 1
         )  # Size of the rotating dot
 
-    def _initial_visual(self):
-        # define important coordinates
+        self.min_bound = self.rect_y
+        self.max_bound = self.rect_y + self.rect_h * 0.5
 
+    def _initial_visual(self):
         # === Layer 0: Background Frame with Strokes ===
         self.bg_layer.line_width = 1.5
 
@@ -152,10 +155,10 @@ class Aufgabe1(AnimationInstance):
                 self.d,
                 self.c,
                 self.eps,
-                self.alpha,
+                self.omega,
             )
-            anregung_sol = np.cos(self.omega * self.t)
-            arrow_sol = np.cos(self.omega * self.t)
+
+            anregung_sol = self.eps * np.sin(self.omega * self.t)
         # Hochlauf
         if self.mode == "Lineary Increasing":
             solution = self.calculator.integrate(
@@ -168,15 +171,13 @@ class Aufgabe1(AnimationInstance):
                 self.d,
                 self.c,
                 self.eps,
-                self.omega,
+                self.alpha,
             )
 
-            anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
-            arrow_sol = np.cos(0.5 * self.alpha * self.t**2)
+            anregung_sol = self.eps * np.sin(0.5 * self.alpha * self.t**2)
 
         self.solution = solution
         self.anregung_sol = anregung_sol
-        self.arrow_sol = arrow_sol
 
         return solution, anregung_sol
 
@@ -198,6 +199,16 @@ class Aufgabe1(AnimationInstance):
         mag_undamped = 10 ** (mag_undamped / 20)
 
         return omega_vec, self.omega, mag, mag_undamped, phase
+
+    def calc_ground_force(self):
+        delta = delta = self.d / (2 * self.m)
+        num = np.array([-2 * delta * self.m_u, -self.m_u * self.omega**2, 0, 0])
+        den = np.array([1, 2 * delta, self.omega**2])
+        G = signal.TransferFunction(num, den)
+        Omega_vec, mag, phase = signal.bode(G)
+        mag = 10 ** (mag / 20)
+
+        return Omega_vec, self.omega, mag, phase
 
     def _animate_visual(self):
 
@@ -317,20 +328,41 @@ class Aufgabe1(AnimationInstance):
             )
 
     def _draw_first_frame(self):
+        self.rect_layer.clear()
+        self.circ_layer.clear()
+        self.spring_layer.clear()
+        self.text_layer.clear()
+
+        # draw circle in position relative to zero position based on defl_0
+        # map inital deflection
+        self.mapped_init_defl = map_value(
+            self.start_deflection,
+            A1_U3_START_DEFLECTION_MIN,
+            A1_U3_START_DEFLECTION_MAX,
+            self.min_bound,
+            self.max_bound,
+        )
+
         # === Layer 1: Rectangle ===
         self.rect_layer.line_width = 1.5
         self.rect_layer.fill_style = "#bebebe"
-        self.rect_layer.fill_rect(self.rect_x, self.rect_y, self.rect_w, self.rect_h)
-        self.rect_layer.stroke_rect(self.rect_x, self.rect_y, self.rect_w, self.rect_h)
+        self.rect_layer.fill_rect(
+            self.rect_x, self.mapped_init_defl, self.rect_w, self.rect_h
+        )
+        self.rect_layer.stroke_rect(
+            self.rect_x, self.mapped_init_defl, self.rect_w, self.rect_h
+        )
 
         # === Layer 2: Circle and Connecting Lines ===
         self.circ_r = abs_value(self.canvas_height, 13)
         self.circ_x = self.rect_x + self.rect_w / 2
-        self.circ_y = self.rect_y - abs_value(self.canvas_height, 15)
+        self.circ_y = self.mapped_init_defl - abs_value(self.canvas_height, 15)
 
-        self.circ_layer.stroke_line(self.rect_x, self.rect_y, self.circ_x, self.circ_y)
         self.circ_layer.stroke_line(
-            self.rect_x + self.rect_w, self.rect_y, self.circ_x, self.circ_y
+            self.rect_x, self.mapped_init_defl, self.circ_x, self.circ_y
+        )
+        self.circ_layer.stroke_line(
+            self.rect_x + self.rect_w, self.mapped_init_defl, self.circ_x, self.circ_y
         )
 
         self.circ_layer.fill_style = "white"
@@ -369,7 +401,7 @@ class Aufgabe1(AnimationInstance):
         # Bottom Fork
         self.anker_point_bottom = (
             self.rect_x + self.rect_w / 2,
-            self.rect_y + self.rect_h,
+            self.mapped_init_defl + self.rect_h,
         )
         spring_anker_point_bottom = ghetto_feder_daempfer_element_bottom(
             self.spring_layer,
@@ -408,7 +440,7 @@ class Aufgabe1(AnimationInstance):
         self.text_layer.fill_text(
             "m₀",
             self.rect_x + self.rect_w / 2 - abs_value(self.canvas_width, 3),
-            self.rect_y + self.rect_h / 2 + abs_value(self.canvas_height, 2),
+            self.mapped_init_defl + self.rect_h / 2 + abs_value(self.canvas_height, 2),
         )
         self.text_layer.fill_text(
             "c",

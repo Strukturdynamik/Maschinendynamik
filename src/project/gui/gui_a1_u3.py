@@ -7,8 +7,8 @@ from ipywidgets import (
     AppLayout,
     GridspecLayout,
 )
+import threading
 
-# reuse the plotmanager from task a1_u2 because the plots needed are the same
 from .mpl_managers.a1_u3_mpl_manager import PlotManagerA1U3
 from .gui_superclass import GUISuperclass
 
@@ -73,12 +73,13 @@ class GUI(GUISuperclass):
         """
 
         # set constants as class variables
+        self._deflection_timer = None
         self.default_c = default_c
         self.default_d = default_d
         self.animation_instance = animation_instance
         self.animation_instance.c = default_c
         self.animation_instance.d = default_d
-        self.animation_instance.mode = "Lineary Increasing"
+        self.animation_instance.mode = "Constant"  # Lineary Increasing"
         self.freeze_change = False
         self.t = A1_U3_T
 
@@ -412,9 +413,10 @@ class GUI(GUISuperclass):
         children = [
             self.plot_manager.fig_deflection.canvas,
             self.plot_manager.fig_bode.canvas,
+            self.plot_manager.fig_ground_force.canvas,
         ]
         tab.children = children
-        tab.titles = ["Deflection", "Bode Diagram"]
+        tab.titles = ["Deflection", "Bode Diagram", "Bode: Ground Force"]
 
         app_layout = AppLayout(
             header=title_grid,
@@ -517,6 +519,16 @@ class GUI(GUISuperclass):
 
             case self.slider_defl:
                 self.animation_instance.start_deflection = new_value
+
+                # delay animation redraw
+                if self._deflection_timer is not None:
+                    self._deflection_timer.cancel()
+
+                self._deflection_timer = threading.Timer(
+                    0.35, self.animation_instance._draw_first_frame
+                )
+                self._deflection_timer.start()
+
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
