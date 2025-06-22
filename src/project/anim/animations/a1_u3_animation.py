@@ -27,18 +27,6 @@ from ...utils.constants import (
     DEFAULT_FRAME,
 )
 
-"""
-    Concrete implementation of AnimationInstance to animate the mechanical
-    oscillation system in Übung 2, Aufgabe 1
-    (Jupyter Notebooks\resources\documents\Übung_2_Aufg1.pdf)
-
-    This class handles the setup, calculation, and visualization of the
-    forced damped oscillation system using a spring-damper model. It includes:
-    - Drawing static elements of the animation that won't change over time
-    - Calculating the system's response over time for two excitation modes
-    - Animate the oscillating system to represent the solution
-"""
-
 
 class Aufgabe1(AnimationInstance):
     def __init__(self, calculator: Any) -> None:
@@ -73,8 +61,8 @@ class Aufgabe1(AnimationInstance):
         self.rect_w = abs_value(self.canvas_width, 25)
         self.rect_h = self.rect_w
         self.dot_radius = abs_value(
-                self.anim_canvas.width / 2, 1
-            )  # Size of the rotating dot
+            self.anim_canvas.width / 2, 1
+        )  # Size of the rotating dot
 
     def _initial_visual(self):
         # define important coordinates
@@ -190,18 +178,6 @@ class Aufgabe1(AnimationInstance):
         self.anregung_sol = anregung_sol
         self.arrow_sol = arrow_sol
 
-
-        #########################
-        # Parameters
-        amplitude = 1.0      # amplitude of the sine wave
-        frequency = 1.0      # in Hz
-        phase = 0.0          # in radians
-
-        # Sine wave: y(t) = A * sin(2πft + phase)
-        y = amplitude * np.sin(2 * np.pi * frequency * self.t + phase)
-        solution = y 
-        ##########################
-
         return solution, anregung_sol
 
     def calc_bode_diagram(
@@ -224,6 +200,7 @@ class Aufgabe1(AnimationInstance):
         return omega_vec, self.omega, mag, mag_undamped, phase
 
     def _animate_visual(self):
+
         # get current solution from frame
         curr_sol_vis = self.solution[self.frame]
 
@@ -235,45 +212,54 @@ class Aufgabe1(AnimationInstance):
             min_sol,
             max_sol,
             self.rect_y,
-            self.rect_y + self.rect_h,
+            self.rect_y + self.rect_h * 0.5,
         )
 
-        with hold_canvas(): 
+        with hold_canvas():
             self.rect_layer.clear()
             self.circ_layer.clear()
             self.spring_layer.clear()
             self.text_layer.clear()
 
+            # rect
+            self.rect_layer.fill_rect(
+                self.rect_x, mapped_curr_pos, self.rect_w, self.rect_h
+            )
+            self.rect_layer.stroke_rect(
+                self.rect_x, mapped_curr_pos, self.rect_w, self.rect_h
+            )
 
-            # rect 
-            self.rect_layer.fill_rect(self.rect_x, mapped_curr_pos, self.rect_w, self.rect_h)
-            self.rect_layer.stroke_rect(self.rect_x, mapped_curr_pos, self.rect_w, self.rect_h)
-
-            # circ and connection line 
+            # circ and connection line
             circ_y = mapped_curr_pos - abs_value(self.canvas_height, 15)
-            self.circ_layer.stroke_line(self.rect_x, mapped_curr_pos, self.circ_x, circ_y)
             self.circ_layer.stroke_line(
-            self.rect_x + self.rect_w, mapped_curr_pos, self.circ_x, circ_y
-        )
-            # big circle 
-            self.circ_layer.stroke_circle(self.circ_x, circ_y, self.circ_r)
+                self.rect_x, mapped_curr_pos, self.circ_x, circ_y
+            )
+            self.circ_layer.stroke_line(
+                self.rect_x + self.rect_w, mapped_curr_pos, self.circ_x, circ_y
+            )
+            # big circle
             self.circ_layer.fill_circle(self.circ_x, circ_y, self.circ_r)
+            self.circ_layer.stroke_circle(self.circ_x, circ_y, self.circ_r)
 
-            # small circle 
-            self.circ_layer.stroke_circle(self.circ_x, circ_y, abs_value(self.canvas_width, 1))
-            self.circ_layer.fill_circle(self.circ_x, circ_y, abs_value(self.canvas_width, 1))
+            # small circle
+            self.circ_layer.fill_circle(
+                self.circ_x, circ_y, abs_value(self.canvas_width, 1)
+            )
+            self.circ_layer.stroke_circle(
+                self.circ_x, circ_y, abs_value(self.canvas_width, 1)
+            )
 
             # rotating dot
-            dot_x = self.circ_x + self.circ_r * math.cos(curr_sol_vis)
-            dot_y = self.circ_y + self.circ_r * math.sin(curr_sol_vis)
+            dot_radius = abs_value(self.canvas_height / 2, 1)
+            orbit_radius = self.circ_r  # - dot_radius / 2
 
-            # Draw the rotating dot
+            dot_x = self.circ_x + orbit_radius * math.cos(curr_sol_vis)
+            dot_y = circ_y + orbit_radius * math.sin(curr_sol_vis)
 
-            # fix later
             self.circ_layer.fill_style = "black"
-            self.circ_layer.fill_circle(dot_x, dot_y, self.dot_radius)
+            self.circ_layer.fill_circle(dot_x, dot_y, dot_radius)
+            self.circ_layer.stroke_circle(dot_x, dot_y, dot_radius)
             self.circ_layer.fill_style = "white"
-
 
             # Top Fork
             # static change later no need to redraw
@@ -290,24 +276,27 @@ class Aufgabe1(AnimationInstance):
             )
 
             # Bottom Fork
-            anker_point_bottom = (self.rect_x + self.rect_w / 2, mapped_curr_pos+self.rect_h)
+            anker_point_bottom = (
+                self.rect_x + self.rect_w / 2,
+                mapped_curr_pos + self.rect_h,
+            )
             spring_anker_point_bottom = ghetto_feder_daempfer_element_bottom(
-            self.spring_layer,
-            anker_point_bottom,
-            bottom_fork_extension=abs_value(self.canvas_width, 2),
-            bottom_fork_width=abs_value(self.canvas_width, 4),
-            daempfer_length=abs_value(self.canvas_width, 4),
-            daempfer_width=abs_value(self.canvas_width, 3),
-            direction="vertical",
-            top_to_bottom=False,
-        )   
-            
-            # spring 
+                self.spring_layer,
+                anker_point_bottom,
+                bottom_fork_extension=abs_value(self.canvas_width, 2),
+                bottom_fork_width=abs_value(self.canvas_width, 4),
+                daempfer_length=abs_value(self.canvas_width, 4),
+                daempfer_width=abs_value(self.canvas_width, 3),
+                direction="vertical",
+                top_to_bottom=False,
+            )
+
+            # spring
             x_coords, y_coords = spring_module.spring(
-            spring_anker_point_top,
-            spring_anker_point_bottom,
-            self.spring_nodes,
-            self.spring_width,
+                spring_anker_point_top,
+                spring_anker_point_bottom,
+                self.spring_nodes,
+                self.spring_width,
             )
             spring_module.draw_spring(
                 canvas=self.spring_layer,
@@ -322,11 +311,10 @@ class Aufgabe1(AnimationInstance):
 
             # text, only animate m
             self.text_layer.fill_text(
-            "m₀",
-            self.rect_x + self.rect_w / 2 - abs_value(self.canvas_width, 3),
-            mapped_curr_pos + self.rect_h / 2 + abs_value(self.canvas_height, 2))
-
-
+                "m₀",
+                self.rect_x + self.rect_w / 2 - abs_value(self.canvas_width, 3),
+                mapped_curr_pos + self.rect_h / 2 + abs_value(self.canvas_height, 2),
+            )
 
     def _draw_first_frame(self):
         # === Layer 1: Rectangle ===
@@ -347,12 +335,16 @@ class Aufgabe1(AnimationInstance):
 
         self.circ_layer.fill_style = "white"
         self.circ_layer.line_width = 1.5
-        self.circ_layer.stroke_circle(self.circ_x, self.circ_y, self.circ_r)
         self.circ_layer.fill_circle(self.circ_x, self.circ_y, self.circ_r)
+        self.circ_layer.stroke_circle(self.circ_x, self.circ_y, self.circ_r)
 
         self.circ_layer.line_width = 1.0
-        self.circ_layer.stroke_circle(self.circ_x, self.circ_y, abs_value(self.canvas_width, 1))
-        self.circ_layer.fill_circle(self.circ_x, self.circ_y, abs_value(self.canvas_width, 1))
+        self.circ_layer.fill_circle(
+            self.circ_x, self.circ_y, abs_value(self.canvas_width, 1)
+        )
+        self.circ_layer.stroke_circle(
+            self.circ_x, self.circ_y, abs_value(self.canvas_width, 1)
+        )
 
         # === Layer 3: Spring-Damper System ===
         self.spring_layer.line_width = 1.5
@@ -375,7 +367,10 @@ class Aufgabe1(AnimationInstance):
         )
 
         # Bottom Fork
-        self.anker_point_bottom = (self.rect_x + self.rect_w / 2, self.rect_y + self.rect_h)
+        self.anker_point_bottom = (
+            self.rect_x + self.rect_w / 2,
+            self.rect_y + self.rect_h,
+        )
         spring_anker_point_bottom = ghetto_feder_daempfer_element_bottom(
             self.spring_layer,
             self.anker_point_bottom,
