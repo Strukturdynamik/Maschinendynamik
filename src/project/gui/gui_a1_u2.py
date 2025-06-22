@@ -1,4 +1,3 @@
-import math
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
 import numpy as np
@@ -7,6 +6,7 @@ from ipywidgets import (
     AppLayout,
     GridspecLayout,
 )
+import threading
 
 from .mpl_managers.a1_u2_mpl_manager import PlotManagerA1U2
 from .gui_superclass import GUISuperclass
@@ -14,8 +14,12 @@ from .gui_superclass import GUISuperclass
 from ..utils.constants import (
     A1_U2_T,
     A1_U2_NUM_DATA_POINTS,
-    A1_U2_START_DEFLECTION,
-    A1_U2_START_VELOCITY,
+    A1_U2_START_DEFLECTION_DEFAULT,
+    A1_U2_START_DEFLECTION_MIN,
+    A1_U2_START_DEFLECTION_MAX,
+    A1_U2_START_VELOCITY_DEFAULT,
+    A1_U2_START_VELOCITY_MIN,
+    A1_U2_START_VELOCITY_MAX,
     A1_U2_DEFAULT_C_MAX,
     A1_U2_DEFAULT_C_MIN,
     A1_U2_DEFAULT_D_MAX,
@@ -67,6 +71,7 @@ class GUI(GUISuperclass):
         """
 
         # set constants as class variables
+        self._deflection_timer = None
         self.default_c = default_c
         self.default_d = default_d
         self.animation_instance = animation_instance
@@ -103,7 +108,6 @@ class GUI(GUISuperclass):
         (
             slider_d,
             slider_c,
-            c_input_max,
             slider_defl,
             slider_v,
             slider_m,
@@ -119,7 +123,6 @@ class GUI(GUISuperclass):
             [
                 slider_d,
                 slider_c,
-                c_input_max,
                 slider_m,
                 slider_omega,
                 slider_alpha,
@@ -172,9 +175,9 @@ class GUI(GUISuperclass):
             value=self.default_d,
             min=A1_U2_DEFAULT_D_MIN,
             max=A1_U2_DEFAULT_D_MAX,
-            step=1.0,
+            step=0.1,
             description="d",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -188,9 +191,9 @@ class GUI(GUISuperclass):
             value=self.default_c,
             min=A1_U2_DEFAULT_C_MIN,
             max=A1_U2_DEFAULT_C_MAX,
-            step=1.0,
+            step=0.1,
             description="c",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -204,9 +207,9 @@ class GUI(GUISuperclass):
             value=A1_U2_DEFAULT_M,
             min=A1_U2_DEFAULT_M_MIN,
             max=A1_U2_DEFAULT_M_MAX,
-            step=1.0,
+            step=0.1,
             description="m",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -216,51 +219,34 @@ class GUI(GUISuperclass):
         )
         self.slider_m = slider_m
 
-        c_input_max = widgets.BoundedFloatText(
-            value=round(A1_U2_DEFAULT_C_MAX, 2),
-            min=0.1,
-            max=100,
-            step=1.0,
-            description="cₘₐₓ : ",
-            readout_format=".2f",
-            disabled=False,
-            layout=widgets.Layout(display="flex", width="50%"),
-        )
-        c_input_max.observe(self.on_value_change, names="value")
-        self.c_input_max = c_input_max
-
         # starting conditions sliders
-        min_v = 0.0
-        max_v = 5.0
         slider_v = widgets.FloatSlider(
-            value=round(A1_U2_START_VELOCITY, 4),
-            min=min_v,
-            max=max_v,
-            step=1.0,
+            value=A1_U2_START_VELOCITY_DEFAULT,
+            min=A1_U2_START_VELOCITY_MIN,
+            max=A1_U2_START_VELOCITY_MAX,
+            step=0.1,
             description="v₀",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".4f",
+            readout_format=".2f",
             layout=widgets.Layout(left="-9%", width="88%", display="flex"),
             tooltip="initial velocity",
         )
         self.slider_v = slider_v
 
-        max_defl = math.pi / 5
-        min_defl = math.pi / 30
         slider_defl = widgets.FloatSlider(
-            value=round(A1_U2_START_DEFLECTION, 4),
-            min=min_defl,
-            max=max_defl,
+            value=A1_U2_START_DEFLECTION_DEFAULT,
+            min=A1_U2_START_DEFLECTION_MIN,
+            max=A1_U2_START_DEFLECTION_MAX,
             step=0.1,
             description="defl₀",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".4f",
+            readout_format=".2f",
             layout=widgets.Layout(left="-9%", width="88%", display="flex"),
             tooltip="initial deflection",
         )
@@ -270,9 +256,9 @@ class GUI(GUISuperclass):
             value=A1_U2_DEFAULT_OMEGA,
             min=A1_U2_DEFAULT_OMEGA_MIN,
             max=A1_U2_DEFAULT_OMEGA_MAX,
-            step=1.0,
+            step=0.1,
             description="Ω",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=True,
             readout=True,
@@ -288,7 +274,7 @@ class GUI(GUISuperclass):
             max=A1_U2_DEFAULT_ALPHA_MAX,
             step=0.01,
             description="α",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -302,9 +288,9 @@ class GUI(GUISuperclass):
             value=A1_U2_DEFAULT_F_HAT,
             min=A1_U2_DEFAULT_F_HAT_MIN,
             max=A1_U2_DEFAULT_F_HAT_MAX,
-            step=0.01,
+            step=0.1,
             description="F̂",
-            continuous_update=False,
+            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
@@ -327,7 +313,7 @@ class GUI(GUISuperclass):
         reset_button = widgets.Button(
             description="Reset",
             layout=widgets.Layout(top="-5%", display="flex"),
-            diabled=False,
+            disabled=False,
         )
         self.reset_button = reset_button
         self.reset_button.on_click(self.reset_parameters)
@@ -362,7 +348,6 @@ class GUI(GUISuperclass):
         return (
             slider_d,
             slider_c,
-            c_input_max,
             slider_defl,
             slider_v,
             slider_m,
@@ -450,12 +435,11 @@ class GUI(GUISuperclass):
 
         self.slider_d.value = self.default_d
         self.slider_c.value = self.default_c
-        self.c_input_max.value = A1_U2_DEFAULT_C_MAX
         self.slider_m.value = A1_U2_DEFAULT_M
         self.slider_omega.value = A1_U2_DEFAULT_OMEGA
         self.slider_alpha.value = A1_U2_DEFAULT_ALPHA
-        self.slider_defl.value = A1_U2_START_DEFLECTION
-        self.slider_v.value = A1_U2_START_VELOCITY
+        self.slider_defl.value = A1_U2_START_DEFLECTION_DEFAULT
+        self.slider_v.value = A1_U2_START_VELOCITY_DEFAULT
         self.radio_buttons.value = "Lineary Increasing"
 
         # unfreeze the change of the graph
@@ -509,11 +493,18 @@ class GUI(GUISuperclass):
 
             case self.slider_defl:
                 self.animation_instance.start_deflection = new_value
+
+                # delay animation redraw
+                if self._deflection_timer is not None:
+                    self._deflection_timer.cancel()
+
+                self._deflection_timer = threading.Timer(
+                    0.35, self.animation_instance._draw_first_frame
+                )
+                self._deflection_timer.start()
+
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
-
-            case self.c_input_max:
-                self.slider_c.max = new_value
 
             case self.slider_m:
                 self.animation_instance.m = new_value
@@ -526,6 +517,10 @@ class GUI(GUISuperclass):
 
             case self.slider_omega:
                 self.animation_instance.omega = new_value
+                alpha_min = self.slider_omega.value / 100
+                alpha_max = self.slider_omega.value / 5
+                self.slider_alpha.max = alpha_max
+                self.slider_alpha.min = alpha_min
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
@@ -543,14 +538,12 @@ class GUI(GUISuperclass):
                 if new_value == True:
                     for s in self.sliders:
                         s.disabled = True
-                    self.c_input_max.disabled = True
 
             case self.play_slider:
                 # if reset button pressed, enable controls
                 if new_value == self.play.min:
                     for s in self.sliders:
                         s.disabled = False
-                    self.c_input_max.disabled = False
                     # handle omega and alpha slider
                     if self.animation_instance.mode == "Lineary Increasing":
                         self.slider_omega.disabled = True
