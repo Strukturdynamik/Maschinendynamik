@@ -155,7 +155,6 @@ class Aufgabe1(AnimationInstance):
                 self.d,
                 self.c,
                 self.eps,
-                self.omega,
             )
 
             anregung_sol = self.eps * np.sin(self.omega * self.t)
@@ -201,7 +200,7 @@ class Aufgabe1(AnimationInstance):
         return omega_vec, self.omega, mag, mag_undamped, phase
 
     def calc_ground_force(self):
-        delta = delta = self.d / (2 * self.m)
+        delta = self.d / (2 * self.m)
         num = np.array([-2 * delta * self.m_u, -self.m_u * self.omega**2, 0, 0])
         den = np.array([1, 2 * delta, self.omega**2])
         G = signal.TransferFunction(num, den)

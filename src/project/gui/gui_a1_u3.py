@@ -25,9 +25,9 @@ from ..utils.constants import (
     A1_U3_DEFAULT_D_MAX,
     A1_U3_DEFAULT_C_MIN,
     A1_U3_DEFAULT_C_MAX,
-    A1_U3_DEFAULT_M,
-    A1_U3_DEFAULT_M_MIN,
-    A1_U3_DEFAULT_M_MAX,
+    A1_U3_DEFAULT_M0,
+    A1_U3_DEFAULT_M0_MIN,
+    A1_U3_DEFAULT_M0_MAX,
     A1_U3_DEFAULT_MU,
     A1_U3_DEFAULT_MU_MIN,
     A1_U3_DEFAULT_MU_MAX,
@@ -79,7 +79,7 @@ class GUI(GUISuperclass):
         self.animation_instance = animation_instance
         self.animation_instance.c = default_c
         self.animation_instance.d = default_d
-        self.animation_instance.mode = "Constant"  # Lineary Increasing"
+        self.animation_instance.mode = "Lineary Increasing"
         self.freeze_change = False
         self.t = A1_U3_T
 
@@ -114,7 +114,7 @@ class GUI(GUISuperclass):
             slider_c,
             slider_defl,
             slider_v,
-            slider_m,
+            slider_m0,
             slider_omega,
             slider_alpha,
             slider_mu,
@@ -128,7 +128,7 @@ class GUI(GUISuperclass):
             [
                 slider_d,
                 slider_c,
-                slider_m,
+                slider_m0,
                 slider_omega,
                 slider_alpha,
                 slider_mu,
@@ -209,10 +209,10 @@ class GUI(GUISuperclass):
         )
         self.slider_c = slider_c
 
-        slider_m = widgets.FloatSlider(
-            value=A1_U3_DEFAULT_M,
-            min=A1_U3_DEFAULT_M_MIN,
-            max=A1_U3_DEFAULT_M_MAX,
+        slider_m0 = widgets.FloatSlider(
+            value=A1_U3_DEFAULT_M0,
+            min=A1_U3_DEFAULT_M0_MIN,
+            max=A1_U3_DEFAULT_M0_MAX,
             step=1.0,
             description="m₀",
             continuous_update=False,
@@ -223,7 +223,7 @@ class GUI(GUISuperclass):
             layout=widgets.Layout(left="-9%", width="90%", display="flex"),
             tooltip="mass",
         )
-        self.slider_m = slider_m
+        self.slider_m0 = slider_m0
 
         slider_v = widgets.FloatSlider(
             value=round(A1_U3_START_VELOCITY_DEFAULT, 4),
@@ -343,7 +343,7 @@ class GUI(GUISuperclass):
             self.slider_d,
             self.slider_c,
             self.slider_v,
-            self.slider_m,
+            self.slider_m0,
             self.slider_defl,
             self.slider_omega,
             self.slider_alpha,
@@ -355,7 +355,7 @@ class GUI(GUISuperclass):
             self.slider_d,
             self.slider_c,
             self.slider_v,
-            self.slider_m,
+            self.slider_m0,
             self.slider_defl,
             self.slider_omega,
             self.slider_alpha,
@@ -373,7 +373,7 @@ class GUI(GUISuperclass):
             slider_c,
             slider_defl,
             slider_v,
-            slider_m,
+            slider_m0,
             slider_omega,
             slider_alpha,
             slider_mu,
@@ -461,7 +461,7 @@ class GUI(GUISuperclass):
         self.slider_d.value = self.default_d
         self.slider_c.value = self.default_c
 
-        self.slider_m.value = A1_U3_DEFAULT_M
+        self.slider_m0.value = A1_U3_DEFAULT_M0
         self.slider_omega.value = A1_U3_DEFAULT_OMEGA
         self.slider_alpha.value = A1_U3_DEFAULT_ALPHA
         self.slider_defl.value = A1_U3_START_DEFLECTION_DEFAULT
@@ -532,12 +532,20 @@ class GUI(GUISuperclass):
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
-            case self.slider_m:
-                self.animation_instance.m = new_value
+            case self.slider_m0:
+                new_m0 = new_value + self.slider_mu.value
+                self.animation_instance.m = new_m0
                 omega_0 = np.sqrt(
                     2 * self.animation_instance.c / (3 * self.animation_instance.m)
                 )
                 self.slider_omega.max = omega_0
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_mu:
+                new_m0 = new_value + self.slider_m0.value
+                self.animation_instance.m = new_m0
+                self.animation_instance.m_u = new_value
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 

@@ -165,16 +165,13 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             phase,
         )
 
+        x_ground_force = omega_vec_ground_force / omega_ground_force
         self.lines_sol_dict[self.line_ground_force_1] = (
-            omega_vec_ground_force / omega_ground_force,
+            x_ground_force,
             mag_ground_force,
         )
-
-        print(f"{(omega_vec_ground_force / omega_ground_force)[:5]=}")
-        print()
-        print(f"{phase_ground_force[:5]=}")
         self.lines_sol_dict[self.line_ground_force_2] = (
-            omega_vec_ground_force / omega_ground_force,
+            x_ground_force,
             phase_ground_force,
         )
 
@@ -183,25 +180,61 @@ class PlotManagerA1U3(PlotManagerSuperclass):
 
         # update axes limits
         self.update_axes_limits(
-            sol_deflection, mag, mag_ground_force, phase_ground_force
+            sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
         )
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
+    # def update_axes_limits(
+    #     self, sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
+    # ):
+    #     min_defl = min(sol_deflection)
+    #     max_defl = max(sol_deflection)
+    #     max_x_ground_force = max(x_ground_force)
+    #     min_phase_ground_force = min(phase_ground_force)
+    #     max_phase_ground_force = max(phase_ground_force)
+    #     max_mag_ground_force = max(mag_ground_force)
+    #     max_mag = max(mag)
+
+    #     self.ax1.set_ylim([min_defl * 1.1, max_defl * 1.1])
+    #     self.ax_bode.set_ylim(0.001, max_mag * 1.1)
+    #     self.ax_ground_force.set_ylim(0, max_mag_ground_force * 1.1)
+    #     self.ax2_ground_force.set_ylim(
+    #         min_phase_ground_force * 1.1, max_phase_ground_force * 1.1
+    #     )
+    #     self.ax2_ground_force.set_xlim(0, max_x_ground_force)
+
+    #     for ax in [
+    #         self.ax1,
+    #         self.ax2_bode,
+    #         self.ax_bode,
+    #         self.ax1_second_yaxis,
+    #         self.ax_ground_force,
+    #         self.ax2_ground_force,
+    #     ]:
+    #         ax.relim()
+    #         ax.autoscale_view()
+
     def update_axes_limits(
-        self, sol_deflection, mag, mag_ground_force, phase_ground_force
+        self, sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
     ):
-        """Update axes limits based on current data"""
-        self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
+        min_defl = safe_min(sol_deflection)
+        max_defl = safe_max(sol_deflection)
+        max_x_ground_force = safe_max(x_ground_force)
+        min_phase_ground_force = safe_min(phase_ground_force)
+        max_phase_ground_force = safe_max(phase_ground_force)
+        max_mag_ground_force = safe_max(mag_ground_force)
+        max_mag = safe_max(mag)
 
-        self.ax_bode.set_ylim(0, max(mag) * 1.1)
-
-        self.ax_ground_force.set_ylim(0, max(mag_ground_force) * 1.1)
+        self.ax1.set_ylim([min_defl * 1.1, max_defl * 1.1])
+        self.ax_bode.set_ylim(0.001, max_mag * 1.1)
+        self.ax_ground_force.set_ylim(0, max_mag_ground_force * 1.1)
         self.ax2_ground_force.set_ylim(
-            min(phase_ground_force) * 1.1, max(phase_ground_force) * 1.1
+            min_phase_ground_force * 1.1, max_phase_ground_force * 1.1
         )
+        self.ax2_ground_force.set_xlim(0, max_x_ground_force)
 
         for ax in [
             self.ax1,
@@ -213,3 +246,15 @@ class PlotManagerA1U3(PlotManagerSuperclass):
         ]:
             ax.relim()
             ax.autoscale_view()
+
+
+def safe_min(arr):
+    arr = np.array(arr)
+    arr = arr[np.isfinite(arr)]
+    return float(np.min(arr)) if arr.size else 0.0
+
+
+def safe_max(arr):
+    arr = np.array(arr)
+    arr = arr[np.isfinite(arr)]
+    return float(np.max(arr)) if arr.size else 1.0
