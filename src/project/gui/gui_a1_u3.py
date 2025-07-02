@@ -1,6 +1,7 @@
 import math
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
+import ipywidgets as widgets
 import numpy as np
 from ipywidgets import (
     VBox,
