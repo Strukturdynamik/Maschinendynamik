@@ -510,6 +510,10 @@ class GUI(GUISuperclass):
                     2 * self.animation_instance.c / (3 * self.animation_instance.m)
                 )
                 self.slider_omega.max = omega_0
+
+                self.animation_instance.omega = np.sqrt(
+                    new_value / self.animation_instance.m
+                )
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
@@ -534,19 +538,32 @@ class GUI(GUISuperclass):
                     self.plot_manager.calc_and_plot_solutions()
 
             case self.slider_m0:
-                new_m0 = new_value + self.slider_mu.value
-                self.animation_instance.m = new_m0
+                new_m = new_value + self.slider_mu.value
+                self.animation_instance.m0 = new_value
+                self.animation_instance.m = new_m
                 omega_0 = np.sqrt(
                     2 * self.animation_instance.c / (3 * self.animation_instance.m)
                 )
                 self.slider_omega.max = omega_0
+
+                self.animation_instance.omega = np.sqrt(
+                    self.animation_instance.c / new_m
+                )
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
             case self.slider_mu:
-                new_m0 = new_value + self.slider_m0.value
-                self.animation_instance.m = new_m0
+                new_m = new_value + self.slider_m0.value
+                self.animation_instance.m = new_m
                 self.animation_instance.m_u = new_value
+                omega_0 = np.sqrt(
+                    2 * self.animation_instance.c / (3 * self.animation_instance.m)
+                )
+                self.slider_omega.max = omega_0
+
+                self.animation_instance.omega = np.sqrt(
+                    self.animation_instance.c / new_m
+                )
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 

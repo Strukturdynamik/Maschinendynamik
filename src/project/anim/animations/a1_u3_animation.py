@@ -17,7 +17,7 @@ from ...utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
     A1_U3_T,
-    A1_U3_DEFAULT_M0,
+    A1_U3_DEFAULT_M,
     A1_U3_START_DEFLECTION_DEFAULT,
     A1_U3_START_VELOCITY_DEFAULT,
     A1_U3_DEFAULT_M,
@@ -40,7 +40,7 @@ class Aufgabe1(AnimationInstance):
         self.alpha = A1_U3_DEFAULT_ALPHA
         self.eps = A1_U3_DEFAULT_EPS
         self.m_u = A1_U3_DEFAULT_MU
-        self.m = A1_U3_DEFAULT_M0 + A1_U3_DEFAULT_MU
+        self.m = A1_U3_DEFAULT_M
         self.frame = DEFAULT_FRAME
         self.start_deflection = A1_U3_START_DEFLECTION_DEFAULT
         self.start_velocity = A1_U3_START_VELOCITY_DEFAULT
@@ -208,6 +208,11 @@ class Aufgabe1(AnimationInstance):
         G = signal.TransferFunction(num, den)
         Omega_vec, mag, phase = signal.bode(G)
         mag = 10 ** (mag / 20)
+
+        # print()
+        # print("inside calc_ground_force")
+        # print(f"{self.m_u=}, {self.m=}, {self.d=}, {self.omega=}, {self.c=}, {delta=}")
+        # print()
 
         return Omega_vec, self.omega, mag, phase
 

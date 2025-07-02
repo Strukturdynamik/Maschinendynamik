@@ -107,16 +107,16 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             )
 
             (self.line_ground_force_1,) = self.ax_ground_force.semilogx(
-                [], [], linewidth=0.75, linestyle="-", color="red"
+                [], [], linestyle="-", linewidth=0.75, color="green"
             )
             (self.line_ground_force_2,) = self.ax2_ground_force.semilogx(
-                [], [], linestyle="-", linewidth=0.75, color="red"
+                [], [], linewidth=0.75, linestyle="-", color="red"
             )
 
             # add figure and lines to figure_lines dict
             self.figure_lines_dict[self.fig_ground_force] = [
-                self.line_ground_force_1,
                 self.line_ground_force_2,
+                self.line_ground_force_1,
             ]
 
             # remove stuff
@@ -180,61 +180,82 @@ class PlotManagerA1U3(PlotManagerSuperclass):
 
         # update axes limits
         self.update_axes_limits(
-            sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
+            sol_deflection,
+            mag,
+            mag_ground_force,
+            phase_ground_force,
+            x_ground_force,
         )
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
-    # def update_axes_limits(
-    #     self, sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
-    # ):
-    #     min_defl = min(sol_deflection)
-    #     max_defl = max(sol_deflection)
-    #     max_x_ground_force = max(x_ground_force)
-    #     min_phase_ground_force = min(phase_ground_force)
-    #     max_phase_ground_force = max(phase_ground_force)
-    #     max_mag_ground_force = max(mag_ground_force)
-    #     max_mag = max(mag)
-
-    #     self.ax1.set_ylim([min_defl * 1.1, max_defl * 1.1])
-    #     self.ax_bode.set_ylim(0.001, max_mag * 1.1)
-    #     self.ax_ground_force.set_ylim(0, max_mag_ground_force * 1.1)
-    #     self.ax2_ground_force.set_ylim(
-    #         min_phase_ground_force * 1.1, max_phase_ground_force * 1.1
-    #     )
-    #     self.ax2_ground_force.set_xlim(0, max_x_ground_force)
-
-    #     for ax in [
-    #         self.ax1,
-    #         self.ax2_bode,
-    #         self.ax_bode,
-    #         self.ax1_second_yaxis,
-    #         self.ax_ground_force,
-    #         self.ax2_ground_force,
-    #     ]:
-    #         ax.relim()
-    #         ax.autoscale_view()
-
     def update_axes_limits(
-        self, sol_deflection, mag, mag_ground_force, phase_ground_force, x_ground_force
+        self,
+        sol_deflection,
+        mag,
+        mag_ground_force,
+        phase_ground_force,
+        x_ground_force,
     ):
-        min_defl = safe_min(sol_deflection)
-        max_defl = safe_max(sol_deflection)
-        max_x_ground_force = safe_max(x_ground_force)
-        min_phase_ground_force = safe_min(phase_ground_force)
-        max_phase_ground_force = safe_max(phase_ground_force)
-        max_mag_ground_force = safe_max(mag_ground_force)
-        max_mag = safe_max(mag)
+        min_defl = min(sol_deflection)
+        max_defl = max(sol_deflection)
+        max_x_ground_force = max(x_ground_force)
+        min_phase_ground_force = min(phase_ground_force)
+        max_phase_ground_force = max(phase_ground_force)
+        max_mag_ground_force = max(mag_ground_force)
+        max_mag = max(mag)
 
         self.ax1.set_ylim([min_defl * 1.1, max_defl * 1.1])
+
         self.ax_bode.set_ylim(0.001, max_mag * 1.1)
+
         self.ax_ground_force.set_ylim(0, max_mag_ground_force * 1.1)
+        self.ax2_ground_force.set_xlim(0, 1500)  # max_x_ground_force)
         self.ax2_ground_force.set_ylim(
             min_phase_ground_force * 1.1, max_phase_ground_force * 1.1
         )
-        self.ax2_ground_force.set_xlim(0, max_x_ground_force)
+
+        # ##########################################
+        # from scipy import signal as signal
+
+        # m_0 = 100
+        # m_u = 10
+        # m = m_0 + m_u
+        # d = 10
+        # delta = d / (2 * m)
+        # c = 5000
+        # omega_0 = np.sqrt(c / m)
+
+        # print("inside mpl manager")
+        # print(f"{omega_0=}")
+        # print(f"{delta =}")
+        # print(f"{m_u =}")
+        # print(f"{m_0 =}")
+        # print(f"{m=}")
+
+        # num = np.array([-2 * delta * m_u, -m_u * omega_0**2, 0, 0])
+        # den = np.array([1, 2 * delta, omega_0**2])
+        # G = signal.TransferFunction(num, den)
+
+        # # bode-values
+        # Omega_vec_2, mag, phase_test = signal.bode(G)
+        # mag_test = 10 ** (mag / 20)  # Umrechnung von dB auf abs
+
+        # are_equal = np.array_equal(Omega_vec_2, omega_vec_ground_force)
+        # print("Arrays are equal:", are_equal)
+
+        # if not are_equal:
+        #     # Get boolean mask of differing elements
+        #     diff_mask = Omega_vec_2 != omega_vec_ground_force
+        #     # Get indices of differing elements
+        #     diff_indices = np.where(diff_mask)[0]
+        #     print("Differing indices:", diff_indices)
+        #     print("Values in a at those indices:", Omega_vec_2[diff_indices])
+        #     print("Values in b at those indices:", omega_vec_ground_force[diff_indices])
+
+        # ##########################################
 
         for ax in [
             self.ax1,
@@ -248,13 +269,13 @@ class PlotManagerA1U3(PlotManagerSuperclass):
             ax.autoscale_view()
 
 
-def safe_min(arr):
-    arr = np.array(arr)
-    arr = arr[np.isfinite(arr)]
-    return float(np.min(arr)) if arr.size else 0.0
+# def safe_min(arr):
+#     arr = np.array(arr)
+#     arr = arr[np.isfinite(arr)]
+#     return float(np.min(arr)) if arr.size else 0.0
 
 
-def safe_max(arr):
-    arr = np.array(arr)
-    arr = arr[np.isfinite(arr)]
-    return float(np.max(arr)) if arr.size else 1.0
+# def safe_max(arr):
+#     arr = np.array(arr)
+#     arr = arr[np.isfinite(arr)]
+#     return float(np.max(arr)) if arr.size else 1.0
