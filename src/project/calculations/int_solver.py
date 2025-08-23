@@ -133,9 +133,9 @@ class IntSolverAufgabe1Uebung3:
         ]
         return x_p
 
-    def integrate(self, func, t, z0, z0d, *args):
+    def integrate(self, func, start_deflection, start_velocity, t, *args):
 
-        x0 = (z0, z0d)
+        x0 = (start_deflection, start_velocity)
         return odeint(func=func, y0=x0, t=t, args=args)[:, 0]
 
 

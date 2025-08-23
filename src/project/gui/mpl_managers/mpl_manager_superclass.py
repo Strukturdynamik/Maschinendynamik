@@ -51,7 +51,6 @@ class PlotManagerSuperclass:
     def update_plots(self):
         """Update all plots with new data"""
         for line, (t_arr, sol_arr) in self.lines_sol_dict.items():
-            # print(f"{line=}, {max(sol_arr)=}, {min(sol_arr)=}")
             line.set_xdata(t_arr)
             line.set_ydata(sol_arr)
 
