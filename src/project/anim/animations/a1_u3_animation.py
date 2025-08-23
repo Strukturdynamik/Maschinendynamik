@@ -70,8 +70,13 @@ class Aufgabe1(AnimationInstance):
 
         self.min_bound = self.rect_y
         self.max_bound = self.rect_y + self.rect_h * 0.5
+        self.mid_point = (self.min_bound + self.max_bound) / 2
 
     def _initial_visual(self):
+        self.circ_r = abs_value(self.canvas_height, 13)
+        self.dot_radius = abs_value(self.canvas_height / 2, 3)
+        self.orbit_radius = self.circ_r
+
         # === Layer 0: Background Frame with Strokes ===
         self.bg_layer.line_width = 1.5
 
@@ -202,6 +207,7 @@ class Aufgabe1(AnimationInstance):
         return omega_vec, self.omega, mag, mag_undamped, phase
 
     def calc_ground_force(self):
+        omega_0 = np.sqrt(self.c / self.m)
         delta = self.d / (2 * self.m)
         num = np.array([-2 * delta * self.m_u, -self.m_u * self.omega**2, 0, 0])
         den = np.array([1, 2 * delta, self.omega**2])
@@ -214,16 +220,18 @@ class Aufgabe1(AnimationInstance):
         # print(f"{self.m_u=}, {self.m=}, {self.d=}, {self.omega=}, {self.c=}, {delta=}")
         # print()
 
-        return Omega_vec, self.omega, mag, phase
+        return Omega_vec, omega_0, mag, phase
 
     def _animate_visual(self):
 
         # get current solution from frame
         curr_sol_vis = self.solution[self.frame]
-
+        curr_force = self.anregung_sol[self.frame]
         # map current position onto the canvas
         min_sol = min(self.solution)
         max_sol = max(self.solution)
+        min_force = min(self.anregung_sol)
+        max_force = max(self.anregung_sol)
         mapped_curr_pos = map_value(
             curr_sol_vis,
             min_sol,
@@ -231,12 +239,13 @@ class Aufgabe1(AnimationInstance):
             self.rect_y,
             self.rect_y + self.rect_h * 0.5,
         )
+        norm_defl = map_value(curr_force, min_force, max_force, -1, 1)
 
         with hold_canvas():
+            self.text_layer.clear()
             self.rect_layer.clear()
             self.circ_layer.clear()
             self.spring_layer.clear()
-            self.text_layer.clear()
 
             # rect
             self.rect_layer.fill_rect(
@@ -266,16 +275,16 @@ class Aufgabe1(AnimationInstance):
                 self.circ_x, circ_y, abs_value(self.canvas_width, 1)
             )
 
-            # rotating dot
-            dot_radius = abs_value(self.canvas_height / 2, 1)
-            orbit_radius = self.circ_r  # - dot_radius / 2
+            # map to angle: 0..2π
+            angle = norm_defl * 2 * math.pi - math.pi / 2
 
-            dot_x = self.circ_x + orbit_radius * math.cos(curr_sol_vis)
-            dot_y = circ_y + orbit_radius * math.sin(curr_sol_vis)
+            # dot coordinates
+            dot_x = self.circ_x + self.orbit_radius * math.cos(angle)
+            dot_y = circ_y + self.orbit_radius * math.sin(angle)
 
             self.circ_layer.fill_style = "black"
-            self.circ_layer.fill_circle(dot_x, dot_y, dot_radius)
-            self.circ_layer.stroke_circle(dot_x, dot_y, dot_radius)
+            self.circ_layer.fill_circle(dot_x, dot_y, self.dot_radius)
+            self.circ_layer.stroke_circle(dot_x, dot_y, self.dot_radius)
             self.circ_layer.fill_style = "white"
 
             # Top Fork
@@ -345,8 +354,8 @@ class Aufgabe1(AnimationInstance):
             self.start_deflection,
             A1_U3_START_DEFLECTION_MIN,
             A1_U3_START_DEFLECTION_MAX,
-            self.min_bound,
             self.max_bound,
+            self.min_bound,
         )
 
         # === Layer 1: Rectangle ===
@@ -360,7 +369,6 @@ class Aufgabe1(AnimationInstance):
         )
 
         # === Layer 2: Circle and Connecting Lines ===
-        self.circ_r = abs_value(self.canvas_height, 13)
         self.circ_x = self.rect_x + self.rect_w / 2
         self.circ_y = self.mapped_init_defl - abs_value(self.canvas_height, 15)
 
@@ -447,14 +455,4 @@ class Aufgabe1(AnimationInstance):
             "m₀",
             self.rect_x + self.rect_w / 2 - abs_value(self.canvas_width, 3),
             self.mapped_init_defl + self.rect_h / 2 + abs_value(self.canvas_height, 2),
-        )
-        self.text_layer.fill_text(
-            "c",
-            self.rect_x + abs_value(self.canvas_width, 5),
-            self.rect_y + abs_value(self.canvas_width, 40),
-        )
-        self.text_layer.fill_text(
-            "d",
-            self.rect_x + abs_value(self.canvas_width, 18),
-            self.rect_y + abs_value(self.canvas_width, 40),
         )

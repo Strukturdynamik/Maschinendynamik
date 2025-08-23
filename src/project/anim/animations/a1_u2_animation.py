@@ -187,8 +187,8 @@ class Aufgabe1(AnimationInstance):
                 self.omega,
                 self.f_hat,
             )
-            anregung_sol = np.cos(self.omega * self.t)
-            arrow_sol = np.cos(self.omega * self.t)
+            anregung_sol = self.f_hat * np.cos(self.omega * self.t)
+            arrow_sol = self.f_hat * np.cos(self.omega * self.t)
         # Hochlauf
         if self.mode == "Lineary Increasing":
             solution = self.calculator.integrate(
@@ -203,14 +203,17 @@ class Aufgabe1(AnimationInstance):
                 self.alpha,
             )
 
-            anregung_sol = np.cos(0.5 * self.alpha * self.t**2)
-            arrow_sol = np.cos(0.5 * self.alpha * self.t**2)
+            anregung_sol = self.f_hat * np.cos(0.5 * self.alpha * self.t**2)
+            arrow_sol = self.f_hat * np.cos(0.5 * self.alpha * self.t**2)
 
         self.solution = solution
         self.anregung_sol = anregung_sol
         self.arrow_sol = arrow_sol
 
-        return solution, anregung_sol
+        if self.omega == 0:
+            self.solution = list(np.zeros(len(self.t)))
+
+        return self.solution, self.anregung_sol
 
     def calc_bode_diagram(
         self,
@@ -253,13 +256,18 @@ class Aufgabe1(AnimationInstance):
         # map current position onto the canvas
         min_sol = min(self.solution)
         max_sol = max(self.solution)
-        mapped_curr_pos = map_value(
-            curr_sol_vis,
-            min_sol,
-            max_sol,
-            self.x_min_bound,
-            self.x_max_bound,
-        )
+        # catch f hat = 0 case
+        if min_sol == max_sol or self.omega == 0:
+            mapped_curr_pos = self.mapped_init_defl
+            curr_sol_vis = self.mapped_init_defl
+        else:
+            mapped_curr_pos = map_value(
+                curr_sol_vis,
+                min_sol,
+                max_sol,
+                self.x_min_bound,
+                self.x_max_bound,
+            )
 
         with hold_canvas():
             # clear the canvas for animation
@@ -310,14 +318,16 @@ class Aufgabe1(AnimationInstance):
             min_sol_arrow = min(self.arrow_sol)
             max_sol_arrow = max(self.arrow_sol)
             arr_pos = self.arrow_sol[self.frame]
-            # if arr_pos <= 0:
-            mapped_arr_sol = map_value(
-                arr_pos,
-                min_sol_arrow,
-                max_sol_arrow,
-                -self.radius,
-                self.radius,
-            )
+            if min_sol_arrow == max_sol_arrow or self.omega == 0:
+                mapped_arr_sol = 0
+            else:
+                mapped_arr_sol = map_value(
+                    arr_pos,
+                    min_sol_arrow,
+                    max_sol_arrow,
+                    -self.radius,
+                    self.radius,
+                )
 
             draw_arrow(
                 canvas=self.anim_canvas[6],

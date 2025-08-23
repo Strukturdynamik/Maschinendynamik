@@ -257,7 +257,7 @@ class GUI(GUISuperclass):
             min=A1_U2_DEFAULT_OMEGA_MIN,
             max=A1_U2_DEFAULT_OMEGA_MAX,
             step=0.1,
-            description="Ω",
+            description="ω",
             continuous_update=True,
             orientation="horizontal",
             disabled=True,
@@ -517,10 +517,17 @@ class GUI(GUISuperclass):
 
             case self.slider_omega:
                 self.animation_instance.omega = new_value
-                alpha_min = self.slider_omega.value / 100
-                alpha_max = self.slider_omega.value / 5
-                self.slider_alpha.max = alpha_max
-                self.slider_alpha.min = alpha_min
+                if self.animation_instance.omega == 0:
+                    alpha_min = 0.1
+                    alpha_max = 1
+                    self.slider_alpha.max = alpha_max
+                    self.slider_alpha.min = alpha_min
+
+                else:
+                    alpha_min = self.slider_omega.value / 100
+                    alpha_max = self.slider_omega.value / 5
+                    self.slider_alpha.max = alpha_max
+                    self.slider_alpha.min = alpha_min
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
