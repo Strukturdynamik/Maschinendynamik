@@ -1,7 +1,7 @@
 ## SS25: Machine Dynamics
 This repository supports the course *Machine Dynamics* (Prof. Zierath), which explores the physical and mathematical description of vibrations in mechanical engineering. It provides the basis for the design and development of dynamically loaded structures. Topics include system modeling, parameter identification, and the study of dynamic behavior in machines.
 
-To enhance understanding, the course content is digitally structured and enriched with interactive Jupyter notebooks and visual animations. These tools aim to make complex concepts more intuitive and practical way.
+To enhance understanding, the course content is digitally structured and enriched with interactive Jupyter notebooks and visual animations. These tools aim to make complex concepts more intuitive in a practical way.
 
 This repository contains code from the Spring 2020 semester of *MCHE485: Mechanical Vibrations* at UL Lafayette and has since been expanded to include materials from the *Machine Dynamics* lecture at the University of Rostock.
 
