@@ -7,6 +7,19 @@ from abc import abstractmethod
 
 
 class Shape:
+    """
+    Abstract base class for geometric shapes used in visualizations.
+
+    A shape can represent various geometrical primitives, such as:
+    - Rectangle (defined by width and height)
+    - Circle (defined by center and radius)
+    - Triangle (defined by points A, B, C)
+    - Spring (defined by start, end, number of nodes, and width)
+
+    This class provides a flexible initializer that sets attributes 
+    based on the given parameters. Subclasses must implement the 
+    `draw` method to define their own rendering behavior.
+    """
     def __init__(
         self,
         center: Tuple[int, int] | Any = None,
@@ -20,6 +33,27 @@ class Shape:
         end: Tuple[int, int] | Any = None,
         nodes: int | Any = None,
     ) -> None:
+        """
+        Initialize a Shape by setting attributes based on the provided parameters.
+
+        Supported shapes:
+        - Rectangle: requires `width` and `height`
+        - Circle: requires `center` and `radius`
+        - Triangle: requires points `A`, `B`, and `C`
+        - Spring: requires `start`, `end`, `nodes`, and `width`
+
+        Args:
+            center (tuple[int, int] | Any, optional): Center point of the circle.
+            width (int | Any, optional): Width (for rectangles or springs).
+            height (int | Any, optional): Height (for rectangles).
+            radius (int | Any, optional): Radius (for circles).
+            A (tuple[int, int] | Any, optional): First vertex of a triangle.
+            B (tuple[int, int] | Any, optional): Second vertex of a triangle.
+            C (tuple[int, int] | Any, optional): Third vertex of a triangle.
+            start (tuple[int, int] | Any, optional): Start point (for springs).
+            end (tuple[int, int] | Any, optional): End point (for springs).
+            nodes (int | Any, optional): Number of nodes (for springs).
+        """
         shapes = [
             (  # check for rectangle
                 width is not None and height is not None,
@@ -51,14 +85,13 @@ class Shape:
 
     @abstractmethod
     def draw(self, canvas: Canvas, pos: Tuple[int, int], fill: bool) -> None:
-        """Specific function for every shape that draws the shape at the given
-            position.
+        """
+        Draw the shape on a given canvas at the specified position.
 
         Args:
-            canvas (Canvas): Canvas to draw the shape on.
-            pos (Any): Position where shape is being drawn.
-            fill (bool): Determines if the shape should be filled in addition
-                to being drawn.
+            canvas (Canvas): The canvas to render the shape on.
+            pos (tuple[int, int]): Position offset for drawing the shape.
+            fill (bool): Whether to fill the shape (True) or only outline it (False).
         """
 
         pass

@@ -4,6 +4,31 @@ from ipywidgets import widgets
 
 
 class PlotManagerSuperclass:
+    """
+    Abstract base class for managing plots and visualizations.
+    
+    This class provides common functionality for creating, configuring, and updating
+    matplotlib plots in an interactive environment. It serves as a foundation for
+    specialized plot managers that implement specific visualization requirements.
+    
+    Attributes:
+        figure_lines_dict (dict): Dictionary mapping figures to their associated plot lines
+        lines_sol_dict (dict): Dictionary mapping lines to their data (time array, solution array)
+        blobs_dict (dict): Dictionary mapping position indicators to their solution data
+        animation_instance: Reference to the animation controller instance
+        t (array): Time array used for plotting
+
+        The following attributes are only used if the GUI 
+        displays a Bode diagram: 
+
+        output_bode: Widget output container for Bode plot
+        fig_bode: Figure object for Bode plot
+        ax_bode: Primary axes for Bode magnitude plot
+        ax2_bode: Secondary axes for Bode phase plot
+        line_bode_1_1: Line object for damped magnitude response
+        line_bode_1_2: Line object for undamped magnitude response
+        line_bode_2: Line object for phase response
+    """
 
     def __init__(self):
         pass
@@ -58,7 +83,16 @@ class PlotManagerSuperclass:
             fig.canvas.draw_idle()
 
     def setup_bode_plot(self):
-        """Set up the Bode plot"""
+        """
+        Set up and configure a Bode plot with magnitude and phase subplots.
+        
+        Creates a Bode plot consisting of two subplots: magnitude response
+        (top) and phase response (bottom). Configures axes, creates plot lines
+        for both damped and undamped responses, and applies consistent styling.
+        
+        The method also registers the figure and lines in the manager's dictionaries
+        for future updates and applies UI cleanup to remove unnecessary elements.
+        """
         self.output_bode = widgets.Output()
         with self.output_bode:
             self.fig_bode = plt.figure(figsize=(5, 5))
@@ -110,5 +144,12 @@ class PlotManagerSuperclass:
     def update_axes_limits(self):
         """
         Update the axes for each graph in the gui.
+        """
+        pass
+
+    @abstractmethod
+    def calc_and_plot_solutions(self):
+        """
+        Calculate and plot the new deflection array after user input. 
         """
         pass

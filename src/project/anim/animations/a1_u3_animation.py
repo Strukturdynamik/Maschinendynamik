@@ -30,6 +30,20 @@ from ...utils.constants import (
     DEFAULT_FRAME,
 )
 
+"""
+Concrete implementation of `AnimationInstance` to animate the mechanical
+oscillation system in Übung 3, Aufgabe 1
+(Jupyter Notebooks\resources\documents\A1_U3.pdf).
+
+This class handles the setup, numerical calculation, and visualization of a
+forced vibration system with a secondary (base) excitation. It includes:
+
+- Defining canvas layers and geometry for all visual elements
+- Drawing static background structures and the spring-damper layout
+- Computing the system response over time for different excitation modes
+- Animating the oscillating mass and force transmission
+- Providing Bode diagram and ground force analysis for frequency response
+"""
 
 class Aufgabe1(AnimationInstance):
     def __init__(self, calculator: Any) -> None:
@@ -48,6 +62,16 @@ class Aufgabe1(AnimationInstance):
         self.t = A1_U3_T
 
     def set_canvas_var(self):
+        """
+        Initializes and assigns canvas layer variables for the animation.
+
+        Layers:
+        - bg_layer: Background frame with boundaries
+        - rect_layer: Rectangular mass representation
+        - circ_layer: Circle and connecting geometry
+        - spring_layer: Spring-damper elements
+        - text_layer: Labels and annotations
+        """
         self.canvas_width, self.canvas_height = (
             self.anim_canvas.width,
             self.anim_canvas.height,
@@ -60,6 +84,15 @@ class Aufgabe1(AnimationInstance):
         self.text_layer = self.anim_canvas[4]
 
     def def_coords(self):
+        """
+        Defines key coordinates and dimensions for the visual system.
+
+        Includes:
+        - Position and size of the rectangular block
+        - Orbit and radius for the circular component
+        - Deflection bounds (min, max, midpoint)
+        - Radius of the rotating dot
+        """
         self.rect_x = abs_value(self.canvas_width, 30)
         self.rect_y = abs_value(self.canvas_height, 40)
         self.rect_w = abs_value(self.canvas_width, 25)
@@ -73,6 +106,16 @@ class Aufgabe1(AnimationInstance):
         self.mid_point = (self.min_bound + self.max_bound) / 2
 
     def _initial_visual(self):
+        """
+        Draws the static background and base structures of the animation.
+
+        Includes:
+        - Left, right, and bottom frame lines with stroke patterns
+        - Base positions for the oscillating rectangle and circle
+        - Initialization of key reference points
+
+        Called once before the dynamic animation begins.
+        """
         self.circ_r = abs_value(self.canvas_height, 13)
         self.dot_radius = abs_value(self.canvas_height / 2, 3)
         self.orbit_radius = self.circ_r
@@ -135,19 +178,17 @@ class Aufgabe1(AnimationInstance):
         )
 
     def _calculate(self) -> tuple[np.ndarray, np.ndarray]:
-        """Calculates the deflection response of the system over time.
+        """
+        Calculates the system's displacement response over time.
 
-        Depending on user input, it can simulate two modes of
-        excitation:
-        - "Constant": Simulates a constant external force.
-        - "Lineary Increasing": Simulates a linearly increasing frequency.
-
-        Uses the system's calculator to solve the differential equations.
+        Two excitation types can be simulated:
+        - "Constant": Sinusoidal excitation with fixed frequency.
+        - "Lineary Increasing": Frequency sweep with linearly increasing frequency.
 
         Returns:
             tuple[np.ndarray, np.ndarray]:
-                solution (displacement values over time),
-                anregung_sol (excitation function values).
+                - solution: Displacement values over time
+                - anregung_sol: Excitation signal values
         """
 
         # Dauerlauf
@@ -187,9 +228,23 @@ class Aufgabe1(AnimationInstance):
 
         return solution, anregung_sol
 
-    def calc_bode_diagram(
-        self,
-    ):
+    def calc_bode_diagram(self):
+        """
+        Computes the Bode diagram data for the current system configuration.
+
+        Analyzes frequency response of the system by evaluating:
+        - Damped magnitude response
+        - Undamped magnitude response
+        - Phase response
+
+        Returns:
+            tuple[np.ndarray, float, np.ndarray, np.ndarray, np.ndarray]:
+                - omega_vec: Frequency vector
+                - omega: Natural frequency of the system
+                - mag: Damped magnitude response
+                - mag_undamped: Undamped magnitude response
+                - phase: Phase shift in radians
+        """
         b2 = -self.m_u / self.m
         delta = self.d / (2 * self.m)
         omega_vec = np.linspace(0, 2 * self.omega, len(self.t))
@@ -207,6 +262,19 @@ class Aufgabe1(AnimationInstance):
         return omega_vec, self.omega, mag, mag_undamped, phase
 
     def calc_ground_force(self):
+        """
+        Computes the ground force transfer function for the system.
+
+        This analysis shows how base excitation is transmitted to the ground,
+        depending on damping, mass, and excitation frequency.
+
+        Returns:
+            tuple[np.ndarray, float, np.ndarray, np.ndarray]:
+                - Omega_vec: Frequency vector
+                - omega_0: Natural frequency of the system
+                - mag: Magnitude of ground force response
+                - phase: Phase shift of ground force response
+        """
         omega_0 = np.sqrt(self.c / self.m)
         delta = self.d / (2 * self.m)
         num = np.array([-2 * delta * self.m_u, -self.m_u * self.omega**2, 0, 0])
@@ -215,15 +283,22 @@ class Aufgabe1(AnimationInstance):
         Omega_vec, mag, phase = signal.bode(G)
         mag = 10 ** (mag / 20)
 
-        # print()
-        # print("inside calc_ground_force")
-        # print(f"{self.m_u=}, {self.m=}, {self.d=}, {self.omega=}, {self.c=}, {delta=}")
-        # print()
-
         return Omega_vec, omega_0, mag, phase
 
     def _animate_visual(self):
+        """
+        Updates and redraws all dynamic elements of the animation 
+        for the current frame.
 
+        Drawn/updated elements include:
+        - Rectangular oscillating mass
+        - Circle and connecting geometry above the block
+        - Rotating dot indicating excitation phase
+        - Spring-damper elements attached to the mass
+        - Label showing the mass ("m₀")
+
+        Called repeatedly for each frame during the animation loop.
+        """
         # get current solution from frame
         curr_sol_vis = self.solution[self.frame]
         curr_force = self.anregung_sol[self.frame]
@@ -343,6 +418,17 @@ class Aufgabe1(AnimationInstance):
             )
 
     def _draw_first_frame(self):
+        """
+        Renders the first static frame of the animation.
+
+        Initializes:
+        - Oscillating rectangular block at mapped initial deflection
+        - Circle and connecting lines in default position
+        - Spring-damper system in equilibrium
+        - Text labels for the mass ("m₀")
+
+        Ensures the system is visually initialized before the animation begins.
+        """
         self.rect_layer.clear()
         self.circ_layer.clear()
         self.spring_layer.clear()

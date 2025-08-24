@@ -8,7 +8,7 @@ from ipywidgets import (
     GridspecLayout,
 )
 
-from .mpl_managers.a4_u1_mpl_manager import PlotManagerA4U1
+from ..mpl_managers.a4_u1_mpl_manager import PlotManagerA4U1
 from .gui_superclass import GUISuperclass
 from ..utils.constants import (
     A4_U1_DEFAULT_C_MAX,
@@ -19,9 +19,8 @@ from ..utils.constants import (
     CANVAS_HEIGHT,
 )
 
-
-"""Module containing functions to build an interactive ui for displaying
-    and manipulating animations.
+"""
+See Superclass for additional documentation.
 """
 
 FIRST_FRAME_CHANGE: bool = False
@@ -29,18 +28,6 @@ FIRST_FRAME_CHANGE: bool = False
 
 class GUI(GUISuperclass):
     def __init__(self, default_c, default_d, animation_instance: Any):
-        """Function to build interactive ui for displaying
-        and manipulating animations.
-
-        Args:
-            default_c (int): Default value for parameter c.
-            default_d (int): Default value for parameter d.
-            animation_instance (Any): Animation that will be run inside the
-                animation canvas (left side) of the GUI.
-
-        Returns:
-            Any: The application.
-        """
         super().__init__()
         self.animation_instance = animation_instance
         # set constants as class variables
@@ -67,7 +54,6 @@ class GUI(GUISuperclass):
         return app_layout
 
     def make_gui(self):
-        """General function to coordinate gui elements."""
 
         # make control elements for parameters
         slider_d, slider_c, c_input_max, slider_defl, slider_v = (
@@ -108,11 +94,6 @@ class GUI(GUISuperclass):
         self.animation_instance._draw_first_frame()
 
     def make_parameter_control_elements(self) -> widgets:
-        """Function to create and place parameter control elements.
-
-        Returns:
-            widgets: Sliders and control elements for the parameters.
-        """
         slider_d = widgets.FloatSlider(
             value=round(self.default_d, 2),
             min=0.0,
@@ -204,11 +185,6 @@ class GUI(GUISuperclass):
         slider_grid: widgets,
         title_grid: widgets,
     ) -> widgets:
-        """Function to place and coordinate all gui elements.
-
-        Returns:
-            widgets: Returns the App Layout.
-        """
 
         # make grid for animation interaction
         anim_inter_grid = AppLayout(
@@ -257,11 +233,6 @@ class GUI(GUISuperclass):
         return app_layout
 
     def reset_parameters(self, button):
-        """Function to reset all parameters to default values.
-
-        Args:
-            button (widgets.Button): Button that triggers the reset.
-        """
 
         # freeze the change of the graph
         self.freeze_change = True
@@ -277,11 +248,6 @@ class GUI(GUISuperclass):
         self.plot_manager.calc_and_plot_solutions()
 
     def on_value_change(self, change):
-        """Unified observer for handling parameter slider value changes.
-
-        Args:
-            change (Any): Incoming user input.
-        """
         widget = change.owner
         new_value = change["new"]
 

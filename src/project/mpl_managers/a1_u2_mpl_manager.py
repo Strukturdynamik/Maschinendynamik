@@ -1,10 +1,12 @@
 import ipywidgets.widgets as widgets
 import matplotlib.pyplot as plt
-import numpy as np
 
-from ...utils.constants import A1_U2_T
+from ..utils.constants import A1_U2_T
 from .mpl_manager_superclass import PlotManagerSuperclass
 
+"""
+See Superclass for additional documentation.
+"""
 
 class PlotManagerA1U2(PlotManagerSuperclass):
     def __init__(self, animation_instance):
@@ -24,6 +26,17 @@ class PlotManagerA1U2(PlotManagerSuperclass):
         self.calc_and_plot_solutions()
 
     def setup_deflection_plot(self):
+        """
+        Set up and configure the deflection plot with dual y-axes.
+        
+        Creates a figure with two y-axes:
+        - Primary y-axis (left): Shows system deflection in meters
+        - Secondary y-axis (right): Shows force input in Newtons
+        
+        Configures plot lines for both deflection and force, sets up appropriate
+        labels and styling, and registers all visual elements in the manager's
+        dictionaries for future updates.
+        """
         self.output_deflection = widgets.Output()
         with self.output_deflection:
             self.fig_deflection, self.ax1 = plt.subplots(figsize=(5, 5))
@@ -92,8 +105,17 @@ class PlotManagerA1U2(PlotManagerSuperclass):
             plt.show()
 
     def calc_and_plot_solutions(self):
-        """Plot initial solutions"""
-
+        """
+        Calculate and plot initial solutions for all visualizations.
+        
+        This method:
+        1. Calculates deflection and force solutions from the animation instance
+        2. Calculates Bode diagram data (frequency response)
+        3. Populates the line dictionaries with calculated data
+        4. Updates all plots with the new data
+        5. Adjusts axes limits based on data ranges
+        6. Updates position indicators (blobs)
+        """
         sol_deflection, sol_force = self.animation_instance._calculate()
         omega_vec, omega_0, mag, mag_undamped, phase = (
             self.animation_instance.calc_bode_diagram()
@@ -125,14 +147,25 @@ class PlotManagerA1U2(PlotManagerSuperclass):
         self.update_plots()
 
         # update axes limits
-        self.update_axes_limits(sol_deflection, sol_force, mag)
+        self.update_axes_limits(sol_deflection, mag)
 
         # fill in solutions for the blobs
         self.blobs_dict[self.blob] = sol_deflection
         self.update_blobs()
 
-    def update_axes_limits(self, sol_deflection, sol_force, mag):
-        """Update axes limits based on current data"""
+    def update_axes_limits(self, sol_deflection, mag):
+        """
+        Update axes limits based on current data ranges.
+        
+        Adjusts the y-axis limits for all plots to ensure proper visualization
+        of the current data with appropriate margins. Also triggers automatic
+        scaling for all axes to accommodate any data changes.
+        
+        Args:
+            sol_deflection (array): Deflection solution data
+            sol_force (array): Force input data (not directly used but maintained for interface consistency)
+            mag (array): Magnitude data from Bode calculation
+        """
         self.ax1.set_ylim([min(sol_deflection) * 1.1, max(sol_deflection) * 1.1])
 
         self.ax_bode.set_ylim(0, max(mag) * 1.1)

@@ -18,20 +18,21 @@ from ...utils.constants import (
 
 """Module to animate the mechanical oscillation system of Übung 1, Aufgabe 4.
 
-See "Jupyter Notebooks\resources\documents\A4_U1.pdf" for reference.
+Reference:
+    See "Jupyter Notebooks\resources\documents\A4_U1.pdf" for details.
+
+This animation models a pendulum-like oscillating rectangle with an attached
+circular mass and a vertical spring-damper element. It handles:
+
+- Numerical calculation of angular displacement over time
+- Initialization of static geometry (reference lines, anchor points)
+- Drawing and animating the rotating block and attached circle
+- Constructing and updating the spring-damper connection
+- Integrating system parameters (mass, damping, stiffness) from defaults
 """
 
 
 class Aufgabe4(AnimationInstance):
-    """Animates the mechanical oscillation system of Übung 1, Aufgabe 4.
-
-    Args:
-        calculator: Object responsible for computing the simulation values.
-        start_deflection (float): Initial angular displacement.
-        start_velocity (float): Initial angular velocity.
-        mass (float): Mass of the system.
-    """
-
     def __init__(self, calculator, start_deflection, start_velocity, mass):
         super().__init__()
         self.calculator = calculator
@@ -46,10 +47,17 @@ class Aufgabe4(AnimationInstance):
         self.spring_nodes = 20
 
     def _initial_visual(self):
-        """Draws the initial visual representation of the oscillation system.
+        """
+        Draws the static background and reference geometry of the system.
 
-        This method sets up and renders all static components such as reference
-        lines, bearing points, and anchor points for dynamic objects.
+        Includes:
+        - Horizontal and vertical reference lines with stroke patterns
+        - Bearing triangles at the reference lines
+        - Circular anchor points at pivot locations
+        - Rectangle dimensions and attached circle
+        - Canvas layer translations for rotation about pivot
+
+        Called once before the first frame is rendered.
         """
 
         # Set spring visual width
@@ -184,16 +192,30 @@ class Aufgabe4(AnimationInstance):
         self.mid_point = self.triangle_endpoint_x_h
 
     def _draw_first_frame(self):
-        """Draws the first animation frame based on the initial solution state."""
+        """
+        Renders the very first frame of the animation.
+
+        - Positions the rectangle and circle at the initial angular deflection
+        - Constructs the initial spring-damper connection
+        """
         first_sol_vis = self.solution[DEFAULT_FRAME]
         self.draw_rotating_angle(-first_sol_vis)
         self.ghetto_spring_damper_element()
 
     def _calculate(self):
-        """Calculates the solution based on system parameters.
+        """
+        Computes the system’s angular displacement solution over time.
+
+        Uses the provided calculator to numerically integrate the system’s
+        equations of motion based on:
+        - Initial angular displacement
+        - Initial angular velocity
+        - Damping constant (c)
+        - Stiffness constant (d)
+        - Mass (m)
 
         Returns:
-            List[float]: List of angular deflections for the animation timeline.
+            list[float]: Angular deflections for each simulation timestep.
         """
         self.anim_canvas[0].clear()
         solution = self.calculator.integrate(
@@ -209,13 +231,31 @@ class Aufgabe4(AnimationInstance):
         return solution
 
     def _animate_visual(self):
-        """Animates the current visual state based on the solution frame."""
+        """
+        Updates the dynamic animation for the current frame.
+
+        Steps:
+        - Computes the current angular displacement
+        - Rotates the rectangle and attached circle
+        - Updates the spring-damper visualization
+        """
         curr_sol_vis = self.solution[self.frame]
         self.draw_rotating_angle(-curr_sol_vis)
         self.ghetto_spring_damper_element()
 
     def ghetto_spring_damper_element(self):
-        """Builds the spring-damper element for the current animation frame."""
+        """
+        Draws the spring-damper element between the moving rectangle and the 
+        fixed bearing for the current frame.
+
+        Procedure:
+        - Clears the spring-damper canvas layers
+        - Recomputes anchor points based on current rectangle rotation
+        - Draws damper forks and extension elements
+        - Generates spring geometry between anchors and renders it
+
+        Called on every frame update to keep spring-damper aligned with motion.
+        """
         self.spring_anker_point = (
             self.spring_anker_point[0] - self.triangle_endpoint_x,
             self.spring_anker_point[1] - self.triangle_endpoint_y,
@@ -278,10 +318,17 @@ class Aufgabe4(AnimationInstance):
             )
 
     def draw_rotating_angle(self, angle: float):
-        """Draws the rectangle and circle at a specified rotation angle.
+        """
+        Rotates and draws the rectangle and attached circle by a given angle.
 
         Args:
-            angle (float): The angle (in radians or degrees) to rotate the elements by.
+            angle (float): Rotation angle (in radians, counterclockwise positive).
+
+        Procedure:
+        - Rotates rectangle corner coordinates about the pivot
+        - Updates spring anchor point based on rectangle’s rotated geometry
+        - Clears and redraws the rectangle at new angle
+        - Draws the attached circle at the rotated end of the rectangle
         """
         fixed_x = self.anker_point_rec[0]
         fixed_y = self.anker_point_rec[1] + self.radius_v

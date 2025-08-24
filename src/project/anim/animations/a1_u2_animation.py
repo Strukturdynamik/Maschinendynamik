@@ -29,15 +29,17 @@ from ...utils.constants import (
 )
 
 """
-    Concrete implementation of AnimationInstance to animate the mechanical
-    oscillation system in Übung 2, Aufgabe 1
-    (Jupyter Notebooks\resources\documents\Übung_2_Aufg1.pdf)
+Concrete implementation of `AnimationInstance` to animate the mechanical
+oscillation system in Übung 2, Aufgabe 1
+(src\resources\documents\A1_U2.pdf).
 
-    This class handles the setup, calculation, and visualization of the
-    forced damped oscillation system using a spring-damper model. It includes:
-    - Drawing static elements of the animation that won't change over time
-    - Calculating the system's response over time for two excitation modes
-    - Animate the oscillating system to represent the solution
+This class handles the setup, numerical calculation, and visualization of a
+forced damped oscillation system using a spring-damper model. It includes:
+
+- Drawing static elements of the animation (walls, anchors, etc.)
+- Computing the system response over time for different excitation modes
+- Animating the oscillating mass with a visual spring-damper system
+- Providing Bode diagram data for frequency response analysis
 """
 
 
@@ -59,13 +61,14 @@ class Aufgabe1(AnimationInstance):
         """
         Draws the static base layout of the animation canvas.
 
-        This includes:
-        - Walls and floor using line strokes
-        - "x" arrow to indicate force direction
-        - Anchor points and zero position for the oscillating mass
-        - Initializes spring and damper layout
+        Elements drawn include:
+        - Walls and floor with stroke patterns
+        - Arrow indicating the x-axis (force direction)
+        - Anchor point for the spring-damper system
+        - Zero-deflection position of the oscillating mass
+        - Initial geometry for the spring and damper
 
-        Should be called once before animation begins.
+        This method is called once before the dynamic animation begins.
         """
         # canvas settings
         self.anim_canvas[6].stroke_style = "red"
@@ -159,19 +162,18 @@ class Aufgabe1(AnimationInstance):
         self.radius = bottom_left[1] - (top_left[1] + bottom_left[1]) / 2
 
     def _calculate(self) -> tuple[np.ndarray, np.ndarray]:
-        """Calculates the deflection response of the system over time.
+        """
+        Calculates the system's displacement response over time.
 
-        Depending on user input, it can simulate two modes of
-        excitation:
-        - "Constant": Simulates a constant external force.
-        - "Lineary Increasing": Simulates a linearly increasing frequency.
-
-        Uses the system's calculator to solve the differential equations.
+        Depending on the selected mode, two excitation types can be simulated:
+        - "Constant": Constant sinusoidal excitation with fixed frequency.
+        - "Lineary Increasing": Frequency sweep with linearly increasing 
+          excitation frequency.
 
         Returns:
             tuple[np.ndarray, np.ndarray]:
-                solution (displacement values over time),
-                anregung_sol (excitation function values).
+                - solution: Displacement values over time
+                - anregung_sol: Excitation signal values
         """
 
         # Dauerlauf
@@ -218,19 +220,19 @@ class Aufgabe1(AnimationInstance):
     def calc_bode_diagram(
         self,
     ) -> tuple[np.ndarray, np.ndarray, List[float], List[float], List[float]]:
-        """Computes the data for the Bode diagram for the current system
-            configuration.
+        """
+        Computes the Bode diagram data for the system.
 
-        This analysis shows how the system reacts to different frequencies,
-        including both damped and undamped magnitude responses.
+        This frequency response analysis illustrates how the system reacts 
+        to different excitation frequencies, both damped and undamped.
 
         Returns:
             tuple[np.ndarray, np.ndarray, List[float], List[float], List[float]]:
-                omega_vec: Array of frequency values,
-                omega_0: Natural frequency of the system,
-                mag: Magnitude response (damped),
-                mag_undamped: Magnitude response (undamped),
-                phase: Phase shift response.
+                - omega_vec: Array of excitation frequencies
+                - omega_0: Natural frequency of the system
+                - mag: Magnitude response (damped)
+                - mag_undamped: Magnitude response (undamped)
+                - phase: Phase shift in radians
         """
         delta = self.d / (3 * self.m)
         omega_0 = np.sqrt(2 * self.c / (3 * self.m))
@@ -250,6 +252,18 @@ class Aufgabe1(AnimationInstance):
         return omega_vec, omega_0, mag, mag_undamped, phase
 
     def _animate_visual(self):
+        """
+        Updates and redraws all dynamic elements of the animation 
+        for the current frame.
+
+        Drawn/updated elements include:
+        - Oscillating mass (circle) at current displacement
+        - Rotating dot on the oscillating mass (visual phase indicator)
+        - Arrow indicating excitation force
+        - Spring-damper system (updated geometry according to mass position)
+
+        This method is called repeatedly for each frame during the animation loop.
+        """
         # get current solution from frame
         curr_sol_vis = self.solution[self.frame]
 
@@ -400,6 +414,17 @@ class Aufgabe1(AnimationInstance):
             )
 
     def _draw_first_frame(self):
+        """
+        Renders the very first frame of the animation.
+
+        Sets up the initial state of:
+        - Oscillating mass at the mapped initial deflection
+        - Center circle and markers
+        - Static spring-damper elements in equilibrium position
+        - Spring geometry based on default parameters
+
+        Ensures the system is visually initialized before the animation begins.
+        """
         self.anim_canvas[6].clear()  # force indicator
         self.anim_canvas[5].clear()  # dot
         self.anim_canvas[3].clear()  # circle

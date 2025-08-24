@@ -5,12 +5,12 @@ from ipycanvas import Canvas
 
 class AnimationInstance:
     """
-    Abstract base class for an animation instance used in visualizing
-    oscillating systems.
+    Abstract base class for animation instances that visualize oscillating systems.
 
-    This class provides a skeleton interface that enforces the implementation
-    of key methods for drawing and animating visual elements, as well as
-    computing the underlying data or logic for visualization.
+    This class defines a common interface for building animations. 
+    Subclasses must implement methods to compute system dynamics, 
+    draw static elements, render the first frame, and handle 
+    the continuous animation process. 
     """
 
     def __init__(self) -> None:
@@ -23,37 +23,40 @@ class AnimationInstance:
     @abstractmethod
     def _animate_visual(self):
         """
-        Abstract method to handle the continuous animation of a solution.
+        Render the animation step for the current frame.
 
-        This should update the canvas with animated transitions or stepwise
-        changes based on the computed solution.
+        Updates the canvas with the system's evolving state, 
+        based on previously computed solutions.
         """
         pass
 
     @abstractmethod
     def _calculate(self):
         """
-        Abstract method to compute the solution based on user-defined parameters
-        or input values.
+        Compute the solution for the system's dynamics.
+
+        This typically involves numerical integration or 
+        evaluation of the model using user-defined parameters.
         """
         pass
 
     @abstractmethod
     def _draw_first_frame(self):
         """
-        Abstract method to draw the first visual frame on the canvas.
+        Draw the initial frame of the animation.
 
-        Called before any user interaction begins.
-        Helps in giving a preview or initial state of the system.
+        Called once before the animation begins, 
+        to visualize the system in its starting state.
         """
         pass
 
     @abstractmethod
     def _initial_visual(self):
         """
-        Abstract method to draw static modules or components of the visualization.
+        Draw all static elements of the visualization.
 
-        Executed during setup before user interaction, such as rendering axes,
-        UI boundaries, static labels, or any persistent visual elements.
+        Executed during setup to render reference structures 
+        such as axes, anchor points, labels, or other 
+        non-changing components.
         """
         pass

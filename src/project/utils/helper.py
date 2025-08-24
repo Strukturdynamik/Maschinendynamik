@@ -4,7 +4,11 @@ import math
 from ipycanvas import Canvas, hold_canvas
 from ..utils.constants import DIRECTIONS
 
-"""Modules containing helper functions.
+"""
+This module provides helper functions for mathematical calculations and canvas-based
+drawing operations, particularly for creating technical diagrams and animations.
+Includes functions for percentage calculations, value mapping, text animation,
+coordinate transformations, and specialized mechanical component rendering.
 """
 
 
@@ -122,141 +126,6 @@ def rotate_point(x, y, pivot_x, pivot_y, angle):
     return x_new, y_new
 
 
-# def ghetto_feder_daempfer_element_top(
-#     canvas,
-#     anker_point_top,
-#     fork_width,
-#     anker_point_extension,
-#     daempfer_fork_extension,
-#     daempfer_fork_length,
-#     daempfer_fork_width,
-#     direction,
-# ):
-#     if direction == "vertical":
-#         fork_left = [
-#             anker_point_top[0] - fork_width / 2,
-#             anker_point_top[1] + anker_point_extension,
-#         ]
-#         fork_right = [
-#             anker_point_top[0] + fork_width / 2,
-#             anker_point_top[1] + anker_point_extension,
-#         ]
-#         fork_middle = [
-#             anker_point_top[0],
-#             anker_point_top[1] + anker_point_extension,
-#         ]
-#         daempfer_middle = [fork_right[0], fork_right[1] + daempfer_fork_extension]
-#         daempfer_left = [
-#             fork_right[0] - daempfer_fork_width / 2,
-#             fork_right[1] + daempfer_fork_extension,
-#         ]
-#         daempfer_right = [
-#             fork_right[0] + daempfer_fork_width / 2,
-#             fork_right[1] + daempfer_fork_extension,
-#         ]
-#         daempfer_bottom_left = [
-#             daempfer_left[0],
-#             daempfer_left[1] + daempfer_fork_length,
-#         ]
-#         daempfer_bottom_right = [
-#             daempfer_right[0],
-#             daempfer_right[1] + daempfer_fork_length,
-#         ]
-#         spring_anker_point = fork_left
-#     elif direction == "left_to_right":
-#         fork_left = [
-#             anker_point_top[0] + anker_point_extension,
-#             anker_point_top[1] - fork_width / 2,
-#         ]
-#         fork_right = [
-#             anker_point_top[0] + anker_point_extension,
-#             anker_point_top[1] + fork_width / 2,
-#         ]
-#         fork_middle = [
-#             anker_point_top[0] + anker_point_extension,
-#             anker_point_top[1],
-#         ]
-#         daempfer_middle = [fork_right[0] + daempfer_fork_extension, fork_right[1]]
-#         daempfer_left = [
-#             fork_right[0] + daempfer_fork_extension,
-#             fork_right[1] - daempfer_fork_width / 2,
-#         ]
-#         daempfer_right = [
-#             fork_right[0] + daempfer_fork_extension,
-#             fork_right[1] + daempfer_fork_width / 2,
-#         ]
-#         daempfer_bottom_left = [
-#             daempfer_left[0] + daempfer_fork_length,
-#             daempfer_left[1],
-#         ]
-#         daempfer_bottom_right = [
-#             daempfer_right[0] + daempfer_fork_length,
-#             daempfer_right[1],
-#         ]
-#         spring_anker_point = fork_left
-#     elif direction == "right_to_left":
-#         # fork_left = [
-#         #     anker_point_top[0] - anker_point_extension,
-#         #     anker_point_top[1] - fork_width / 2,
-#         # ]
-#         # fork_right = [
-#         #     anker_point_top[0] - anker_point_extension,
-#         #     anker_point_top[1] + fork_width / 2,
-#         # ]
-#         # fork_middle = [
-#         #     anker_point_top[0] - anker_point_extension,
-#         #     anker_point_top[1],
-#         # ]
-#         # daempfer_middle = [fork_left[0], fork_left[1] - daempfer_fork_extension]
-#         # daempfer_left = [
-#         #     fork_left[0] - daempfer_fork_extension,
-#         #     fork_left[1] - daempfer_fork_width / 2,
-#         # ]
-#         # daempfer_right = [
-#         #     fork_left[0] - daempfer_fork_extension,
-#         #     fork_left[1] + daempfer_fork_width / 2,
-#         # ]
-#         # daempfer_bottom_left = [
-#         #     daempfer_left[0] - daempfer_fork_length,
-#         #     daempfer_left[1],
-#         # ]
-#         # daempfer_bottom_right = [
-#         #     daempfer_right[0] - daempfer_fork_length,
-#         #     daempfer_right[1],
-#         # ]
-#         # spring_anker_point = fork_right
-#         raise NotImplementedError("Not implemented yet")
-#     else:
-#         raise ValueError(
-#             "Invalid direction. Choose from 'vertical', 'left_to_right', or 'right_to_left'."
-#         )
-
-#     canvas.stroke_line(
-#         anker_point_top[0], anker_point_top[1], fork_middle[0], fork_middle[1]
-#     )
-#     canvas.stroke_line(fork_left[0], fork_left[1], fork_right[0], fork_right[1])
-#     canvas.stroke_line(
-#         fork_right[0], fork_right[1], daempfer_middle[0], daempfer_middle[1]
-#     )
-#     canvas.stroke_line(
-#         daempfer_left[0], daempfer_left[1], daempfer_right[0], daempfer_right[1]
-#     )
-#     canvas.stroke_line(
-#         daempfer_left[0],
-#         daempfer_left[1],
-#         daempfer_bottom_left[0],
-#         daempfer_bottom_left[1],
-#     )
-#     canvas.stroke_line(
-#         daempfer_right[0],
-#         daempfer_right[1],
-#         daempfer_bottom_right[0],
-#         daempfer_bottom_right[1],
-#     )
-
-#     return spring_anker_point
-
-
 def ghetto_feder_daempfer_element_top(
     canvas,
     anker_point_top,
@@ -268,6 +137,28 @@ def ghetto_feder_daempfer_element_top(
     direction,
     top_to_bottom=True,  # New parameter
 ):
+    """Draw a simplified spring-damper top element for mechanical diagrams.
+    
+    Creates a fork and damper assembly commonly used in suspension system diagrams.
+    
+    Args:
+        canvas: Canvas to draw on
+        anker_point_top: Anchor point coordinates (x, y)
+        fork_width: Width of the fork element
+        anker_point_extension: Length of the anchor extension
+        daempfer_fork_extension: Damper fork extension length
+        daempfer_fork_length: Damper fork length
+        daempfer_fork_width: Damper fork width
+        direction: Orientation - "vertical", "left_to_right", or "right_to_left"
+        top_to_bottom: For vertical direction, controls orientation (default: top-to-bottom)
+    
+    Returns:
+        Spring anchor point coordinates for connecting spring elements
+    
+    Raises:
+        ValueError: For invalid direction
+        NotImplementedError: For right_to_left direction (not implemented)
+    """
     if direction == "vertical":
         if top_to_bottom:
             fork_left = [
@@ -399,99 +290,6 @@ def ghetto_feder_daempfer_element_top(
     return spring_anker_point
 
 
-# def ghetto_feder_daempfer_element_bottom(
-#     canvas,
-#     anker_point_bottom,
-#     bottom_fork_extension,
-#     bottom_fork_width,
-#     daempfer_length,
-#     daempfer_width,
-#     direction,
-# ):
-#     if direction == "left_to_right":
-#         bottom_fork_middle = [
-#             anker_point_bottom[0] - bottom_fork_extension,
-#             anker_point_bottom[1],
-#         ]
-#     elif direction == "right_to_left":
-#         bottom_fork_middle = [
-#             anker_point_bottom[0] + bottom_fork_extension,
-#             anker_point_bottom[1],
-#         ]
-#     elif direction == "vertical":
-#         bottom_fork_middle = [
-#             anker_point_bottom[0],
-#             anker_point_bottom[1] - bottom_fork_extension,
-#         ]
-#     else:
-#         raise ValueError(
-#             "Invalid direction. Choose from 'left_to_right', 'right_to_left', or 'vertical'."
-#         )
-
-#     canvas.stroke_line(
-#         anker_point_bottom[0],
-#         anker_point_bottom[1],
-#         bottom_fork_middle[0],
-#         bottom_fork_middle[1],
-#     )
-
-#     if direction in ["left_to_right", "right_to_left"]:
-#         bottom_fork_right = [
-#             bottom_fork_middle[0],
-#             bottom_fork_middle[1] - bottom_fork_width / 2,
-#         ]
-#         bottom_fork_left = [
-#             bottom_fork_middle[0],
-#             bottom_fork_middle[1] + bottom_fork_width / 2,
-#         ]
-#     else:  # vertical
-#         bottom_fork_right = [
-#             bottom_fork_middle[0] - bottom_fork_width / 2,
-#             bottom_fork_middle[1],
-#         ]
-#         bottom_fork_left = [
-#             bottom_fork_middle[0] + bottom_fork_width / 2,
-#             bottom_fork_middle[1],
-#         ]
-
-#     canvas.stroke_line(
-#         bottom_fork_right[0],
-#         bottom_fork_right[1],
-#         bottom_fork_left[0],
-#         bottom_fork_left[1],
-#     )
-
-#     if direction == "left_to_right":
-#         daempfer_middle = [bottom_fork_left[0] - daempfer_length, bottom_fork_left[1]]
-#     elif direction == "right_to_left":
-#         daempfer_middle = [bottom_fork_left[0] + daempfer_length, bottom_fork_left[1]]
-#     else:  # vertical
-#         daempfer_middle = [bottom_fork_left[0], bottom_fork_left[1] - daempfer_length]
-
-#     if direction in ["left_to_right", "right_to_left"]:
-#         daempfer_left = [daempfer_middle[0], daempfer_middle[1] + daempfer_width / 2]
-#         daempfer_right = [daempfer_middle[0], daempfer_middle[1] - daempfer_width / 2]
-#     else:  # vertical
-#         daempfer_left = [daempfer_middle[0] - daempfer_width / 2, daempfer_middle[1]]
-#         daempfer_right = [daempfer_middle[0] + daempfer_width / 2, daempfer_middle[1]]
-
-#     canvas.stroke_line(
-#         bottom_fork_left[0],
-#         bottom_fork_left[1],
-#         daempfer_middle[0],
-#         daempfer_middle[1],
-#     )
-#     canvas.stroke_line(
-#         daempfer_left[0], daempfer_left[1], daempfer_right[0], daempfer_right[1]
-#     )
-
-#     return (
-#         bottom_fork_right
-#         if direction in ["left_to_right", "right_to_left"]
-#         else bottom_fork_right
-#     )
-
-
 def ghetto_feder_daempfer_element_bottom(
     canvas,
     anker_point_bottom,
@@ -502,6 +300,27 @@ def ghetto_feder_daempfer_element_bottom(
     direction,
     top_to_bottom=True,
 ):
+    """Draw a simplified spring-damper bottom element for mechanical diagrams.
+    
+    Creates the bottom part of a suspension damper assembly.
+    
+    Args:
+        canvas: Canvas to draw on
+        anker_point_bottom: Bottom anchor point coordinates
+        bottom_fork_extension: Fork extension length
+        bottom_fork_width: Fork width
+        daempfer_length: Damper length
+        daempfer_width: Damper width
+        direction: Orientation - "vertical", "left_to_right", or "right_to_left"
+        top_to_bottom: For vertical direction, controls orientation
+    
+    Returns:
+        Bottom fork connection point coordinates
+    
+    Raises:
+        ValueError: For invalid direction
+    """
+    
     if direction == "left_to_right":
         bottom_fork_middle = [
             anker_point_bottom[0] - bottom_fork_extension,
