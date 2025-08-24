@@ -19,7 +19,7 @@ from ...utils.constants import (
 """Module to animate the mechanical oscillation system of Übung 1, Aufgabe 4.
 
 Reference:
-    See "Jupyter Notebooks\resources\documents\A4_U1.pdf" for details.
+    See "documentation\aufgaben_pdfs\A4_U1.pdf" for details.
 
 This animation models a pendulum-like oscillating rectangle with an attached
 circular mass and a vertical spring-damper element. It handles:

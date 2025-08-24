@@ -31,7 +31,7 @@ from ...utils.constants import (
 """
 Concrete implementation of `AnimationInstance` to animate the mechanical
 oscillation system in Übung 2, Aufgabe 1
-(src\resources\documents\A1_U2.pdf).
+(documentation\aufgaben_pdfs\A1_U2.pdf).
 
 This class handles the setup, numerical calculation, and visualization of a
 forced damped oscillation system using a spring-damper model. It includes:

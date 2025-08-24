@@ -33,7 +33,7 @@ from ...utils.constants import (
 """
 Concrete implementation of `AnimationInstance` to animate the mechanical
 oscillation system in Übung 3, Aufgabe 1
-(Jupyter Notebooks\resources\documents\A1_U3.pdf).
+(documentation\aufgaben_pdfs\A1_U3.pdf).
 
 This class handles the setup, numerical calculation, and visualization of a
 forced vibration system with a secondary (base) excitation. It includes:
