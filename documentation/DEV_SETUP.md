@@ -8,7 +8,7 @@
 
 # Set Up 
 
-Set up of the development environment for the animation modules for future reference.
+Set up of the development environment for the future development of the Jupyter Notebooks.
 
 To set up and acitvate the virtual environment for this project, follow these steps:
 
