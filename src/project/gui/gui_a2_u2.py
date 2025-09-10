@@ -1,45 +1,46 @@
+from typing import Any
+import numpy as np
 from ipycanvas import MultiCanvas
 import ipywidgets.widgets as widgets
-import numpy as np
 from ipywidgets import (
     VBox,
     AppLayout,
     GridspecLayout,
 )
-import threading
 
-from ..mpl_managers.a1_u2_mpl_manager import PlotManagerA1U2
 from .gui_superclass import GUISuperclass
-
+from ..mpl_managers.a2_u2_mpl_manager import PlotManagerA2U2
 from ..utils.constants import (
-    A1_U2_T,
-    A1_U2_NUM_DATA_POINTS,
-    A1_U2_START_DEFLECTION_DEFAULT,
-    A1_U2_START_DEFLECTION_MIN,
-    A1_U2_START_DEFLECTION_MAX,
-    A1_U2_START_VELOCITY_DEFAULT,
-    A1_U2_START_VELOCITY_MIN,
-    A1_U2_START_VELOCITY_MAX,
-    A1_U2_DEFAULT_C_MAX,
-    A1_U2_DEFAULT_C_MIN,
-    A1_U2_DEFAULT_D_MAX,
-    A1_U2_DEFAULT_D_MIN,
-    A1_U2_DEFAULT_D_MAX,
-    A1_U2_DEFAULT_M,
-    A1_U2_DEFAULT_M_MIN,
-    A1_U2_DEFAULT_M_MIN,
-    A1_U2_DEFAULT_M_MAX,
-    A1_U2_DEFAULT_F_HAT,
-    A1_U2_DEFAULT_F_HAT_MIN,
-    A1_U2_DEFAULT_F_HAT_MAX,
-    A1_U2_DEFAULT_OMEGA,
-    A1_U2_DEFAULT_OMEGA_MIN,
-    A1_U2_DEFAULT_OMEGA_MAX,
-    A1_U2_DEFAULT_ALPHA,
-    A1_U2_DEFAULT_ALPHA_MIN,
-    A1_U2_DEFAULT_ALPHA_MAX,
-    CANVAS_WIDTH,
     CANVAS_HEIGHT,
+    CANVAS_WIDTH,
+    A2_U2_NUM_DATA_POINTS,
+    A2_U2_J_A_DEFAULT,
+    A2_U2_J_A_MAX,
+    A2_U2_J_A_MIN,
+    A2_U2_L_DEFAULT,
+    A2_U2_L_MAX,
+    A2_U2_L_MIN,
+    A2_U2_C_DEFAULT,
+    A2_U2_C_MAX,
+    A2_U2_C_MIN,
+    A2_U2_D_DEFAULT,
+    A2_U2_D_MAX,
+    A2_U2_D_MIN,
+    A2_U2_U_HAT_DEFAULT,
+    A2_U2_U_HAT_MAX,
+    A2_U2_U_HAT_MIN,
+    A2_U2_PHI_0_DEFAULT,
+    A2_U2_PHI_0_MAX,
+    A2_U2_PHI_0_MIN,
+    A2_U2_PHI_0_DOT_DEFAULT,
+    A2_U2_PHI_0_DOT_MAX,
+    A2_U2_PHI_0_DOT_MIN,
+    A2_U2_OMEGA_DEFAULT,
+    A2_U2_OMEGA_MAX,
+    A2_U2_OMEGA_MIN,
+    A2_U2_ALPHA_DEFAULT,
+    A2_U2_ALPHA_MIN,
+    A2_U2_ALPHA_MAX,
 )
 
 """
@@ -50,26 +51,17 @@ FIRST_FRAME_CHANGE: bool = False
 
 
 class GUI(GUISuperclass):
-    def __init__(
-        self,
-        default_c,
-        default_d,
-        animation_instance,
-    ):
+    def __init__(self, default_c, default_d, animation_instance: Any):
+        super().__init__()
+        self.animation_instance = animation_instance
         # set constants as class variables
-        self._deflection_timer = None
         self.default_c = default_c
         self.default_d = default_d
-        self.animation_instance = animation_instance
-        self.animation_instance.c = default_c
-        self.animation_instance.d = default_d
-        self.animation_instance.mode = "Lineary Increasing"
         self.freeze_change = False
-        self.t = A1_U2_T
 
         # set up anim canvas
         self.mult_canvas_anim = MultiCanvas(
-            n_canvases=10,
+            n_canvases=5,
             width=CANVAS_WIDTH,
             height=CANVAS_HEIGHT,
             layout=widgets.Layout(
@@ -78,9 +70,8 @@ class GUI(GUISuperclass):
             ),
         )
         self.animation_instance.anim_canvas = self.mult_canvas_anim
-
         # set up plot manager
-        self.plot_manager = PlotManagerA1U2(self.animation_instance)
+        self.plot_manager = PlotManagerA2U2(animation_instance)
 
         # after inital set up, set up gui elements
         app_layout = self.make_gui()
@@ -88,35 +79,37 @@ class GUI(GUISuperclass):
         return app_layout
 
     def make_gui(self):
+
         # make control elements for parameters
         (
             slider_d,
             slider_c,
-            slider_defl,
-            slider_v,
-            slider_m,
+            slider_ja,
+            slider_L,
+            slider_u_hat,
+            slider_phi0,
+            slider_phi0_dot,
             slider_omega,
             slider_alpha,
-            slider_f_hat,
             radio_buttons,
             reset_button,
         ) = self.make_parameter_control_elements()
-
         # make slider grid
         slider_grid = VBox(
             [
                 slider_d,
                 slider_c,
-                slider_m,
+                slider_ja,
+                slider_L,
+                slider_u_hat,
+                slider_phi0,
+                slider_phi0_dot,
                 slider_omega,
                 slider_alpha,
-                slider_f_hat,
-                slider_defl,
-                slider_v,
-            ],
-            layout=widgets.Layout(top="-2%"),
+            ]
         )
 
+        # make titles
         slider_title = widgets.HTML(
             '<strong style="font-family: Arial, sans-serif;">Variables</strong>'
         )
@@ -124,7 +117,7 @@ class GUI(GUISuperclass):
             '<strong style="font-family: Arial, sans-serif;">Pendulum Animation</strong>'
         )
         graph_title = widgets.HTML(
-            '<strong style="font-family: Arial, sans-serif;">Graphs</strong>'
+            '<strong style="font-family: Arial, sans-serif;">Deflection Graph</strong>'
         )
         # make title grid
         title_grid = GridspecLayout(1, 3)
@@ -133,7 +126,7 @@ class GUI(GUISuperclass):
         title_grid[0, 2] = graph_title
 
         # make play control widget
-        play_control_widget = self.make_play_control_element(A1_U2_NUM_DATA_POINTS)
+        play_control_widget = self.make_play_control_element(A2_U2_NUM_DATA_POINTS)
 
         self.app_layout = self.place_and_coordinate_gui_elements(
             play_control_widget,
@@ -142,7 +135,8 @@ class GUI(GUISuperclass):
             reset_button,
             radio_buttons,
         )
-
+        # set vars
+        self.animation_instance.set_vars_and_coordinates()
         # draw inital visual
         self.animation_instance._initial_visual()
         # draw first frame
@@ -150,134 +144,131 @@ class GUI(GUISuperclass):
 
     def make_parameter_control_elements(self) -> widgets:
 
-        slider_d = widgets.FloatSlider(
-            value=self.default_d,
-            min=A1_U2_DEFAULT_D_MIN,
-            max=A1_U2_DEFAULT_D_MAX,
-            step=0.1,
-            description="d",
-            continuous_update=True,
-            orientation="horizontal",
-            disabled=False,
-            readout=True,
-            readout_format=".2f",
-            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="damping coefficient",
-        )
-        self.slider_d = slider_d
-
         slider_c = widgets.FloatSlider(
-            value=self.default_c,
-            min=A1_U2_DEFAULT_C_MIN,
-            max=A1_U2_DEFAULT_C_MAX,
-            step=0.1,
+            value=A2_U2_C_DEFAULT,
+            min=A2_U2_C_MIN,
+            max=A2_U2_C_MAX,
+            step=0.01,
             description="c",
-            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".2f",
+            readout_format=".4f",
             layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="spring constant",
         )
         self.slider_c = slider_c
 
-        slider_m = widgets.FloatSlider(
-            value=A1_U2_DEFAULT_M,
-            min=A1_U2_DEFAULT_M_MIN,
-            max=A1_U2_DEFAULT_M_MAX,
-            step=0.1,
-            description="m",
-            continuous_update=True,
+        slider_d = widgets.FloatSlider(
+            value=A2_U2_D_DEFAULT,
+            min=A2_U2_D_MIN,
+            max=A2_U2_D_MAX,
+            step=0.01,
+            description="d",
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
+            readout_format=".4f",
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
+        )
+        self.slider_d = slider_d
+
+        slider_ja = widgets.FloatSlider(
+            value=A2_U2_J_A_DEFAULT,
+            min=A2_U2_J_A_MIN,
+            max=A2_U2_J_A_MAX,
+            step=0.01,
+            description="jₐ",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".2f",
             layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="mass",
         )
-        self.slider_m = slider_m
+        self.slider_ja = slider_ja
 
-        # starting conditions sliders
-        slider_v = widgets.FloatSlider(
-            value=A1_U2_START_VELOCITY_DEFAULT,
-            min=A1_U2_START_VELOCITY_MIN,
-            max=A1_U2_START_VELOCITY_MAX,
-            step=0.1,
-            description="v₀",
-            continuous_update=True,
+        slider_L = widgets.FloatSlider(
+            value=A2_U2_L_DEFAULT,
+            min=A2_U2_L_MIN,
+            max=A2_U2_L_MAX,
+            step=0.01,
+            description="L",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-9%", width="88%", display="flex"),
-            tooltip="initial velocity",
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
-        self.slider_v = slider_v
+        self.slider_L = slider_L
 
-        slider_defl = widgets.FloatSlider(
-            value=A1_U2_START_DEFLECTION_DEFAULT,
-            min=A1_U2_START_DEFLECTION_MIN,
-            max=A1_U2_START_DEFLECTION_MAX,
-            step=0.1,
-            description="defl₀",
-            continuous_update=True,
+        slider_u_hat = widgets.FloatSlider(
+            value=A2_U2_U_HAT_DEFAULT,
+            min=A2_U2_U_HAT_MIN,
+            max=A2_U2_U_HAT_MAX,
+            step=0.01,
+            description="û",
             orientation="horizontal",
             disabled=False,
             readout=True,
             readout_format=".2f",
-            layout=widgets.Layout(left="-9%", width="88%", display="flex"),
-            tooltip="initial deflection",
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
         )
-        self.slider_defl = slider_defl
+        self.slider_u_hat = slider_u_hat
+
+        slider_phi0 = widgets.FloatSlider(
+            value=A2_U2_PHI_0_DEFAULT,
+            min=A2_U2_PHI_0_MIN,
+            max=A2_U2_PHI_0_MAX,
+            step=0.01,
+            description="φ₀",
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
+            readout_format=".4f",
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
+        )
+        self.slider_phi0 = slider_phi0
+
+        slider_phi0_dot = widgets.FloatSlider(
+            value=A2_U2_PHI_0_DOT_DEFAULT,
+            min=A2_U2_PHI_0_DOT_MIN,
+            max=A2_U2_PHI_0_DOT_MAX,
+            step=0.01,
+            description="φ̇₀",
+            orientation="horizontal",
+            disabled=False,
+            readout=True,
+            readout_format=".4f",
+            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
+        )
+        self.slider_phi0_dot = slider_phi0_dot
 
         slider_omega = widgets.FloatSlider(
-            value=A1_U2_DEFAULT_OMEGA,
-            min=A1_U2_DEFAULT_OMEGA_MIN,
-            max=A1_U2_DEFAULT_OMEGA_MAX,
-            step=0.1,
-            description="ω",
-            continuous_update=True,
+            value=A2_U2_OMEGA_DEFAULT,
+            min=A2_U2_OMEGA_MIN,
+            max=A2_U2_OMEGA_MAX,
+            step=0.01,
+            description="Ω",
             orientation="horizontal",
-            disabled=True,
+            disabled=False,
             readout=True,
-            readout_format=".2f",
+            readout_format=".4f",
             layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="angular frequency of the input",
         )
         self.slider_omega = slider_omega
 
         slider_alpha = widgets.FloatSlider(
-            value=A1_U2_DEFAULT_ALPHA,
-            min=A1_U2_DEFAULT_ALPHA_MIN,
-            max=A1_U2_DEFAULT_ALPHA_MAX,
+            value=A2_U2_ALPHA_DEFAULT,
+            min=A2_U2_ALPHA_MIN,
+            max=A2_U2_ALPHA_MAX,
             step=0.01,
             description="α",
-            continuous_update=True,
             orientation="horizontal",
             disabled=False,
             readout=True,
-            readout_format=".2f",
+            readout_format=".4f",
             layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="angular acceleration of the input",
         )
         self.slider_alpha = slider_alpha
-
-        slider_f_hat = widgets.FloatSlider(
-            value=A1_U2_DEFAULT_F_HAT,
-            min=A1_U2_DEFAULT_F_HAT_MIN,
-            max=A1_U2_DEFAULT_F_HAT_MAX,
-            step=0.1,
-            description="F̂",
-            continuous_update=True,
-            orientation="horizontal",
-            disabled=False,
-            readout=True,
-            readout_format=".2f",
-            layout=widgets.Layout(left="-9%", width="90%", display="flex"),
-            tooltip="F_Hat",
-        )
-        self.slider_f_hat = slider_f_hat
 
         radio_buttons = widgets.RadioButtons(
             options=["Lineary Increasing", "Constant"],
@@ -298,25 +289,27 @@ class GUI(GUISuperclass):
         self.reset_button.on_click(self.reset_parameters)
 
         self.sliders = [
-            self.slider_d,
-            self.slider_c,
-            self.slider_v,
-            self.slider_m,
-            self.slider_defl,
-            self.slider_omega,
-            self.slider_alpha,
-            self.slider_f_hat,
+            slider_d,
+            slider_c,
+            slider_ja,
+            slider_L,
+            slider_u_hat,
+            slider_phi0,
+            slider_phi0_dot,
+            slider_omega,
+            slider_alpha,
         ]
 
         self.sliders_and_radio_buttons = [
-            self.slider_d,
-            self.slider_c,
-            self.slider_v,
-            self.slider_m,
-            self.slider_defl,
-            self.slider_omega,
-            self.slider_alpha,
-            self.slider_f_hat,
+            slider_d,
+            slider_c,
+            slider_ja,
+            slider_L,
+            slider_u_hat,
+            slider_phi0,
+            slider_phi0_dot,
+            slider_omega,
+            slider_alpha,
             self.radio_buttons,
         ]
 
@@ -327,12 +320,13 @@ class GUI(GUISuperclass):
         return (
             slider_d,
             slider_c,
-            slider_defl,
-            slider_v,
-            slider_m,
+            slider_ja,
+            slider_L,
+            slider_u_hat,
+            slider_phi0,
+            slider_phi0_dot,
             slider_omega,
             slider_alpha,
-            slider_f_hat,
             reset_button,
             radio_buttons,
         )
@@ -402,13 +396,15 @@ class GUI(GUISuperclass):
         # freeze the change of the graph
         self.freeze_change = True
 
-        self.slider_d.value = self.default_d
-        self.slider_c.value = self.default_c
-        self.slider_m.value = A1_U2_DEFAULT_M
-        self.slider_omega.value = A1_U2_DEFAULT_OMEGA
-        self.slider_alpha.value = A1_U2_DEFAULT_ALPHA
-        self.slider_defl.value = A1_U2_START_DEFLECTION_DEFAULT
-        self.slider_v.value = A1_U2_START_VELOCITY_DEFAULT
+        self.slider_d.value = A2_U2_D_DEFAULT
+        self.slider_c.value = A2_U2_C_DEFAULT
+        self.slider_ja.value = A2_U2_J_A_DEFAULT
+        self.slider_L.value = A2_U2_L_DEFAULT
+        self.slider_u_hat.value = A2_U2_U_HAT_DEFAULT
+        self.slider_phi0.value = A2_U2_PHI_0_DEFAULT
+        self.slider_phi0_dot.value = A2_U2_PHI_0_DOT_DEFAULT
+        self.slider_omega.value = A2_U2_OMEGA_DEFAULT
+        self.slider_alpha.value = A2_U2_ALPHA_DEFAULT
         self.radio_buttons.value = "Lineary Increasing"
 
         # unfreeze the change of the graph
@@ -422,6 +418,71 @@ class GUI(GUISuperclass):
         new_value = change["new"]
 
         match widget:
+            case self.slider_d:
+                self.animation_instance.d = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_c:
+                omega_0 = np.sqrt(
+                    (new_value * self.slider_L.value**2) / self.slider_ja.value
+                )
+                self.slider_omega.max = 2 * omega_0
+                self.animation_instance.c = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_ja:
+                omega_0 = np.sqrt(
+                    (self.slider_c.value * self.slider_L.value**2) / new_value
+                )
+                self.slider_omega.max = 2 * omega_0
+                self.animation_instance.j_a = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_L:
+                omega_0 = np.sqrt(
+                    (self.slider_c.value * new_value**2) / self.slider_ja.value
+                )
+                self.slider_omega.max = 2 * omega_0
+                self.animation_instance.L = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_u_hat:
+                self.animation_instance.u_hat = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_phi0:
+                new_value = np.pi * new_value / 180
+                self.animation_instance.phi_0 = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_phi0_dot:
+                self.animation_instance.phi_0_dot = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_omega:
+                if new_value == 0:
+                    temp_new_value = 0.1
+                    self.slider_alpha.max = temp_new_value
+                    self.slider_alpha.min = temp_new_value / 100
+                else:
+                    self.slider_alpha.max = new_value
+                    self.slider_alpha.min = new_value / 100
+                self.animation_instance.omega = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
+            case self.slider_alpha:
+                self.animation_instance.alpha = new_value
+                if not self.freeze_change:
+                    self.plot_manager.calc_and_plot_solutions()
+
             case self.radio_buttons:
                 self.animation_instance.mode = new_value
 
@@ -433,75 +494,6 @@ class GUI(GUISuperclass):
                     self.slider_omega.disabled = False
                     self.slider_alpha.disabled = True
 
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_d:
-                self.animation_instance.d = new_value
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_c:
-                self.animation_instance.c = new_value
-                omega_0 = np.sqrt(
-                    2 * self.animation_instance.c / (3 * self.animation_instance.m)
-                )
-                self.slider_omega.max = omega_0
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_v:
-                self.animation_instance.start_velocity = new_value
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_defl:
-                self.animation_instance.start_deflection = new_value
-
-                # delay animation redraw
-                if self._deflection_timer is not None:
-                    self._deflection_timer.cancel()
-
-                self._deflection_timer = threading.Timer(
-                    0.35, self.animation_instance._draw_first_frame
-                )
-                self._deflection_timer.start()
-
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_m:
-                self.animation_instance.m = new_value
-                omega_0 = np.sqrt(
-                    2 * self.animation_instance.c / (3 * self.animation_instance.m)
-                )
-                self.slider_omega.max = omega_0
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_omega:
-                self.animation_instance.omega = new_value
-                if self.animation_instance.omega == 0:
-                    alpha_min = 0.1
-                    alpha_max = 1
-                    self.slider_alpha.max = alpha_max
-                    self.slider_alpha.min = alpha_min
-
-                else:
-                    alpha_min = self.slider_omega.value / 100
-                    alpha_max = self.slider_omega.value / 5
-                    self.slider_alpha.max = alpha_max
-                    self.slider_alpha.min = alpha_min
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_alpha:
-                self.animation_instance.alpha = new_value
-                if not self.freeze_change:
-                    self.plot_manager.calc_and_plot_solutions()
-
-            case self.slider_f_hat:
-                self.animation_instance.f_hat = new_value
                 if not self.freeze_change:
                     self.plot_manager.calc_and_plot_solutions()
 
@@ -529,6 +521,7 @@ class GUI(GUISuperclass):
 
                 global FIRST_FRAME_CHANGE
                 # animate blob in gaph
+                # animate blob in gaph
                 self.plot_manager.update_blobs()
 
                 # animate pendulum
@@ -537,5 +530,5 @@ class GUI(GUISuperclass):
                 if FIRST_FRAME_CHANGE == False:
                     FIRST_FRAME_CHANGE = True
 
-                if new_value == A1_U2_NUM_DATA_POINTS - 1:
+                if new_value == A2_U2_NUM_DATA_POINTS - 1:
                     FIRST_FRAME_CHANGE = False

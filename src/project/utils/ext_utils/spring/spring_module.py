@@ -85,32 +85,32 @@ def draw_spring(
         clear_x (int): Size of canvas to clear it.
         clear_y (int): Size of canvas to clear it.
     """
-    with hold_canvas():
-        canvas.clear_rect(
-            clear_x,
-            clear_y,
-            canvas.width,
-            canvas.height,
+
+    canvas.clear_rect(
+        clear_x,
+        clear_y,
+        canvas.width,
+        canvas.height,
+    )
+    if np.isscalar(x_coords):
+        canvas.stroke_line(
+            spring_anker_point[0] + width_offset,
+            spring_anker_point[1] - height_offset,
+            x_coords,
+            y_coords,
         )
-        if np.isscalar(x_coords):
-            canvas.stroke_line(
-                spring_anker_point[0] + width_offset,
-                spring_anker_point[1] - height_offset,
-                x_coords,
-                y_coords,
-            )
-            canvas.stroke_line(
-                x_coords,
-                y_coords,
-                x_coords,
-                y_coords,
-            )
-        else:
-            canvas.stroke_lines(list(zip(x_coords, y_coords)))
-            index = len(x_coords) - 1
-            canvas.stroke_line(
-                x_coords[index],
-                y_coords[index],
-                x_coords[index],
-                y_coords[index],
-            )
+        canvas.stroke_line(
+            x_coords,
+            y_coords,
+            x_coords,
+            y_coords,
+        )
+    else:
+        canvas.stroke_lines(list(zip(x_coords, y_coords)))
+        index = len(x_coords) - 1
+        canvas.stroke_line(
+            x_coords[index],
+            y_coords[index],
+            x_coords[index],
+            y_coords[index],
+        )
