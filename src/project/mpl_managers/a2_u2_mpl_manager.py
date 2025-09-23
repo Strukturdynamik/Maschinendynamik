@@ -105,6 +105,55 @@ class PlotManagerA2U2(PlotManagerSuperclass):
             plt.tight_layout()
             plt.show()
 
+    def setup_bode_plot(self):
+        """
+        Set up and configure a Bode plot with magnitude and phase subplots.
+
+        Creates a Bode plot consisting of two subplots: magnitude response
+        (top) and phase response (bottom). Configures axes, creates plot lines
+        for both damped and undamped responses, and applies consistent styling.
+
+        The method also registers the figure and lines in the manager's dictionaries
+        for future updates and applies UI cleanup to remove unnecessary elements.
+        """
+        self.output_bode = widgets.Output()
+        with self.output_bode:
+            self.fig_bode = plt.figure(figsize=(5, 5))
+            self.ax_bode = self.fig_bode.add_subplot(2, 1, 1)
+            self.ax2_bode = self.fig_bode.add_subplot(2, 1, 2)
+            self.configure_axes(self.ax_bode, "", r"$\hat{F}/e$ [abs]")
+            self.configure_axes(self.ax2_bode, r"$\Omega$ / $\omega$", r"$phase$ [deg]")
+
+            (self.line_bode_1_1,) = self.ax_bode.plot(
+                [], [], linewidth=0.75, linestyle="--", color="red", label="mag"
+            )
+            (self.line_bode_1_2,) = self.ax_bode.plot(
+                [],
+                [],
+                linestyle="--",
+                color="blue",
+                alpha=0.25,
+                linewidth=0.75,
+                label="mag undamped",
+            )
+            (self.line_bode_2,) = self.ax2_bode.plot(
+                [], [], linestyle="--", linewidth=0.75, color="red"
+            )
+
+            # add figure and lines to figure_lines dict
+            self.figure_lines_dict[self.fig_bode] = [
+                self.line_bode_1_1,
+                self.line_bode_1_2,
+                self.line_bode_2,
+            ]
+
+            # remove stuff
+            self.remove_stuff()
+
+            self.ax_bode.legend()
+            plt.tight_layout()
+            plt.show()
+
     def calc_and_plot_solutions(self):
         """
         Calculate and plot initial solutions for all visualizations.
