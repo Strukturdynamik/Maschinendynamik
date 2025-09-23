@@ -12,7 +12,9 @@ This repository contains code from the Spring 2020 semester of *MCHE485: Mechani
 * [Jupyter Notebook Introduction][1]
 * [Übung 1 Aufgabe 4][2]
 * [Übung 2 Aufgabe 1][3]
+* [Übung 2 Aufgabe 2][27]
 * [Übung 3 Aufgabe 1][26]
+* [Übung 5 Aufgabe 1][28]
 * [Free Vibration][4]
 * [Interactive Free Vibration][5]
 * [Step Inputs][6]
@@ -64,3 +66,5 @@ Copyright (c) 2013–2015, Joshua Vaughan. All rights reserved.
 [24]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/Zeros_in_a_Forced_Response.ipynb
 [25]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/Two_Mass_Spring_Damper_Modal_Damping_Approx.ipynb
 [26]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a1_u3_notebook.ipynb
+[27]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a2_u2_notebook.ipynb
+[28]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a1_u5_notebook.ipynb
