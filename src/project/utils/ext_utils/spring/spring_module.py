@@ -69,8 +69,6 @@ def draw_spring(
     spring_anker_point,
     width_offset,
     height_offset,
-    clear_x,
-    clear_y,
 ):
     """Function to draw a spring.
 
@@ -85,13 +83,6 @@ def draw_spring(
         clear_x (int): Size of canvas to clear it.
         clear_y (int): Size of canvas to clear it.
     """
-
-    canvas.clear_rect(
-        clear_x,
-        clear_y,
-        canvas.width,
-        canvas.height,
-    )
     if np.isscalar(x_coords):
         canvas.stroke_line(
             spring_anker_point[0] + width_offset,

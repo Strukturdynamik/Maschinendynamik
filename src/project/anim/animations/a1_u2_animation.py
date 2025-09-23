@@ -167,7 +167,7 @@ class Aufgabe1(AnimationInstance):
 
         Depending on the selected mode, two excitation types can be simulated:
         - "Constant": Constant sinusoidal excitation with fixed frequency.
-        - "Lineary Increasing": Frequency sweep with linearly increasing 
+        - "Lineary Increasing": Frequency sweep with linearly increasing
           excitation frequency.
 
         Returns:
@@ -223,7 +223,7 @@ class Aufgabe1(AnimationInstance):
         """
         Computes the Bode diagram data for the system.
 
-        This frequency response analysis illustrates how the system reacts 
+        This frequency response analysis illustrates how the system reacts
         to different excitation frequencies, both damped and undamped.
 
         Returns:
@@ -253,7 +253,7 @@ class Aufgabe1(AnimationInstance):
 
     def _animate_visual(self):
         """
-        Updates and redraws all dynamic elements of the animation 
+        Updates and redraws all dynamic elements of the animation
         for the current frame.
 
         Drawn/updated elements include:
@@ -409,8 +409,6 @@ class Aufgabe1(AnimationInstance):
                 spring_anker_point=spring_anker_point_top,
                 width_offset=0,
                 height_offset=0,
-                clear_x=0,
-                clear_y=0,
             )
 
     def _draw_first_frame(self):
@@ -519,6 +517,4 @@ class Aufgabe1(AnimationInstance):
             spring_anker_point=self.spring_anker_point_top,
             width_offset=0,
             height_offset=0,
-            clear_x=0,
-            clear_y=0,
         )

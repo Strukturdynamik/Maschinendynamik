@@ -45,6 +45,7 @@ forced vibration system with a secondary (base) excitation. It includes:
 - Providing Bode diagram and ground force analysis for frequency response
 """
 
+
 class Aufgabe1(AnimationInstance):
     def __init__(self, calculator: Any) -> None:
         super().__init__()
@@ -287,7 +288,7 @@ class Aufgabe1(AnimationInstance):
 
     def _animate_visual(self):
         """
-        Updates and redraws all dynamic elements of the animation 
+        Updates and redraws all dynamic elements of the animation
         for the current frame.
 
         Drawn/updated elements include:
@@ -406,8 +407,6 @@ class Aufgabe1(AnimationInstance):
                 spring_anker_point=spring_anker_point_top,
                 width_offset=0,
                 height_offset=0,
-                clear_x=self.canvas_width,
-                clear_y=self.canvas_height,
             )
 
             # text, only animate m
@@ -530,8 +529,6 @@ class Aufgabe1(AnimationInstance):
             spring_anker_point=spring_anker_point_top,
             width_offset=0,
             height_offset=0,
-            clear_x=self.canvas_width,
-            clear_y=self.canvas_height,
         )
 
         # === Layer 4: Text ===

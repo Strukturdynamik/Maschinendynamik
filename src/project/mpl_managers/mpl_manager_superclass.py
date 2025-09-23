@@ -6,11 +6,11 @@ from ipywidgets import widgets
 class PlotManagerSuperclass:
     """
     Abstract base class for managing plots and visualizations.
-    
+
     This class provides common functionality for creating, configuring, and updating
     matplotlib plots in an interactive environment. It serves as a foundation for
     specialized plot managers that implement specific visualization requirements.
-    
+
     Attributes:
         figure_lines_dict (dict): Dictionary mapping figures to their associated plot lines
         lines_sol_dict (dict): Dictionary mapping lines to their data (time array, solution array)
@@ -18,8 +18,8 @@ class PlotManagerSuperclass:
         animation_instance: Reference to the animation controller instance
         t (array): Time array used for plotting
 
-        The following attributes are only used if the GUI 
-        displays a Bode diagram: 
+        The following attributes are only used if the GUI
+        displays a Bode diagram:
 
         output_bode: Widget output container for Bode plot
         fig_bode: Figure object for Bode plot
@@ -85,11 +85,11 @@ class PlotManagerSuperclass:
     def setup_bode_plot(self):
         """
         Set up and configure a Bode plot with magnitude and phase subplots.
-        
+
         Creates a Bode plot consisting of two subplots: magnitude response
         (top) and phase response (bottom). Configures axes, creates plot lines
         for both damped and undamped responses, and applies consistent styling.
-        
+
         The method also registers the figure and lines in the manager's dictionaries
         for future updates and applies UI cleanup to remove unnecessary elements.
         """
@@ -150,6 +150,6 @@ class PlotManagerSuperclass:
     @abstractmethod
     def calc_and_plot_solutions(self):
         """
-        Calculate and plot the new deflection array after user input. 
+        Calculate and plot the new deflection array after user input.
         """
         pass

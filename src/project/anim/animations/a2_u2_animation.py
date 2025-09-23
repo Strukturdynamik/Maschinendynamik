@@ -61,6 +61,8 @@ class Aufgabe2(AnimationInstance):
         self.spring_canvas.line_width = 1.5
         self.still_canvas.line_width = 1.5
 
+        self.force_input_canvas.font = f"{abs_value(self.anim_canvas.width, 3)}px serif"
+
         self.rect_x = abs_value(self.anim_canvas.width, 10)
         self.rect_y = abs_value(self.anim_canvas.width, 45)
         self.rect_w = abs_value(self.anim_canvas.width, 85)
@@ -120,27 +122,6 @@ class Aufgabe2(AnimationInstance):
         self.still_canvas.fill_circle(self.bearings_x, self.bearings_y, self.bearings_r)
         self.still_canvas.stroke_circle(
             self.bearings_x, self.bearings_y, self.bearings_r
-        )
-
-        # draw arrow as force input under the spring damper element
-        draw_arrow(
-            self.force_input_canvas,
-            self.general_x,
-            self.bottom_spring_lower_bound + abs_value(self.anim_canvas.height, 6),
-            self.general_x,
-            self.bottom_spring_lower_bound,
-            arrow_length=abs_value(self.anim_canvas.width, 2),
-            base_length=abs_value(self.anim_canvas.width, 4),
-            num_base_strokes=5,
-            stroke_len=abs_value(self.anim_canvas.width / 2, 3),
-            spacing_padding=1,
-        )
-
-        self.force_input_canvas.font = f"{abs_value(self.anim_canvas.width, 3)}px serif"
-        self.force_input_canvas.fill_text(
-            "u(t)",
-            self.general_x - abs_value(self.anim_canvas.width, 1),
-            self.bottom_spring_lower_bound + abs_value(self.anim_canvas.height, 11),
         )
 
     def _calculate(self):
@@ -212,7 +193,7 @@ class Aufgabe2(AnimationInstance):
         self.rectangle_canvas.fill_style = "#bebebe"
 
         self.rectangle_canvas.clear()
-        # self.force_input_canvas.clear()
+        self.force_input_canvas.clear()
         self.spring_canvas.clear()
         with hold_canvas(self.anim_canvas):
             # draw rectangle on self.rectangle_canvas
@@ -220,7 +201,7 @@ class Aufgabe2(AnimationInstance):
                 self.rectangle_canvas, -curr_sol_top
             )
 
-            # draw spring damper element on self.force_input_canvas
+            # draw spring damper element
             # draw black circle at end of rod
             self.spring_canvas.fill_circle(
                 ankerpoint_top[0],
@@ -290,6 +271,26 @@ class Aufgabe2(AnimationInstance):
                 abs_value(self.anim_canvas.width / 4, 3),
             )
 
+            # draw arrow as force input under the spring damper element
+            draw_arrow(
+                self.force_input_canvas,
+                self.general_x,
+                mapped_value_bottom + abs_value(self.anim_canvas.height, 6),
+                self.general_x,
+                mapped_value_bottom,
+                arrow_length=abs_value(self.anim_canvas.width, 2),
+                base_length=abs_value(self.anim_canvas.width, 4),
+                num_base_strokes=5,
+                stroke_len=abs_value(self.anim_canvas.width / 2, 3),
+                spacing_padding=1,
+            )
+
+            self.force_input_canvas.fill_text(
+                "u(t)",
+                self.general_x - abs_value(self.anim_canvas.width, 1),
+                mapped_value_bottom + abs_value(self.anim_canvas.height, 11),
+            )
+
     def _draw_first_frame(self):
         first_sol_top = self.solution[DEFAULT_FRAME]
 
@@ -307,7 +308,7 @@ class Aufgabe2(AnimationInstance):
         # draw rectangle on self.rectangle_canvas
         ankerpoint_top = self.draw_rotating_angle(self.rectangle_canvas, -first_sol_top)
 
-        # draw spring damper element on self.force_input_canvas
+        # draw spring damper element
         # draw black circle at end of rod
         self.spring_canvas.fill_circle(
             ankerpoint_top[0],

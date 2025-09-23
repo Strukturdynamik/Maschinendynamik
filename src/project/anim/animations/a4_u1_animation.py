@@ -245,7 +245,7 @@ class Aufgabe4(AnimationInstance):
 
     def ghetto_spring_damper_element(self):
         """
-        Draws the spring-damper element between the moving rectangle and the 
+        Draws the spring-damper element between the moving rectangle and the
         fixed bearing for the current frame.
 
         Procedure:
@@ -267,6 +267,13 @@ class Aufgabe4(AnimationInstance):
                 -self.triangle_endpoint_y,
                 self.anim_canvas.width,
                 self.anim_canvas.height,
+            )
+
+            self.anim_canvas[2].clear_rect(
+                -self.triangle_endpoint_x,
+                -self.triangle_endpoint_y,
+                self.anim_canvas[2].width,
+                self.anim_canvas[2].height,
             )
 
             anker_point_extension = abs_value(self.anim_canvas.width, 3)
@@ -313,8 +320,8 @@ class Aufgabe4(AnimationInstance):
                 spring_anker_point=self.spring_anker_point,
                 width_offset=5,
                 height_offset=5,
-                clear_x=-self.triangle_endpoint_x,
-                clear_y=-self.triangle_endpoint_y,
+                # clear_x=-self.triangle_endpoint_x,
+                # clear_y=-self.triangle_endpoint_y,
             )
 
     def draw_rotating_angle(self, angle: float):

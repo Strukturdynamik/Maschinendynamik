@@ -1,3 +1,5 @@
 a1_u2: -2 * delta * x_p - omega_0**2 * x + b0 * f_hat * np.cos(0.5 * alpha * t**2)
 a4_u1: (x_2, -d / m * x_2 - c / m * x_1)
 a1_u3: [z_p, -2*delta*z_p - omega_0**2*z + b2*e*Omega**2*np.sin(Omega*t)]
+a2_u2: [phi_dot, -2 * delta * phi_dot - omega_0**2 * phi + b0 * u_hat * np.cos(omega * t) - b1 * u_hat * omega * np.sin(omega * t),]
+a1_u5: (s_dot, phi_dot, s*phi_dot**2 + g*np.cos(phi) - c/m*(s-s_0), -(m*g*s*np.sin(phi) + 2*m*s*s_dot*phi_dot)/(J_s + m*s**2))
