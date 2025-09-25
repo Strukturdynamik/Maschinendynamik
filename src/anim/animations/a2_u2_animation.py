@@ -205,7 +205,7 @@ class Aufgabe2(AnimationInstance):
         )
         return omega_vec, omega_0, mag, mag_undamped, phase
 
-    def _animate_visual(self):
+    def animate_visual(self):
         """
         Draw one frame of the animation, including:
           - Rotating rod
@@ -320,7 +320,7 @@ class Aufgabe2(AnimationInstance):
                 mapped_value_bottom + abs_value(self.anim_canvas.height, 11),
             )
 
-    def _draw_first_frame(self):
+    def draw_first_frame(self):
         """
         Draw the initial (static) frame of the system before animation.
         """

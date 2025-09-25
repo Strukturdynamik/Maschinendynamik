@@ -1,13 +1,7 @@
 
 ### Development Set Up
 
-# Command prompt (cmd) Guide
-![alt text](imgs/cmd.png)
-![alt text](imgs/cmd_1.png)
-![alt text](imgs/cmd_2.png)
-
 # Set Up
-
 Set up of the development environment for the future development of the Jupyter Notebooks.
 
 To set up and acitvate the virtual environment for this project, follow these steps:

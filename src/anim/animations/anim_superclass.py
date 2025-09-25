@@ -21,7 +21,7 @@ class AnimationInstance:
         # self._observer = None
 
     @abstractmethod
-    def _animate_visual(self):
+    def animate_visual(self):
         """
         Render the animation step for the current frame.
 
@@ -41,7 +41,7 @@ class AnimationInstance:
         pass
 
     @abstractmethod
-    def _draw_first_frame(self):
+    def draw_first_frame(self):
         """
         Draw the initial frame of the animation.
 

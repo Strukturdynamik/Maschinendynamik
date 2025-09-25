@@ -191,7 +191,7 @@ class Aufgabe4(AnimationInstance):
         self.triangle_endpoint_y = self.triangle_endpoint_y_v
         self.mid_point = self.triangle_endpoint_x_h
 
-    def _draw_first_frame(self):
+    def draw_first_frame(self):
         """
         Renders the very first frame of the animation.
 
@@ -230,7 +230,7 @@ class Aufgabe4(AnimationInstance):
         self.solution = solution
         return solution
 
-    def _animate_visual(self):
+    def animate_visual(self):
         """
         Updates the dynamic animation for the current frame.
 

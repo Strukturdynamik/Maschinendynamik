@@ -146,7 +146,7 @@ class GUI(GUISuperclass):
         # draw inital visual
         self.animation_instance._initial_visual()
         # draw first frame
-        self.animation_instance._draw_first_frame()
+        self.animation_instance.draw_first_frame()
 
     def make_parameter_control_elements(self) -> widgets:
 
@@ -463,7 +463,7 @@ class GUI(GUISuperclass):
                     self._deflection_timer.cancel()
 
                 self._deflection_timer = threading.Timer(
-                    0.35, self.animation_instance._draw_first_frame
+                    0.35, self.animation_instance.draw_first_frame
                 )
                 self._deflection_timer.start()
 
@@ -533,7 +533,7 @@ class GUI(GUISuperclass):
 
                 # animate pendulum
                 self.animation_instance.frame = new_value
-                self.animation_instance._animate_visual()
+                self.animation_instance.animate_visual()
                 if FIRST_FRAME_CHANGE == False:
                     FIRST_FRAME_CHANGE = True
 

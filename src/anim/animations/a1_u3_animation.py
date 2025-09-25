@@ -285,7 +285,7 @@ class Aufgabe1(AnimationInstance):
 
         return Omega_vec, omega_0, mag, phase
 
-    def _animate_visual(self):
+    def animate_visual(self):
         """
         Updates and redraws all dynamic elements of the animation
         for the current frame.
@@ -415,7 +415,7 @@ class Aufgabe1(AnimationInstance):
                 mapped_curr_pos + self.rect_h / 2 + abs_value(self.canvas_height, 2),
             )
 
-    def _draw_first_frame(self):
+    def draw_first_frame(self):
         """
         Renders the first static frame of the animation.
 
