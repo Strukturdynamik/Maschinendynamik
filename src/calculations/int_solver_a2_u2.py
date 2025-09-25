@@ -56,7 +56,7 @@ class IntSolverAufgabe2Uebung2:
 
         # bode-values
         _, mag, phase = signal.bode(G, omega_vec)
-        mag = 10 ** (mag / 20)  # Umrechnung von dB auf abs
+        mag = 10 ** (mag / 20)
 
         G_undamped = signal.TransferFunction([0, 0, b0], [1, 0, omega_0**2])
         _, mag_undamped, phase_undamped = signal.bode(G_undamped, omega_vec)

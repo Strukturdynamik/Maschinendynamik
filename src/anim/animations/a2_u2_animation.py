@@ -1,10 +1,8 @@
-from typing import Any, List
+from typing import Any
 import numpy as np
-import time
-import os
 import math
-from ipycanvas import MultiCanvas, hold_canvas
-from src.project.utils.helper import (
+from ipycanvas import hold_canvas
+from src.utils.helper import (
     abs_value,
     map_value,
     draw_line_with_strokes,
@@ -14,7 +12,7 @@ from src.project.utils.helper import (
 )
 from .anim_superclass import AnimationInstance
 from ...calculations.int_solver_a2_u2 import IntSolverAufgabe2Uebung2
-from src.project.utils.ext_utils.spring import spring_module
+from src.utils.ext_utils.spring import spring_module
 
 from ...utils.constants import (
     DEFAULT_FRAME,
@@ -33,6 +31,13 @@ from ...utils.constants import (
 
 class Aufgabe2(AnimationInstance):
     def __init__(self, calculator: Any) -> None:
+        """
+        Initialize the simulation with default constants and solver.
+
+        Args:
+            calculator (Any): Optional custom calculator. Defaults to
+                              `IntSolverAufgabe2Uebung2`.
+        """
         super().__init__()
         self.calculator: Any = calculator
         self.calculator = IntSolverAufgabe2Uebung2()
@@ -51,6 +56,10 @@ class Aufgabe2(AnimationInstance):
         self.spring_nodes = 20
 
     def set_vars_and_coordinates(self):
+        """
+        Initialize drawing canvases and calculate key coordinates
+        (rod, bearings, spring anchor points).
+        """
         self.force_input_canvas = self.anim_canvas[0]
         self.rectangle_canvas = self.anim_canvas[1]
         self.spring_canvas = self.anim_canvas[2]
@@ -87,6 +96,9 @@ class Aufgabe2(AnimationInstance):
         )
 
     def _initial_visual(self):
+        """
+        Draw the static base setup (supports, ground lines, bearings).
+        """
         self.still_canvas.fill_style = "#FFFFFF"
 
         # draw line with strokes
@@ -125,7 +137,16 @@ class Aufgabe2(AnimationInstance):
         )
 
     def _calculate(self):
+        """
+        Perform numerical integration of the system for the chosen mode.
 
+        Modes:
+            - "Constant": excitation with constant frequency `omega`
+            - "Lineary Increasing": excitation with frequency ramping (factor `alpha`)
+
+        Returns:
+            tuple: (solution array, excitation array)
+        """
         # Dauerlauf
         if self.mode == "Constant":
             if self.omega == 0:
@@ -173,12 +194,24 @@ class Aufgabe2(AnimationInstance):
         return self.solution, self.anregung_sol
 
     def calc_bode_diagram(self):
+        """
+        Compute the Bode diagram for the system (frequency response).
+
+        Returns:
+            tuple: (omega_vec, omega_0, magnitude, magnitude_undamped, phase)
+        """
         omega_vec, omega_0, mag, mag_undamped, phase = self.calculator.calc_bode(
             self.t, self.d, self.c, self.L, self.j_a
         )
         return omega_vec, omega_0, mag, mag_undamped, phase
 
     def _animate_visual(self):
+        """
+        Draw one frame of the animation, including:
+          - Rotating rod
+          - Spring-damper element
+          - Force input with arrow
+        """
         curr_sol_top = self.solution[self.frame]
 
         curr_sol_bottom = self.anregung_sol[self.frame]
@@ -220,10 +253,6 @@ class Aufgabe2(AnimationInstance):
                 daempfer_fork_width=abs_value(self.anim_canvas.width, 3),
                 direction="vertical",
             )
-
-            # ankerpoint_bottom = (self.rect_x + self.rect_w, self.rect_y + self.rect_h + abs_value(self.anim_canvas.height, 30))
-
-            # force_input_point = (ankerpoint_top[0], mapped_value)
             anker_point_bottom = [
                 self.general_x,
                 mapped_value_bottom,
@@ -266,8 +295,8 @@ class Aufgabe2(AnimationInstance):
 
             # draw force input under the spring damper element
             self.spring_canvas.fill_circle(
-                self.general_x,  # force_input_point[0],
-                mapped_value_bottom,  # force_input_point[1],
+                self.general_x,
+                mapped_value_bottom,
                 abs_value(self.anim_canvas.width / 4, 3),
             )
 
@@ -292,6 +321,9 @@ class Aufgabe2(AnimationInstance):
             )
 
     def _draw_first_frame(self):
+        """
+        Draw the initial (static) frame of the system before animation.
+        """
         first_sol_top = self.solution[DEFAULT_FRAME]
 
         first_sol_bottom = self.anregung_sol[DEFAULT_FRAME]

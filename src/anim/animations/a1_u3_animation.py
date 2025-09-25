@@ -1,6 +1,6 @@
 import math
-from typing import Any, List
-from ipycanvas import hold_canvas, MultiCanvas
+from typing import Any
+from ipycanvas import hold_canvas
 import numpy as np
 from scipy import signal as signal
 
@@ -8,7 +8,6 @@ from ...utils.helper import (
     abs_value,
     map_value,
     draw_line_with_strokes,
-    draw_arrow,
     ghetto_feder_daempfer_element_top,
     ghetto_feder_daempfer_element_bottom,
 )
