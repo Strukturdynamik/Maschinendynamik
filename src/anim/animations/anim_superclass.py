@@ -7,10 +7,10 @@ class AnimationInstance:
     """
     Abstract base class for animation instances that visualize oscillating systems.
 
-    This class defines a common interface for building animations. 
-    Subclasses must implement methods to compute system dynamics, 
-    draw static elements, render the first frame, and handle 
-    the continuous animation process. 
+    This class defines a common interface for building animations.
+    Subclasses must implement methods to compute system dynamics,
+    draw static elements, render the first frame, and handle
+    the continuous animation process.
     """
 
     def __init__(self) -> None:
@@ -25,7 +25,7 @@ class AnimationInstance:
         """
         Render the animation step for the current frame.
 
-        Updates the canvas with the system's evolving state, 
+        Updates the canvas with the system's evolving state,
         based on previously computed solutions.
         """
         pass
@@ -35,7 +35,7 @@ class AnimationInstance:
         """
         Compute the solution for the system's dynamics.
 
-        This typically involves numerical integration or 
+        This typically involves numerical integration or
         evaluation of the model using user-defined parameters.
         """
         pass
@@ -45,7 +45,7 @@ class AnimationInstance:
         """
         Draw the initial frame of the animation.
 
-        Called once before the animation begins, 
+        Called once before the animation begins,
         to visualize the system in its starting state.
         """
         pass
@@ -55,8 +55,8 @@ class AnimationInstance:
         """
         Draw all static elements of the visualization.
 
-        Executed during setup to render reference structures 
-        such as axes, anchor points, labels, or other 
+        Executed during setup to render reference structures
+        such as axes, anchor points, labels, or other
         non-changing components.
         """
         pass

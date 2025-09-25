@@ -8,6 +8,7 @@ from .mpl_manager_superclass import PlotManagerSuperclass
 See Superclass for additional documentation.
 """
 
+
 class PlotManagerA1U2(PlotManagerSuperclass):
     def __init__(self, animation_instance):
         self.animation_instance = animation_instance
@@ -28,11 +29,11 @@ class PlotManagerA1U2(PlotManagerSuperclass):
     def setup_deflection_plot(self):
         """
         Set up and configure the deflection plot with dual y-axes.
-        
+
         Creates a figure with two y-axes:
         - Primary y-axis (left): Shows system deflection in meters
         - Secondary y-axis (right): Shows force input in Newtons
-        
+
         Configures plot lines for both deflection and force, sets up appropriate
         labels and styling, and registers all visual elements in the manager's
         dictionaries for future updates.
@@ -107,7 +108,7 @@ class PlotManagerA1U2(PlotManagerSuperclass):
     def calc_and_plot_solutions(self):
         """
         Calculate and plot initial solutions for all visualizations.
-        
+
         This method:
         1. Calculates deflection and force solutions from the animation instance
         2. Calculates Bode diagram data (frequency response)
@@ -156,11 +157,11 @@ class PlotManagerA1U2(PlotManagerSuperclass):
     def update_axes_limits(self, sol_deflection, mag):
         """
         Update axes limits based on current data ranges.
-        
+
         Adjusts the y-axis limits for all plots to ensure proper visualization
         of the current data with appropriate margins. Also triggers automatic
         scaling for all axes to accommodate any data changes.
-        
+
         Args:
             sol_deflection (array): Deflection solution data
             sol_force (array): Force input data (not directly used but maintained for interface consistency)

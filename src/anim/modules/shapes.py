@@ -132,7 +132,7 @@ class Spring(Shape):
     """
     Spring shape implementation.
 
-    A spring is drawn between a start point and an endpoint, with a 
+    A spring is drawn between a start point and an endpoint, with a
     configurable number of coils (nodes) and width.
     """
 

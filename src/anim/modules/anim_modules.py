@@ -16,10 +16,11 @@ class Shape:
     - Triangle (defined by points A, B, C)
     - Spring (defined by start, end, number of nodes, and width)
 
-    This class provides a flexible initializer that sets attributes 
-    based on the given parameters. Subclasses must implement the 
+    This class provides a flexible initializer that sets attributes
+    based on the given parameters. Subclasses must implement the
     `draw` method to define their own rendering behavior.
     """
+
     def __init__(
         self,
         center: Tuple[int, int] | Any = None,

@@ -2,9 +2,9 @@
 ### Development Set Up
 
 # Command prompt (cmd) Guide
-![alt text](cmd.png)
-![alt text](cmd_1.png)
-![alt text](cmd_2.png)
+![alt text](imgs/cmd.png)
+![alt text](imgs/cmd_1.png)
+![alt text](imgs/cmd_2.png)
 
 # Set Up
 

@@ -138,9 +138,9 @@ def ghetto_feder_daempfer_element_top(
     top_to_bottom=True,  # New parameter
 ):
     """Draw a simplified spring-damper top element for mechanical diagrams.
-    
+
     Creates a fork and damper assembly commonly used in suspension system diagrams.
-    
+
     Args:
         canvas: Canvas to draw on
         anker_point_top: Anchor point coordinates (x, y)
@@ -151,10 +151,10 @@ def ghetto_feder_daempfer_element_top(
         daempfer_fork_width: Damper fork width
         direction: Orientation - "vertical", "left_to_right", or "right_to_left"
         top_to_bottom: For vertical direction, controls orientation (default: top-to-bottom)
-    
+
     Returns:
         Spring anchor point coordinates for connecting spring elements
-    
+
     Raises:
         ValueError: For invalid direction
         NotImplementedError: For right_to_left direction (not implemented)
@@ -301,9 +301,9 @@ def ghetto_feder_daempfer_element_bottom(
     top_to_bottom=True,
 ):
     """Draw a simplified spring-damper bottom element for mechanical diagrams.
-    
+
     Creates the bottom part of a suspension damper assembly.
-    
+
     Args:
         canvas: Canvas to draw on
         anker_point_bottom: Bottom anchor point coordinates
@@ -313,14 +313,14 @@ def ghetto_feder_daempfer_element_bottom(
         daempfer_width: Damper width
         direction: Orientation - "vertical", "left_to_right", or "right_to_left"
         top_to_bottom: For vertical direction, controls orientation
-    
+
     Returns:
         Bottom fork connection point coordinates
-    
+
     Raises:
         ValueError: For invalid direction
     """
-    
+
     if direction == "left_to_right":
         bottom_fork_middle = [
             anker_point_bottom[0] - bottom_fork_extension,

@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.integrate import odeint
 
+
 class IntSolverAufgabe1Uebung2:
     def __init__(self) -> None:
         return None

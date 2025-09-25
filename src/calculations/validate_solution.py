@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def validate_solution(solution, correct_solution, relative_threshold=0.05):
     """Validates the student's solution against the correct solution.
 

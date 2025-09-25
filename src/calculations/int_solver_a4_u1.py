@@ -3,11 +3,11 @@ from scipy.integrate import odeint
 from scipy import signal as signal
 
 """
-This module provides numerical solvers for integrating differential equations 
-associated with oscillatory systems. 
+This module provides numerical solvers for integrating differential equations
+associated with oscillatory systems.
 
-Each solver class represents a specific exercise or scenario and implements 
-the corresponding state-space formulations. The solutions can then be used 
+Each solver class represents a specific exercise or scenario and implements
+the corresponding state-space formulations. The solutions can then be used
 for visualization in graphs and animations.
 """
 
