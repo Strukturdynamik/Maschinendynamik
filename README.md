@@ -14,6 +14,7 @@ This repository contains code from the Spring 2020 semester of *MCHE485: Mechani
 * [Übung 2 Aufgabe 1][3]
 * [Übung 2 Aufgabe 2][27]
 * [Übung 3 Aufgabe 1][26]
+* [Übung 5 Aufgabe 1][28]
 * [Free Vibration][4]
 * [Interactive Free Vibration][5]
 * [Step Inputs][6]
