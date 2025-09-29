@@ -67,4 +67,4 @@ Copyright (c) 2013–2015, Joshua Vaughan. All rights reserved.
 [25]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/Two_Mass_Spring_Damper_Modal_Damping_Approx.ipynb
 [26]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a1_u3_notebook.ipynb
 [27]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a2_u2_notebook.ipynb
-[28]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a1_u5_notebook.ipynb
+[28]: https://mybinder.org/v2/gh/Strukturdynamik/Technische-Mechanik/HEAD?labpath=Jupyter%20Notebooks/a1_u5_notebook_unfinished.ipynb
